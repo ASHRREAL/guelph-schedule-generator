@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - GryphPlan</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .error-container {
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .error-header {
+            padding: 3rem 2rem 2rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        .error-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .error-icon.warning {
+            background: linear-gradient(135deg, var(--warning-color), #d97706);
+        }
+
+        .error-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .error-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .error-body {
+            padding: 2rem;
+        }
+
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .error-message.warning {
+            background: #fffbeb;
+            border-color: #fed7aa;
+        }
+
+        .error-details {
+            font-weight: 600;
+            color: var(--danger-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .error-details.warning {
+            color: var(--warning-color);
+        }
+
+        .error-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .invalid-courses {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .course-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .course-badge {
+            background: var(--danger-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .suggestions {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .suggestions-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .suggestion-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .suggestion-list li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .suggestion-list li:before {
+            content: "💡";
+            margin-right: 0.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #3b82f6 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-outline-secondary {
+            border: 2px solid var(--text-secondary);
+            color: var(--text-secondary);
+            background: transparent;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-outline-secondary:hover {
+            background: var(--text-secondary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            padding: 1.5rem 2rem;
+            background: rgba(248, 250, 252, 0.5);
+            border-top: 1px solid rgba(226, 232, 240, 0.5);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .error-container {
+                margin: 1rem;
+                border-radius: 16px;
+            }
+
+            .error-header {
+                padding: 2rem 1.5rem 1.5rem;
+            }
+
+            .error-title {
+                font-size: 1.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-primary, .btn-outline-secondary {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-header">
+            {% if error_code == "Course_Not_Available" %}
+                <div class="error-icon warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h1 class="error-title">Courses Not Found</h1>
+                <p class="error-subtitle">Some of the courses you entered are not available</p>
+            {% elif error_code == "No_Course_Entered" %}
+                <div class="error-icon">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <h1 class="error-title">No Courses Entered</h1>
+                <p class="error-subtitle">Please enter at least one course code</p>
+            {% elif error_code == "Invalid_Times" %}
+                <div class="error-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h1 class="error-title">Invalid Time Range</h1>
+                <p class="error-subtitle">Your earliest time must be before your latest time</p>
+            {% elif error_code == "No_Combinations" %}
+                <div class="error-icon">
+                    <i class="fas fa-calendar-times"></i>
+                </div>
+                <h1 class="error-title">No Valid Schedules</h1>
+                <p class="error-subtitle">No schedule combinations could be found</p>
+            {% else %}
+                <div class="error-icon">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <h1 class="error-title">Something Went Wrong</h1>
+                <p class="error-subtitle">An unexpected error occurred</p>
+            {% endif %}
+        </div>
+
+        <div class="error-body">
+            {% if error_code == "Course_Not_Available" %}
+                <div class="error-message warning">
+                    <div class="error-details warning">
+                        <i class="fas fa-exclamation-circle"></i>
+                        The following courses were not found:
+                    </div>
+                    <div class="invalid-courses">
+                        <div class="course-list">
+                            {% for course in invalid_courses %}
+                                <span class="course-badge">{{ course }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="error-description">
+                        These courses may not be offered in the selected semester, or they might be entered incorrectly.
+                    </div>
+                </div>
+
+                <div class="suggestions">
+                    <div class="suggestions-title">
+                        <i class="fas fa-lightbulb"></i>
+                        Suggestions to fix this:
+                    </div>
+                    <ul class="suggestion-list">
+                        <li>Double-check the course codes for typos</li>
+                        <li>Verify the courses are offered in the selected semester</li>
+                        <li>Use the correct format: CIS*2750, CIS 2750, or CIS2750</li>
+                        <li>Try searching for the course on WebAdvisor first</li>
+                        <li>Remove the invalid courses and try again</li>
+                    </ul>
+                </div>
+
+            {% elif error_code == "No_Course_Entered" %}
+                <div class="error-message">
+                    <div class="error-details">
+                        <i class="fas fa-info-circle"></i>
+                        Course input is required
+                    </div>
+                    <div class="error-description">
+                        You need to enter at least one course code to generate a schedule.
+                    </div>
+                </div>
+
+                <div class="suggestions">
+                    <div class="suggestions-title">
+                        <i class="fas fa-lightbulb"></i>
+                        How to enter courses:
+                    </div>
+                    <ul class="suggestion-list">
+                        <li>Enter courses like: CIS*2750, MATH*1200, PHYS*1010</li>
+                        <li>Separate multiple courses with commas</li>
+                        <li>Formats accepted: CIS*2750, CIS 2750, or CIS2750</li>
+                        <li>Make sure courses are offered in your selected semester</li>
+                    </ul>
+                </div>
+
+            {% elif error_code == "Invalid_Times" %}
+                <div class="error-message">
+                    <div class="error-details">
+                        <i class="fas fa-clock"></i>
+                        Time constraint error
+                    </div>
+                    <div class="error-description">
+                        Your earliest time must be before your latest time. Please check your time preferences.
+                    </div>
+                </div>
+
+                <div class="suggestions">
+                    <div class="suggestions-title">
+                        <i class="fas fa-lightbulb"></i>
+                        How to fix this:
+                    </div>
+                    <ul class="suggestion-list">
+                        <li>Make sure your earliest time is before your latest time</li>
+                        <li>Leave both fields blank if you have no time preferences</li>
+                        <li>Use 24-hour format or ensure AM/PM is correct</li>
+                        <li>Example: Earliest 9:00 AM, Latest 5:00 PM</li>
+                    </ul>
+                </div>
+
+            {% elif error_code == "No_Combinations" %}
+                <div class="error-message">
+                    <div class="error-details">
+                        <i class="fas fa-calendar-times"></i>
+                        No valid schedule combinations found
+                    </div>
+                    <div class="error-description">
+                        The courses you selected have conflicting times or don't fit within your time constraints.
+                    </div>
+                </div>
+
+                <div class="suggestions">
+                    <div class="suggestions-title">
+                        <i class="fas fa-lightbulb"></i>
+                        Try these solutions:
+                    </div>
+                    <ul class="suggestion-list">
+                        <li>Relax your time constraints (make time window wider)</li>
+                        <li>Remove time constraints entirely</li>
+                        <li>Try selecting different course sections</li>
+                        <li>Check if courses have overlapping times</li>
+                        <li>Consider taking some courses in a different semester</li>
+                    </ul>
+                </div>
+
+            {% else %}
+                <div class="error-message">
+                    <div class="error-details">
+                        <i class="fas fa-bug"></i>
+                        Unexpected error occurred
+                    </div>
+                    <div class="error-description">
+                        Something went wrong while processing your request. Please try again.
+                    </div>
+                </div>
+
+                <div class="suggestions">
+                    <div class="suggestions-title">
+                        <i class="fas fa-lightbulb"></i>
+                        What you can do:
+                    </div>
+                    <ul class="suggestion-list">
+                        <li>Try refreshing the page and submitting again</li>
+                        <li>Check your internet connection</li>
+                        <li>Verify your course codes are correct</li>
+                        <li>Contact support if the problem persists</li>
+                    </ul>
+                </div>
+            {% endif %}
+
+            <div class="action-buttons">
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Planner
+                </a>
+                <button onclick="window.history.back()" class="btn btn-outline-secondary">
+                    <i class="fas fa-undo"></i>
+                    Try Again
+                </button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>
+                Need help? Check out our 
+                <a href="/" style="color: var(--primary-color); text-decoration: none;">how-to guide</a>
+                or contact support.
+            </p>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

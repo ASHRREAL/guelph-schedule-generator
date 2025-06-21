@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Optimizer - University of Guelph</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Light theme */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --text-muted: #adb5bd;
+            --border-color: #dee2e6;
+            --primary-color: #0d6efd;
+            --success-color: #198754;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #0dcaf0;
+            --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+        }
+
+        [data-theme="dark"] {
+            /* Dark theme */
+            --bg-primary: #1e1e2e;
+            --bg-secondary: #313244;
+            --bg-tertiary: #45475a;
+            --text-primary: #cdd6f4;
+            --text-secondary: #bac2de;
+            --text-muted: #a6adc8;
+            --border-color: #585b70;
+            --primary-color: #89b4fa;
+            --success-color: #a6e3a1;
+            --warning-color: #f9e2af;
+            --danger-color: #f38ba8;
+            --info-color: #94e2d5;
+            --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.6);
+        }
+
+        [data-theme="dark"] .navbar {
+            background: var(--bg-secondary) !important;
+        }
+
+        [data-theme="dark"] .card {
+            background: var(--bg-secondary);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .card-header {
+            background: var(--bg-tertiary);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .form-control:focus,
+        [data-theme="dark"] .form-select:focus {
+            background: var(--bg-primary);
+            border-color: var(--primary-color);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.2rem rgba(137, 180, 250, 0.25);
+        }
+
+        [data-theme="dark"] .suggestions-dropdown {
+            background: var(--bg-secondary);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .suggestion-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        [data-theme="dark"] .time-preset-btn,
+        [data-theme="dark"] .class-time-btn {
+            background: var(--bg-tertiary);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .time-preset-btn:hover,
+        [data-theme="dark"] .class-time-btn:hover {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--bg-primary);
+        }
+
+        [data-theme="dark"] .advanced-options {
+            background: var(--bg-tertiary);
+        }
+
+        [data-theme="dark"] .text-muted,
+        [data-theme="dark"] small.text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        [data-theme="dark"] .btn-outline-secondary {
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .btn-outline-secondary:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .semester-card small {
+            color: var(--text-muted) !important;
+        }
+
+        [data-theme="dark"] .semester-card.active small {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .navbar {
+            background: var(--bg-secondary) !important;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--text-primary) !important;
+        }
+
+        .main-container {
+            background: var(--bg-primary);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            padding: 1.5rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .form-control, .form-select {
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: var(--bg-primary);
+            border-color: var(--primary-color);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 1rem 2rem rgba(13, 110, 253, 0.3);
+            filter: brightness(1.1);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .course-tag {
+            display: inline-flex;
+            align-items: center;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin: 0.25rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .course-tag .remove-btn {
+            background: none;
+            border: none;
+            color: white;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+
+        .course-tag .remove-btn:hover {
+            opacity: 1;
+        }
+
+        .course-time-constraint {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .course-time-constraint .course-code {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .time-input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .time-input-group input[type="time"] {
+            min-width: 120px;
+        }
+
+        .remove-constraint-btn {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .remove-constraint-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .time-preset-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .time-preset-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .class-time-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .class-time-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        .class-time-btn.selected {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .time-slot-tag {
+            display: inline-flex;
+            align-items: center;
+            background: var(--success-color);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            margin: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .time-slot-tag .remove-btn {
+            background: none;
+            border: none;
+            color: white;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+
+        .time-slot-tag .remove-btn:hover {
+            opacity: 1;
+        }
+
+        .suggestion-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            color: var(--text-primary);
+        }
+
+        .suggestion-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .suggestions-dropdown {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            max-height: 300px;
+            overflow-y: auto;
+            color: var(--text-primary);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .advanced-options {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .semester-card {
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .semester-card.active {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.3);
+        }
+
+        .semester-card:hover:not(.active) {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .semester-card i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .theme-transition {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem 0;
+            }
+            
+            .course-tag {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="theme-transition">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-calendar-alt me-2"></i>
+                Schedule Optimizer
+            </a>
+            
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-warning btn-sm me-2" onclick="clearAllData()" title="Clear All Saved Data">
+                    <i class="fas fa-eraser me-1"></i>
+                    Clear Data
+                </button>
+                <button class="theme-toggle me-3" onclick="toggleTheme()" title="Toggle Dark Mode">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <!-- Header -->
+                    <div class="text-center mb-4 fade-in">
+                        <h1 class="display-5 fw-bold mb-3">
+                            <i class="fas fa-graduation-cap text-primary me-3"></i>
+                            Course Schedule Optimizer
+                        </h1>
+                        <p class="lead text-muted">Create the perfect class schedule with intelligent optimization</p>
+                    </div>
+
+                    <!-- Main Form Card -->
+                    <div class="card fade-in">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-cog me-2"></i>
+                                Schedule Configuration
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="/" id="schedule-form">
+                                <!-- Semester Selection -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-calendar me-2"></i>
+                                        Select Semester
+                                    </label>
+                                    <div class="row g-2" id="semester-selection">
+                                        <div class="col-6 col-md-4">
+                                            <div class="semester-card active" data-semester="Summer 2025">
+                                                <i class="fas fa-sun mb-2 d-block"></i>
+                                                <div class="fw-semibold">Summer 2025</div>
+                                                <small class="text-muted">Current</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 col-md-4">
+                                            <div class="semester-card" data-semester="Fall 2025">
+                                                <i class="fas fa-leaf mb-2 d-block"></i>
+                                                <div class="fw-semibold">Fall 2025</div>
+                                                <small class="text-muted">Upcoming</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 col-md-4">
+                                            <div class="semester-card" data-semester="Winter 2026">
+                                                <i class="fas fa-snowflake mb-2 d-block"></i>
+                                                <div class="fw-semibold">Winter 2026</div>
+                                                <small class="text-muted">Future</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="semester" id="selected-semester" value="Summer 2025">
+                                </div>
+
+                                <!-- Course Selection -->
+                                <div class="mb-4">
+                                    <label for="course-input" class="form-label fw-semibold">
+                                        <i class="fas fa-book me-2"></i>
+                                        Course Codes
+                                    </label>
+                                    <div class="position-relative">
+                                        <input type="text" 
+                                               id="course-input" 
+                                               name="courses[]" 
+                                               class="form-control" 
+                                               placeholder="Enter course code (e.g., CIS*2750, MATH*1200)"
+                                               autocomplete="off">
+                                        <div id="course-suggestions" class="suggestions-dropdown position-absolute w-100" style="display: none; z-index: 1000;"></div>
+                                    </div>
+                                    <div class="mt-2" id="selected-courses"></div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Press Enter after typing each course code
+                                    </small>
+                                    
+                                    <!-- Course-Specific Time Constraints -->
+                                    <div class="mt-3" id="course-time-constraints" style="display: none;">
+                                        <label class="form-label fw-semibold">
+                                            <i class="fas fa-clock me-2"></i>
+                                            Course-Specific Time Preferences
+                                        </label>
+                                        <small class="text-muted d-block mb-2">Set specific time ranges for individual courses:</small>
+                                        <div id="course-time-list"></div>
+                                        <input type="hidden" name="course_time_constraints" id="course-time-constraints-input" value="">
+                                    </div>
+                                </div>
+
+                                <!-- Time Constraints -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-clock me-2"></i>
+                                        Time Preferences (Optional)
+                                    </label>
+                                    
+                                    <!-- Quick Time Presets -->
+                                    <div class="mb-3">
+                                        <small class="text-muted d-block mb-2">Quick Presets:</small>
+                                        <div class="d-flex flex-wrap">
+                                            <button type="button" class="time-preset-btn" data-start="08:00" data-end="17:00">
+                                                <i class="fas fa-briefcase me-1"></i> Business Hours
+                                            </button>
+                                            <button type="button" class="time-preset-btn" data-start="09:00" data-end="15:00">
+                                                <i class="fas fa-coffee me-1"></i> Morning Person
+                                            </button>
+                                            <button type="button" class="time-preset-btn" data-start="11:00" data-end="19:00">
+                                                <i class="fas fa-moon me-1"></i> Night Owl
+                                            </button>
+                                            <button type="button" class="time-preset-btn" data-start="" data-end="">
+                                                <i class="fas fa-times me-1"></i> No Preference
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Time Range -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="earliest" class="form-label">
+                                                <i class="fas fa-sunrise me-1"></i> Earliest Time
+                                            </label>
+                                            <input type="time" id="earliest" name="earliest" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="latest" class="form-label">
+                                                <i class="fas fa-sunset me-1"></i> Latest Time
+                                            </label>
+                                            <input type="time" id="latest" name="latest" class="form-control">
+                                        </div>
+                                    </div>
+
+                                    <!-- Class Time Preferences -->
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">
+                                            <i class="fas fa-clock me-2"></i>
+                                            Preferred Class Times
+                                        </label>
+                                        <small class="text-muted d-block mb-2">Select your preferred time slots for classes:</small>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <button type="button" class="class-time-btn" data-time="08:30">
+                                                <i class="fas fa-sunrise me-1"></i> 8:30 AM
+                                            </button>
+                                            <button type="button" class="class-time-btn" data-time="09:30">
+                                                <i class="fas fa-sun me-1"></i> 9:30 AM
+                                            </button>
+                                            <button type="button" class="class-time-btn" data-time="10:30">
+                                                <i class="fas fa-sun me-1"></i> 10:30 AM
+                                            </button>
+                                            <button type="button" class="class-time-btn" data-time="11:30">
+                                                <i class="fas fa-sun me-1"></i> 11:30 AM
+                                            </button>
+                                            <button type="button" class="class-time-btn" data-time="12:30">
+                                                <i class="fas fa-sun me-1"></i> 12:30 PM
+                                            </button>
+                                            <button type="button" class="class-time-btn" data-time="13:30">
+                                                <i class="fas fa-sun me-1"></i> 1:30 PM
+                                            </button>
+                                            <button type="button" class="class-time-btn" data-time="14:30">
+                                                <i class="fas fa-sun me-1"></i> 2:30 PM
+                                            </button>
+                                            <button type="button" class="class-time-btn" data-time="15:30">
+                                                <i class="fas fa-sun me-1"></i> 3:30 PM
+                                            </button>
+                                            <button type="button" class="class-time-btn" data-time="16:30">
+                                                <i class="fas fa-sunset me-1"></i> 4:30 PM
+                                            </button>
+                                            <button type="button" class="class-time-btn" data-time="17:30">
+                                                <i class="fas fa-moon me-1"></i> 5:30 PM
+                                            </button>
+                                            <button type="button" class="class-time-btn" data-time="18:30">
+                                                <i class="fas fa-moon me-1"></i> 6:30 PM
+                                            </button>
+                                            <button type="button" class="class-time-btn" data-time="19:30">
+                                                <i class="fas fa-moon me-1"></i> 7:30 PM
+                                            </button>
+                                        </div>
+                                        <input type="hidden" name="preferred_times" id="preferred-times" value="">
+                                        <div class="mt-2" id="selected-time-slots"></div>
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Click to toggle preferred class time slots
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Advanced Options -->
+                                <div class="mb-4">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#advanced-options">
+                                        <i class="fas fa-cogs me-2"></i>
+                                        Advanced Options
+                                    </button>
+                                    
+                                    <div class="collapse" id="advanced-options">
+                                        <div class="advanced-options">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label for="sort-preference" class="form-label">
+                                                        Sort By:
+                                                        <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" 
+                                                           title="Choose how to prioritize your schedule results"></i>
+                                                    </label>
+                                                    <select id="sort-preference" name="sort_preference" class="form-select">
+                                                        <option value="smart_gaps" selected>Smart Gaps (Recommended)</option>
+                                                        <option value="minimal_gaps">Minimal Time Between Classes</option>
+                                                        <option value="best_gaps">Best Gaps Distribution</option>
+                                                        <option value="fewer_days">Fewer Days on Campus</option>
+                                                        <option value="early_start">Early Start Times</option>
+                                                        <option value="late_start">Late Start Times</option>
+                                                        <option value="compact">Most Compact Schedule</option>
+                                                    </select>
+                                                    <div class="form-text mt-1">
+                                                        <small id="sort-description" class="text-muted">
+                                                            Balances good gaps (30-90 min) with fewer back-to-back classes and compact daily schedules.
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="max-results" class="form-label">Max Results:</label>
+                                                    <select id="max-results" name="max_results" class="form-select">
+                                                        <option value="100">100 schedules</option>
+                                                        <option value="250">250 schedules</option>
+                                                        <option value="500" selected>500 schedules</option>
+                                                        <option value="1000">1000 schedules</option>
+                                                        <option value="2500">2500 schedules</option>
+                                                        <option value="5000">5000 schedules (Max)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary btn-lg pulse" id="generate-btn">
+                                        <i class="fas fa-magic me-2"></i>
+                                        Generate Optimal Schedules
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Loading Spinner -->
+                    <div class="loading-spinner" id="loading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div class="mt-3">
+                            <h5>Optimizing your schedule...</h5>
+                            <p class="text-muted">This may take a few moments</p>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Global variables
+        let selectedCourses = [];
+        let selectedSemester = 'Summer 2025';
+        let courseSearchTimeout;
+
+        // Storage keys
+        const STORAGE_KEYS = {
+            courses: 'scheduleOptimizer_selectedCourses',
+            semester: 'scheduleOptimizer_selectedSemester',
+            preferences: 'scheduleOptimizer_preferences',
+            timeConstraints: 'scheduleOptimizer_timeConstraints',
+            courseTimeConstraints: 'scheduleOptimizer_courseTimeConstraints'
+        };
+
+        // Load saved data on page load
+        function loadSavedData() {
+            try {
+                // Load courses
+                const savedCourses = localStorage.getItem(STORAGE_KEYS.courses);
+                if (savedCourses) {
+                    selectedCourses = JSON.parse(savedCourses);
+                    selectedCourses.forEach(course => displayCourse(course));
+                }
+
+                // Load semester
+                const savedSemester = localStorage.getItem(STORAGE_KEYS.semester);
+                if (savedSemester) {
+                    selectedSemester = savedSemester;
+                    document.getElementById('selected-semester').value = selectedSemester;
+                    // Update active semester card
+                    document.querySelectorAll('.semester-card').forEach(card => {
+                        card.classList.toggle('active', card.dataset.semester === selectedSemester);
+                    });
+                }
+
+                // Load time preferences
+                const savedTimeConstraints = localStorage.getItem(STORAGE_KEYS.timeConstraints);
+                if (savedTimeConstraints) {
+                    const constraints = JSON.parse(savedTimeConstraints);
+                    if (constraints.earliest) document.getElementById('earliest').value = constraints.earliest;
+                    if (constraints.latest) document.getElementById('latest').value = constraints.latest;
+                    if (constraints.preferredTimes) {
+                        document.getElementById('preferred-times').value = constraints.preferredTimes;
+                        // Restore selected time buttons
+                        constraints.preferredTimes.split(',').forEach(time => {
+                            if (time) {
+                                const btn = document.querySelector(`.class-time-btn[data-time="${time}"]`);
+                                if (btn) btn.classList.add('selected');
+                            }
+                        });
+                        updateSelectedTimeSlotsDisplay();
+                    }
+                }
+
+                // Load preferences
+                const savedPreferences = localStorage.getItem(STORAGE_KEYS.preferences);
+                if (savedPreferences) {
+                    const prefs = JSON.parse(savedPreferences);
+                    if (prefs.sortPreference) document.getElementById('sort-preference').value = prefs.sortPreference;
+                    if (prefs.maxResults) document.getElementById('max-results').value = prefs.maxResults;
+                    if (prefs.includeFull !== undefined) document.getElementById('include-full').checked = prefs.includeFull;
+                    if (prefs.allowOverlap !== undefined) document.getElementById('allow-overlap').checked = prefs.allowOverlap;
+                }
+
+                // Load course-specific time constraints
+                const savedCourseConstraints = localStorage.getItem(STORAGE_KEYS.courseTimeConstraints);
+                if (savedCourseConstraints) {
+                    try {
+                        courseTimeConstraints = JSON.parse(savedCourseConstraints);
+                        document.getElementById('course-time-constraints-input').value = savedCourseConstraints;
+                        updateCourseTimeConstraints(); // Update the display
+                        console.log('Loaded course constraints:', courseTimeConstraints);
+                    } catch (error) {
+                        console.error('Error parsing saved course constraints:', error);
+                        courseTimeConstraints = {};
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error loading saved data:', error);
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEYS.courses, JSON.stringify(selectedCourses));
+                localStorage.setItem(STORAGE_KEYS.semester, selectedSemester);
+                
+                // Save time constraints
+                const timeConstraints = {
+                    earliest: document.getElementById('earliest').value,
+                    latest: document.getElementById('latest').value,
+                    preferredTimes: document.getElementById('preferred-times').value
+                };
+                localStorage.setItem(STORAGE_KEYS.timeConstraints, JSON.stringify(timeConstraints));
+
+                // Save preferences
+                const preferences = {
+                    sortPreference: document.getElementById('sort-preference').value,
+                    maxResults: document.getElementById('max-results').value,
+                    includeFull: document.getElementById('include-full').checked,
+                    allowOverlap: document.getElementById('allow-overlap').checked
+                };
+                localStorage.setItem(STORAGE_KEYS.preferences, JSON.stringify(preferences));
+
+                // Save course-specific constraints
+                localStorage.setItem(STORAGE_KEYS.courseTimeConstraints, JSON.stringify(courseTimeConstraints));
+            } catch (error) {
+                console.error('Error saving data:', error);
+            }
+        }
+
+        // Clear all saved data
+        function clearSavedData() {
+            Object.values(STORAGE_KEYS).forEach(key => {
+                localStorage.removeItem(key);
+            });
+        }
+
+        // Clear all data and reset form
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all saved data? This will reset the form to default values.')) {
+                clearSavedData();
+                
+                // Reset all form values
+                selectedCourses = [];
+                selectedSemester = 'Summer 2025';
+                courseTimeConstraints = {};
+                
+                // Reset UI
+                updateSelectedCoursesDisplay();
+                updateCourseTimeConstraints();
+                
+                // Reset semester selection
+                document.querySelectorAll('.semester-card').forEach(card => {
+                    card.classList.toggle('active', card.dataset.semester === selectedSemester);
+                });
+                document.getElementById('selected-semester').value = selectedSemester;
+                
+                // Reset time inputs
+                document.getElementById('earliest').value = '';
+                document.getElementById('latest').value = '';
+                document.getElementById('preferred-times').value = '';
+                
+                // Reset checkboxes and selects
+                document.getElementById('sort-preference').value = 'minimal_gaps';
+                document.getElementById('max-results').value = '100';
+                document.getElementById('include-full').checked = false;
+                document.getElementById('allow-overlap').checked = false;
+                
+                // Reset time buttons
+                document.querySelectorAll('.class-time-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                updateSelectedTimeSlotsDisplay();
+                
+                // Clear course input
+                document.getElementById('course-input').value = '';
+                hideSuggestions();
+                
+                alert('All data cleared successfully!');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSavedData(); // Load saved data first
+            setupEventListeners();
+            initializeTheme(); // Use consistent theme function
+            loadSemesterInfo();
+        });
+
+        // Theme management
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        // Class time button functionality
+        function setupClassTimeButtons() {
+            document.querySelectorAll('.class-time-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                    updateSelectedTimeSlotsDisplay();
+                });
+            });
+        }
+
+        function updateSelectedTimeSlotsDisplay() {
+            const selectedTimes = Array.from(document.querySelectorAll('.class-time-btn.selected'))
+                .map(btn => btn.dataset.time);
+            
+            document.getElementById('preferred-times').value = selectedTimes.join(',');
+            
+            const container = document.getElementById('selected-time-slots');
+            if (selectedTimes.length > 0) {
+                container.innerHTML = selectedTimes.map(time => `
+                    <span class="time-slot-tag">
+                        <i class="fas fa-clock me-1"></i>
+                        ${time}
+                        <button type="button" class="remove-btn" onclick="removeTimeSlot('${time}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </span>
+                `).join('');
+            } else {
+                container.innerHTML = '';
+            }
+            saveData(); // Save data after time slot change
+        }
+
+        function removeTimeSlot(time) {
+            document.querySelector(`.class-time-btn[data-time="${time}"]`).classList.remove('selected');
+            updateSelectedTimeSlotsDisplay();
+        }
+
+        // Event listeners setup
+        function setupEventListeners() {
+            // Semester selection
+            document.querySelectorAll('.semester-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.semester-card').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedSemester = this.dataset.semester;
+                    document.getElementById('selected-semester').value = selectedSemester;
+                    loadSemesterInfo();
+                    saveData(); // Save data after semester change
+                });
+            });
+
+            // Course input
+            const courseInput = document.getElementById('course-input');
+            courseInput.addEventListener('input', handleCourseInput);
+            courseInput.addEventListener('keydown', handleCourseKeydown);
+
+            // Time presets
+            document.querySelectorAll('.time-preset-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const start = this.dataset.start;
+                    const end = this.dataset.end;
+                    document.getElementById('earliest').value = start;
+                    document.getElementById('latest').value = end;
+                    saveData(); // Save data after time preset change
+                });
+            });
+
+            // Class time buttons
+            setupClassTimeButtons();
+
+            // Form submission
+            document.getElementById('schedule-form').addEventListener('submit', handleFormSubmit);
+
+            // Click outside to hide suggestions
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('#course-input') && !e.target.closest('#course-suggestions')) {
+                    hideSuggestions();
+                }
+            });
+
+            // Add auto-save for form inputs
+            ['earliest', 'latest', 'sort-preference', 'max-results', 'include-full', 'allow-overlap'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('change', saveData);
+                }
+            });
+        }
+
+        // Course input handling
+        function handleCourseInput() {
+            const query = this.value.trim().toUpperCase();
+            clearTimeout(courseSearchTimeout);
+            
+            if (query.length >= 2) {
+                courseSearchTimeout = setTimeout(() => {
+                    searchCourses(query);
+                }, 300);
+            } else {
+                hideSuggestions();
+            }
+        }
+
+        function handleCourseKeydown(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const courseCode = this.value.trim().toUpperCase();
+                if (courseCode && !selectedCourses.includes(courseCode)) {
+                    addCourse(courseCode);
+                    this.value = '';
+                    hideSuggestions();
+                }
+            }
+        }
+
+        // Course management
+        let courseTimeConstraints = {};
+
+        function displayCourse(courseCode) {
+            // This function is called when loading saved courses
+            // The actual display is handled by updateSelectedCoursesDisplay
+            updateSelectedCoursesDisplay();
+            updateCourseTimeConstraints();
+        }
+
+        function addCourse(courseCode) {
+            if (!selectedCourses.includes(courseCode)) {
+                selectedCourses.push(courseCode);
+                updateSelectedCoursesDisplay();
+                updateCourseTimeConstraints();
+                saveData(); // Save data after adding course
+            }
+        }
+
+        function removeCourse(courseCode) {
+            selectedCourses = selectedCourses.filter(c => c !== courseCode);
+            delete courseTimeConstraints[courseCode];
+            updateSelectedCoursesDisplay();
+            updateCourseTimeConstraints();
+            saveData(); // Save data after removing course
+        }
+
+        function updateSelectedCoursesDisplay() {
+            const container = document.getElementById('selected-courses');
+            container.innerHTML = selectedCourses.map(course => `
+                <span class="course-tag">
+                    <i class="fas fa-book me-1"></i>
+                    ${course}
+                    <button type="button" class="remove-btn" onclick="removeCourse('${course}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </span>
+            `).join('');
+        }
+
+        function updateCourseTimeConstraints() {
+            const container = document.getElementById('course-time-list');
+            const constraintsSection = document.getElementById('course-time-constraints');
+            
+            if (selectedCourses.length === 0) {
+                constraintsSection.style.display = 'none';
+                return;
+            }
+            
+            constraintsSection.style.display = 'block';
+            
+            container.innerHTML = selectedCourses.map(course => {
+                const constraint = courseTimeConstraints[course] || { earliest: '', latest: '' };
+                return `
+                    <div class="course-time-constraint">
+                        <div class="course-code">${course}</div>
+                        <div class="time-input-group">
+                            <label class="small">Earliest:</label>
+                            <input type="time" class="form-control form-control-sm" 
+                                   value="${constraint.earliest}" 
+                                   onchange="updateCourseTimeConstraint('${course}', 'earliest', this.value)">
+                            <label class="small">Latest:</label>
+                            <input type="time" class="form-control form-control-sm" 
+                                   value="${constraint.latest}" 
+                                   onchange="updateCourseTimeConstraint('${course}', 'latest', this.value)">
+                            <button type="button" class="remove-constraint-btn" 
+                                    onclick="clearCourseTimeConstraint('${course}')">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            updateCourseTimeConstraintsInput();
+        }
+
+        function updateCourseTimeConstraint(courseCode, type, value) {
+            if (!courseTimeConstraints[courseCode]) {
+                courseTimeConstraints[courseCode] = { earliest: '', latest: '' };
+            }
+            courseTimeConstraints[courseCode][type] = value;
+            updateCourseTimeConstraintsInput();
+            saveData(); // Save changes to localStorage
+        }
+
+        function clearCourseTimeConstraint(courseCode) {
+            courseTimeConstraints[courseCode] = { earliest: '', latest: '' };
+            updateCourseTimeConstraints();
+            saveData(); // Save changes to localStorage
+        }
+
+        function updateCourseTimeConstraintsInput() {
+            const input = document.getElementById('course-time-constraints-input');
+            input.value = JSON.stringify(courseTimeConstraints);
+        }
+
+        // Course search
+        async function searchCourses(query) {
+            try {
+                const response = await fetch(`/api/search-courses?q=${encodeURIComponent(query)}&semester=${encodeURIComponent(selectedSemester)}`);
+                const courses = await response.json();
+                displaySuggestions(courses);
+            } catch (error) {
+                console.error('Error searching courses:', error);
+            }
+        }
+
+        function displaySuggestions(courses) {
+            const container = document.getElementById('course-suggestions');
+            
+            if (courses.length === 0) {
+                hideSuggestions();
+                return;
+            }
+
+            container.innerHTML = courses.map(course => `
+                <div class="suggestion-item" onclick="selectCourse('${course.code}')">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1 me-2">
+                            <div>
+                                <strong class="text-primary">${course.code}</strong>
+                                ${course.credits ? `<span class="badge bg-info ms-2">${course.credits}</span>` : ''}
+                            </div>
+                            <div class="small fw-semibold mt-1">${course.title}</div>
+                            ${course.description ? `<div class="small text-muted mt-1">${course.description}</div>` : ''}
+                        </div>
+                        <span class="badge bg-secondary flex-shrink-0">${course.sections} sections</span>
+                    </div>
+                </div>
+            `).join('');
+
+            container.style.display = 'block';
+        }
+
+        function selectCourse(courseCode) {
+            addCourse(courseCode);
+            document.getElementById('course-input').value = '';
+            hideSuggestions();
+        }
+
+        function hideSuggestions() {
+            document.getElementById('course-suggestions').style.display = 'none';
+        }
+
+        // Semester info loading
+        async function loadSemesterInfo() {
+            // This function is kept for potential future use but doesn't display stats
+            try {
+                const response = await fetch(`/api/semester-info?semester=${encodeURIComponent(selectedSemester)}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error('Error loading semester info:', data.error);
+                    return;
+                }
+
+                console.log(`Loaded info for ${selectedSemester}:`, data);
+            } catch (error) {
+                console.error('Error loading semester info:', error);
+            }
+        }
+
+        // Form submission
+        function handleFormSubmit(e) {
+            if (selectedCourses.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one course!');
+                return;
+            }
+
+            // Update hidden input with selected courses
+            const coursesInput = document.querySelector('input[name="courses[]"]');
+            coursesInput.value = selectedCourses.join(',');
+
+            // Update course time constraints input before submission
+            updateCourseTimeConstraintsInput();
+            
+            // Debug: Log what we're sending
+            console.log('Submitting course time constraints:', courseTimeConstraints);
+            console.log('Hidden input value:', document.getElementById('course-time-constraints-input').value);
+
+            // Show loading spinner
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('generate-btn').disabled = true;
+        }
+
+        // Sort preference descriptions
+        const sortDescriptions = {
+            'smart_gaps': 'Balances good gaps (30-90 min) with fewer back-to-back classes and compact daily schedules.',
+            'minimal_gaps': 'Prioritizes schedules with the least total time between classes.',
+            'best_gaps': 'Focuses on ideal gap times (30-90 minutes) between classes for optimal study/break time.',
+            'fewer_days': 'Minimizes the number of days you need to be on campus.',
+            'early_start': 'Prioritizes schedules that start earliest in the day.',
+            'late_start': 'Prioritizes schedules that start latest in the day.',
+            'compact': 'Creates the most compact schedule by minimizing time from first to last class.'
+        };
+
+        // Update sort description when preference changes
+        function updateSortDescription() {
+            const sortSelect = document.getElementById('sort-preference');
+            const descElement = document.getElementById('sort-description');
+            const selectedValue = sortSelect.value;
+            
+            if (sortDescriptions[selectedValue]) {
+                descElement.textContent = sortDescriptions[selectedValue];
+            }
+        }
+
+        // Initialize sort description and add event listener
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSortDescription();
+            document.getElementById('sort-preference').addEventListener('change', updateSortDescription);
+            
+            // Initialize Bootstrap tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+</body>
+</html>

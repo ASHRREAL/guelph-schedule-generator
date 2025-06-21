@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Results - Schedule Optimizer</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Light theme */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --text-muted: #adb5bd;
+            --border-color: #dee2e6;
+            --primary-color: #0d6efd;
+            --success-color: #198754;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #0dcaf0;
+            --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+        }
+
+        [data-theme="dark"] {
+            /* Dark theme */
+            --bg-primary: #1e1e2e;
+            --bg-secondary: #313244;
+            --bg-tertiary: #45475a;
+            --text-primary: #cdd6f4;
+            --text-secondary: #bac2de;
+            --text-muted: #a6adc8;
+            --border-color: #585b70;
+            --primary-color: #89b4fa;
+            --success-color: #a6e3a1;
+            --warning-color: #f9e2af;
+            --danger-color: #f38ba8;
+            --info-color: #94e2d5;
+            --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .main-container {
+            padding: 1rem 0;
+            min-height: 100vh;
+        }
+
+        .header-section {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .back-button:hover {
+            background: var(--primary-color);
+            transform: translateY(-50%) translateY(-2px);
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+        }
+
+        .header-title {
+            text-align: center;
+            padding: 0 6rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .controls-section {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .schedule-card {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: all 0.2s ease;
+            margin-bottom: 1.5rem;
+            display: block; /* Show by default */
+        }
+
+        .schedule-card.hidden {
+            display: none;
+        }
+
+        .schedule-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        .schedule-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .schedule-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .schedule-number {
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .gap-time {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        .course-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .course-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .visual-schedule {
+            position: relative;
+            height: 600px;
+            display: flex;
+            background: var(--bg-secondary);
+            border-radius: 0 0 16px 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .time-column {
+            width: 70px;
+            background: linear-gradient(to bottom, var(--bg-tertiary), var(--bg-secondary));
+            border-right: 2px solid var(--border-color);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .time-marker {
+            position: absolute;
+            right: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            transform: translateY(-50%);
+            opacity: 0.9;
+            background: var(--bg-primary);
+            padding: 0.3rem 0.5rem;
+            border-radius: 6px;
+            border: 2px solid var(--border-color);
+            text-align: center;
+            min-width: 55px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .day-column {
+            flex: 1;
+            position: relative;
+            border-right: 1px solid var(--border-color);
+            min-width: 120px;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(to bottom, var(--bg-primary), var(--bg-secondary));
+        }
+
+        .day-column:last-child {
+            border-right: none;
+        }
+
+        .day-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            color: white;
+            padding: 1rem 0.5rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-bottom: 3px solid var(--border-color);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .day-content {
+            position: relative;
+            flex: 1;
+            height: calc(100% - 60px);
+            padding: 8px 4px;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 59px,
+                var(--border-color) 59px,
+                var(--border-color) 60px
+            );
+        }
+
+        .course-block {
+            position: absolute;
+            left: 6px;
+            right: 6px;
+            border-radius: 8px;
+            padding: 0.4rem 0.3rem;
+            color: white;
+            font-size: 0.65rem;
+            line-height: 1.2;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 1;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .course-block:hover {
+            transform: scale(1.05) translateY(-2px);
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .course-block.lecture {
+            background: linear-gradient(145deg, #ef4444, #dc2626);
+            border-left: 4px solid #fca5a5;
+        }
+
+        .course-block.seminar {
+            background: linear-gradient(145deg, #3b82f6, #2563eb);
+            border-left: 4px solid #93c5fd;
+        }
+
+        .course-block.lab {
+            background: linear-gradient(145deg, #10b981, #059669);
+            border-left: 4px solid #6ee7b7;
+        }
+
+        .course-info {
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            gap: 0.2rem;
+        }
+
+        .course-main {
+            flex: 1;
+        }
+
+        .course-time {
+            font-size: 0.7rem;
+            opacity: 0.95;
+            font-weight: 600;
+            text-align: right;
+            flex-shrink: 0;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-top: 0.1rem; /* Move slightly down */
+            align-self: flex-end;
+        }
+
+        /* Schedule spacing for better visual gaps */
+        .schedule-card:nth-child(3n) {
+            margin-bottom: 3rem;
+        }
+
+        .schedule-card:nth-child(5n) {
+            margin-bottom: 4rem;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 1rem;
+        }
+
+        .schedule-card:nth-child(3n)::after {
+            content: "";
+            display: block;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--border-color), transparent);
+            margin: 1rem 0;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 0.4rem;
+            margin-left: auto;
+        }
+
+        .btn-export {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-export:hover {
+            background: var(--success-color);
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* Performance and UX improvements */
+        .loading-more {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .alert-sm {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        #virtual-scroll-placeholder {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        #virtual-scroll-placeholder:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--primary-color);
+        }
+
+        .btn-outline-primary {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Adaptive button styles */
+        .btn-success.btn-sm {
+            background: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .btn-warning.btn-sm {
+            background: var(--warning-color);
+            border-color: var(--warning-color);
+            color: #000;
+        }
+
+        /* Performance indicator */
+        .performance-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            z-index: 999;
+            box-shadow: var(--shadow-lg);
+            display: none;
+        }
+
+        /* Keyboard shortcuts hint */
+        .shortcuts-hint {
+            position: fixed;
+            bottom: 60px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.7rem;
+            opacity: 0.7;
+            z-index: 998;
+            max-width: 200px;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            background: var(--bg-secondary);
+            box-shadow: var(--shadow);
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .filters-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-input {
+            width: 200px;
+        }
+
+        /* Dark theme specific styles */
+        [data-theme="dark"] .navbar {
+            background: var(--bg-secondary) !important;
+        }
+
+        [data-theme="dark"] .card {
+            background: var(--bg-secondary);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .form-control,
+        [data-theme="dark"] .form-select {
+            background: var(--bg-primary);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .form-control:focus,
+        [data-theme="dark"] .form-select:focus {
+            background: var(--bg-primary);
+            border-color: var(--primary-color);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.2rem rgba(137, 180, 250, 0.25);
+        }
+
+        [data-theme="dark"] .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-tertiary);
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Performance and UX improvements */
+        .alert-sm {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        #virtual-scroll-placeholder {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        #virtual-scroll-placeholder:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--primary-color);
+        }
+
+        .btn-outline-primary {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Adaptive button styles */
+        .btn-success.btn-sm {
+            background: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .btn-warning.btn-sm {
+            background: var(--warning-color);
+            border-color: var(--warning-color);
+            color: #000;
+        }
+
+        /* Performance indicator */
+        .performance-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            z-index: 999;
+            box-shadow: var(--shadow-lg);
+            display: none;
+        }
+
+        /* Keyboard shortcuts hint */
+        .shortcuts-hint {
+            position: fixed;
+            bottom: 60px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.7rem;
+            opacity: 0.7;
+            z-index: 998;
+            max-width: 200px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .schedule-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .visual-schedule {
+                height: 400px;
+            }
+
+            .day-column {
+                min-width: 60px;
+            }
+
+            .course-block {
+                font-size: 0.55rem;
+                padding: 0.2rem;
+            }
+
+            .time-column {
+                width: 50px;
+            }
+
+            .header-title {
+                padding: 0 4rem;
+            }
+
+            .filters-row {
+                flex-direction: column;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+        <i class="fas fa-moon" id="theme-icon"></i>
+    </button>
+
+    <div class="main-container">
+        <div class="container-fluid px-3">
+            <!-- Header Section -->
+            <div class="header-section">
+                <a href="/" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Planner</span>
+                </a>
+                
+                <div class="header-title">
+                    <h1 class="mb-2">
+                        <i class="fas fa-calendar-check text-primary"></i>
+                        Your Optimized Schedules
+                    </h1>
+                    <p class="text-muted mb-0">Found {{ combinations | length }} optimal combinations</p>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">{{ combinations | length }}</div>
+                        <div class="stat-label">Valid Schedules</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">{{ total_possible }}</div>
+                        <div class="stat-label">Total Combinations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">{{ "%.1f"|format(elapsed_time) }}s</div>
+                        <div class="stat-label">Processing Time</div>
+                    </div>
+                    <div class="stat-card">
+                        {% set start_hour = earliestAtSchool // 60 %}
+                        {% set start_minute = earliestAtSchool % 60 %}
+                        {% set end_hour = latestAtSchool // 60 %}
+                        {% set end_minute = latestAtSchool % 60 %}
+                        <div class="stat-number">
+                            {{ start_hour if start_hour == 12 else start_hour % 12 }}:{{ '%02d' | format(start_minute) }} {{ 'AM' if start_hour < 12 else 'PM' }} - 
+                            {{ end_hour if end_hour == 12 else end_hour % 12 }}:{{ '%02d' | format(end_minute) }} {{ 'AM' if end_hour < 12 else 'PM' }}
+                        </div>
+                        <div class="stat-label">Time Range</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls Section -->
+            <div class="controls-section">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label for="search-filter" class="form-label mb-0">
+                            <i class="fas fa-search me-1"></i> Search:
+                        </label>
+                        <input type="text" id="search-filter" class="form-control form-control-sm search-input" placeholder="Search by course code...">
+                    </div>
+                    <div class="filter-group">
+                        <label for="sort-filter" class="form-label mb-0">
+                            <i class="fas fa-sort me-1"></i> Sort by:
+                        </label>
+                        <select id="sort-filter" class="form-select form-select-sm">
+                            <option value="gap">Minimal Gaps</option>
+                            <option value="best-gaps">Best Gaps Distribution</option>
+                            <option value="early">Earliest Start</option>
+                            <option value="late">Latest Start</option>
+                            <option value="compact">Most Compact</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <button id="load-more-btn" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus me-1"></i> Load More (50)
+                        </button>
+                    </div>
+                    <div class="filter-group">
+                        <button id="show-all-btn" class="btn btn-outline-primary btn-sm" onclick="showAllSchedules()" style="display: none;">
+                            <i class="fas fa-expand me-1"></i> Show All
+                        </button>
+                    </div>
+                    <div class="filter-group">
+                        <button id="bulk-load-btn" class="btn btn-outline-secondary btn-sm" onclick="bulkLoadSchedules()" style="display: none;">
+                            <i class="fas fa-rocket me-1"></i> Load 500 More
+                        </button>
+                    </div>
+                    <div class="filter-group ms-auto">
+                        <button class="btn btn-success btn-sm" onclick="exportAllSchedules()">
+                            <i class="fas fa-download me-1"></i> Export All
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading indicator for sorting -->
+            <div id="sorting-loading" class="loading-more" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Sorting...</span>
+                </div>
+                <p class="mt-2">Sorting schedules...</p>
+            </div>
+
+            <!-- Schedules Container -->
+            <div id="schedules-container">
+                {% for combination in combinations %}
+                <div class="schedule-card" data-index="{{ loop.index0 }}" data-gap="{{ combination.total_time }}">
+                    <div class="schedule-header">
+                        <div class="schedule-meta">
+                            <div class="d-flex align-items-center">
+                                <div class="schedule-number">{{ loop.index }}</div>
+                                <div class="gap-time">
+                                    <i class="fas fa-clock"></i>
+                                    <span>{{ combination.total_time }} min total gaps</span>
+                                </div>
+                            </div>
+                            
+                            <div class="course-list">
+                                {% for course in combination.courses %}
+                                <span class="course-badge">{{ course.courseCode }}</span>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="export-buttons">
+                                <button class="btn btn-export" onclick="exportSchedule({{ loop.index0 }})">
+                                    <i class="fas fa-download me-1"></i> Export
+                                </button>
+                                <button class="btn btn-export" onclick="printSchedule({{ loop.index0 }})">
+                                    <i class="fas fa-print me-1"></i> Print
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Visual Schedule -->
+                    <div class="visual-schedule">
+                        <!-- Time Column -->
+                        <div class="time-column">
+                            <div class="time-header" style="height: 60px;"></div> <!-- Match day header height -->
+                            {% for hour in range(8, 23) %}
+                            <div class="time-marker" style="top: calc(60px + {{ ((hour - 8) * 36) }}px);">
+                                {{ hour if hour == 12 else hour % 12 }}{{ 'PM' if hour >= 12 else 'AM' }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Day Columns -->
+                        {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+                        {% set day_abbr = ['M', 'T', 'W', 'Th', 'F'][loop.index0] %}
+                        <div class="day-column">
+                            <div class="day-header">{{ day }}</div>
+                            <div class="day-content">
+                                {% for course in combination.courses %}
+                                    {% for schedule_item in [course.lecture, course.seminar, course.lab] %}
+                                        {% if schedule_item and day_abbr in schedule_item.days %}
+                                            {% set start_time = schedule_item.start %}
+                                            {% set finish_time = schedule_item.finish %}
+                                            {% set start_hour = start_time // 60 %}
+                                            {% set start_minute = start_time % 60 %}
+                                            {% set finish_hour = finish_time // 60 %}
+                                            {% set finish_minute = finish_time % 60 %}
+                                            
+                                            {% set day_start = 8 * 60 %}
+                                            {% set day_end = 23 * 60 %}
+                                            {% set day_duration = day_end - day_start %}
+                                            
+                                            {% set top_position = ((start_time - day_start) / day_duration) * 100 %}
+                                            {% set height = ((finish_time - start_time) / day_duration) * 100 %}
+                                            
+                                            <div class="course-block {{ schedule_item.item_type | lower }}"
+                                                 style="top: {{ top_position }}%; height: {{ height }}%;"
+                                                 title="{{ course.courseCode }} - {{ schedule_item.item_type }}">
+                                                <div class="course-info">
+                                                    <div class="course-main">
+                                                        <span class="course-code">{{ course.courseCode }} ({{ schedule_item.item_type }})</span>
+                                                    </div>
+                                                    <div class="course-time">
+                                                        {{ start_hour if start_hour == 12 else start_hour % 12 }}:{{ '%02d' % start_minute }}{{ 'AM' if start_hour < 12 else 'PM' }}-{{ finish_hour if finish_hour == 12 else finish_hour % 12 }}:{{ '%02d' % finish_minute }}{{ 'AM' if finish_hour < 12 else 'PM' }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Loading indicator -->
+            <div id="loading-more" class="loading-more" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading more schedules...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Theme management with persistence
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (icon) {
+                icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+        }
+
+        // Load theme immediately
+        loadTheme();
+
+        // Performance and UI improvements with adaptive pagination
+        let currentlyVisible = 50; // Start with more schedules  
+        let loadIncrement = 50; // Larger increments
+        let maxInitialLoad = 100; // Maximum for initial load
+        let maxTotalVisible = 1000; // Higher browser performance limit
+        let allSchedules = [];
+        let filteredSchedules = [];
+        let isVirtualScrollEnabled = false;
+        
+        // Initialize schedules data with adaptive loading
+        function initializeSchedules() {
+            allSchedules = Array.from(document.querySelectorAll('.schedule-card'));
+            filteredSchedules = [...allSchedules];
+            
+            // Adaptive loading based on total schedules
+            setupAdaptiveLoading();
+            showSchedules(currentlyVisible);
+            updateLoadMoreButton();
+        }
+
+        // Setup adaptive loading parameters based on total schedule count
+        function setupAdaptiveLoading() {
+            const totalSchedules = allSchedules.length;
+            
+            if (totalSchedules <= 100) {
+                // Small dataset - show most/all
+                currentlyVisible = Math.min(totalSchedules, 100);
+                loadIncrement = 50;
+                isVirtualScrollEnabled = false;
+            } else if (totalSchedules <= 500) {
+                // Medium dataset - moderate pagination
+                currentlyVisible = 100;
+                loadIncrement = 100;
+                isVirtualScrollEnabled = false;
+            } else if (totalSchedules <= 2000) {
+                // Large dataset - bigger chunks with virtual scroll preparation
+                currentlyVisible = 150;
+                loadIncrement = 150;
+                isVirtualScrollEnabled = false;
+                maxTotalVisible = 600; // Limit DOM elements
+            } else {
+                // Very large dataset - enable virtual scrolling
+                currentlyVisible = 100;
+                loadIncrement = 100;
+                isVirtualScrollEnabled = true;
+                maxTotalVisible = 400; // Strict DOM limit
+            }
+            
+            console.log(`Adaptive loading: ${totalSchedules} total schedules, showing ${currentlyVisible} initially, increment ${loadIncrement}`);
+        }
+
+        // Show limited number of schedules for performance with virtual scrolling support
+        function showSchedules(count) {
+            const container = document.getElementById('schedules-container');
+            
+            // Performance optimization: batch DOM operations
+            const fragment = document.createDocumentFragment();
+            const toShow = Math.min(count, maxTotalVisible);
+            
+            if (isVirtualScrollEnabled && filteredSchedules.length > maxTotalVisible) {
+                // Virtual scrolling for very large datasets
+                showSchedulesVirtual(toShow);
+                return;
+            }
+            
+            // Standard showing with performance optimizations
+            filteredSchedules.forEach((schedule, index) => {
+                if (index < toShow) {
+                    schedule.classList.remove('hidden');
+                    schedule.style.display = 'block';
+                    
+                    // Lazy load heavy visual elements only when visible
+                    if (index >= currentlyVisible - loadIncrement) {
+                        lazyLoadScheduleVisuals(schedule);
+                    }
+                } else {
+                    schedule.classList.add('hidden');
+                    schedule.style.display = 'none';
+                }
+            });
+        }
+
+        // Virtual scrolling for very large datasets
+        function showSchedulesVirtual(count) {
+            const container = document.getElementById('schedules-container');
+            
+            // Only keep visible + buffer schedules in DOM
+            const bufferSize = 20;
+            const startIndex = Math.max(0, currentlyVisible - count - bufferSize);
+            const endIndex = Math.min(filteredSchedules.length, currentlyVisible + bufferSize);
+            
+            filteredSchedules.forEach((schedule, index) => {
+                if (index >= startIndex && index < endIndex && index < count) {
+                    schedule.classList.remove('hidden');
+                    schedule.style.display = 'block';
+                    lazyLoadScheduleVisuals(schedule);
+                } else {
+                    schedule.classList.add('hidden');
+                    schedule.style.display = 'none';
+                }
+            });
+            
+            // Add placeholder for remaining schedules
+            updateVirtualScrollPlaceholder(count);
+        }
+
+        // Lazy load heavy visual elements
+        function lazyLoadScheduleVisuals(schedule) {
+            const visualSchedule = schedule.querySelector('.visual-schedule');
+            if (visualSchedule && !visualSchedule.classList.contains('loaded')) {
+                visualSchedule.classList.add('loaded');
+                // Any heavy visual computations can be done here
+            }
+        }
+
+        // Update virtual scroll placeholder
+        function updateVirtualScrollPlaceholder(visibleCount) {
+            const container = document.getElementById('schedules-container');
+            let placeholder = document.getElementById('virtual-scroll-placeholder');
+            
+            if (filteredSchedules.length > visibleCount) {
+                const remaining = filteredSchedules.length - visibleCount;
+                
+                if (!placeholder) {
+                    placeholder = document.createElement('div');
+                    placeholder.id = 'virtual-scroll-placeholder';
+                    placeholder.className = 'text-center p-4 text-muted';
+                    container.appendChild(placeholder);
+                }
+                
+                placeholder.innerHTML = `
+                    <div class="border-top pt-3">
+                        <i class="fas fa-list-ul me-2"></i>
+                        ${remaining} more schedules available
+                        <div class="small mt-1">Use filters to narrow down results or load more</div>
+                    </div>
+                `;
+            } else if (placeholder) {
+                placeholder.remove();
+            }
+        }
+
+        // Load more schedules with adaptive increment
+        function loadMoreSchedules() {
+            const previousVisible = currentlyVisible;
+            const totalFiltered = filteredSchedules.length;
+            
+            // Adaptive increment based on remaining schedules
+            let adaptiveIncrement = loadIncrement;
+            const remaining = totalFiltered - currentlyVisible;
+            
+            if (remaining <= 100) {
+                // Small remaining - load all or larger chunk
+                adaptiveIncrement = Math.min(remaining, 100);
+            } else if (remaining <= 500) {
+                // Medium remaining - larger chunks
+                adaptiveIncrement = Math.min(loadIncrement * 2, remaining);
+            } else if (currentlyVisible >= maxTotalVisible) {
+                // At DOM limit - enable virtual scroll mode
+                isVirtualScrollEnabled = true;
+                adaptiveIncrement = loadIncrement;
+            }
+            
+            currentlyVisible = Math.min(
+                currentlyVisible + adaptiveIncrement,
+                isVirtualScrollEnabled ? maxTotalVisible : totalFiltered
+            );
+            
+            // Show loading animation for better UX
+            if (adaptiveIncrement > 50) {
+                showLoadingAnimation();
+                setTimeout(() => {
+                    showSchedules(currentlyVisible);
+                    updateLoadMoreButton();
+                    hideLoadingAnimation();
+                }, 100);
+            } else {
+                showSchedules(currentlyVisible);
+                updateLoadMoreButton();
+            }
+            
+            console.log(`Loaded more: ${previousVisible} -> ${currentlyVisible} (increment: ${adaptiveIncrement})`);
+        }
+
+        // Show loading animation
+        function showLoadingAnimation() {
+            const loadingMore = document.getElementById('loading-more');
+            if (loadingMore) {
+                loadingMore.style.display = 'block';
+            }
+        }
+
+        // Hide loading animation
+        function hideLoadingAnimation() {
+            const loadingMore = document.getElementById('loading-more');
+            if (loadingMore) {
+                loadingMore.style.display = 'none';
+            }
+        }
+
+        // Update load more button with smart increment display
+        function updateLoadMoreButton() {
+            const loadMoreBtn = document.getElementById('load-more-btn');
+            const totalFiltered = filteredSchedules.length;
+            const remaining = totalFiltered - currentlyVisible;
+            
+            if (remaining <= 0) {
+                loadMoreBtn.style.display = 'none';
+                // Show completion message
+                updateVirtualScrollPlaceholder(currentlyVisible);
+                return;
+            }
+            
+            loadMoreBtn.style.display = 'block';
+            
+            // Smart increment calculation for button text
+            let nextIncrement = loadIncrement;
+            if (remaining <= 50) {
+                nextIncrement = remaining;
+            } else if (remaining <= 200) {
+                nextIncrement = Math.min(loadIncrement * 2, remaining);
+            } else if (currentlyVisible >= maxTotalVisible * 0.8) {
+                nextIncrement = Math.min(loadIncrement, remaining);
+            }
+            
+            // Update button text with context
+            if (remaining <= 50) {
+                loadMoreBtn.innerHTML = `<i class="fas fa-check-circle me-1"></i> Show All Remaining (${remaining})`;
+                loadMoreBtn.className = 'btn btn-success btn-sm';
+            } else if (isVirtualScrollEnabled || currentlyVisible >= maxTotalVisible) {
+                loadMoreBtn.innerHTML = `<i class="fas fa-layer-group me-1"></i> Load More (${nextIncrement}) - ${remaining} total remaining`;
+                loadMoreBtn.className = 'btn btn-warning btn-sm';
+            } else {
+                loadMoreBtn.innerHTML = `<i class="fas fa-plus me-1"></i> Load More (${nextIncrement})`;
+                loadMoreBtn.className = 'btn btn-primary btn-sm';
+            }
+            
+            // Add performance warning for large datasets
+            if (remaining > 1000 && !isVirtualScrollEnabled) {
+                const warning = document.getElementById('performance-warning') || createPerformanceWarning();
+                warning.style.display = 'block';
+            }
+            
+            // Update show all button
+            updateShowAllButton();
+            
+            // Update bulk load button
+            updateBulkLoadButton();
+        }
+
+        // Create performance warning element
+        function createPerformanceWarning() {
+            const warning = document.createElement('div');
+            warning.id = 'performance-warning';
+            warning.className = 'alert alert-info alert-sm mt-2';
+            warning.innerHTML = `
+                <i class="fas fa-info-circle me-1"></i>
+                <small>Large dataset detected. Consider using filters to narrow results for better performance.</small>
+            `;
+            
+            const controlsSection = document.querySelector('.controls-section');
+            controlsSection.appendChild(warning);
+            return warning;
+        }
+
+        // Show all schedules function
+        function showAllSchedules() {
+            const totalFiltered = filteredSchedules.length;
+            
+            if (totalFiltered > 2000) {
+                const confirm = window.confirm(
+                    `This will load all ${totalFiltered} schedules at once, which may slow down your browser. Continue?`
+                );
+                if (!confirm) return;
+            }
+            
+            showLoadingAnimation();
+            
+            setTimeout(() => {
+                currentlyVisible = totalFiltered;
+                isVirtualScrollEnabled = false; // Disable virtual scroll for show all
+                showSchedules(currentlyVisible);
+                updateLoadMoreButton();
+                updateShowAllButton();
+                hideLoadingAnimation();
+                
+                console.log(`Showing all ${totalFiltered} schedules`);
+            }, 100);
+        }
+
+        // Update show all button visibility
+        function updateShowAllButton() {
+            const showAllBtn = document.getElementById('show-all-btn');
+            const remaining = filteredSchedules.length - currentlyVisible;
+            
+            if (remaining > 50 && !isVirtualScrollEnabled) {
+                showAllBtn.style.display = 'block';
+            } else {
+                showAllBtn.style.display = 'none';
+            }
+        }
+        // Bulk load function for power users
+        function bulkLoadSchedules() {
+            const previousVisible = currentlyVisible;
+            const totalFiltered = filteredSchedules.length;
+            const bulkAmount = 500;
+            
+            const remaining = totalFiltered - currentlyVisible;
+            const actualLoad = Math.min(bulkAmount, remaining);
+            
+            if (actualLoad === 0) return;
+            
+            showLoadingAnimation();
+            
+            setTimeout(() => {
+                currentlyVisible = Math.min(currentlyVisible + actualLoad, totalFiltered);
+                showSchedules(currentlyVisible);
+                updateLoadMoreButton();
+                updateShowAllButton();
+                updateBulkLoadButton();
+                hideLoadingAnimation();
+                
+                console.log(`Bulk loaded: ${previousVisible} -> ${currentlyVisible} (+${actualLoad})`);
+            }, 150);
+        }
+
+        // Update bulk load button
+        function updateBulkLoadButton() {
+            const bulkLoadBtn = document.getElementById('bulk-load-btn');
+            if (!bulkLoadBtn) return;
+            
+            const remaining = filteredSchedules.length - currentlyVisible;
+            
+            if (remaining > 200 && !isVirtualScrollEnabled) {
+                const bulkAmount = Math.min(500, remaining);
+                bulkLoadBtn.innerHTML = `<i class="fas fa-rocket me-1"></i> Load ${bulkAmount} More`;
+                bulkLoadBtn.style.display = 'block';
+            } else {
+                bulkLoadBtn.style.display = 'none';
+            }
+        }
+
+        // Search functionality with async sorting for better performance
+        async function filterSchedules() {
+            const searchTerm = document.getElementById('search-filter').value.toLowerCase();
+            const sortBy = document.getElementById('sort-filter').value;
+            
+            // Show loading indicator for sorting
+            if (sortBy === 'best-gaps' || allSchedules.length > 50) {
+                document.getElementById('sorting-loading').style.display = 'block';
+                document.getElementById('schedules-container').style.opacity = '0.5';
+            }
+            
+            // Use setTimeout to allow UI to update with loading indicator
+            setTimeout(async () => {
+                try {
+                    // Filter schedules
+                    if (searchTerm) {
+                        filteredSchedules = allSchedules.filter(schedule => {
+                            const courses = Array.from(schedule.querySelectorAll('.course-badge'))
+                                .map(badge => badge.textContent.toLowerCase());
+                            return courses.some(course => course.includes(searchTerm));
+                        });
+                    } else {
+                        filteredSchedules = [...allSchedules];
+                    }
+
+                    // Sort schedules with optimized algorithm
+                    if (sortBy === 'best-gaps') {
+                        // More sophisticated gap distribution algorithm
+                        filteredSchedules.sort((a, b) => {
+                            const gapA = parseInt(a.dataset.gap);
+                            const gapB = parseInt(b.dataset.gap);
+                            
+                            // Calculate gap distribution score
+                            const scoreA = calculateGapScore(gapA);
+                            const scoreB = calculateGapScore(gapB);
+                            
+                            return scoreB - scoreA; // Higher score is better
+                        });
+                    } else {
+                        // Other sorting options
+                        filteredSchedules.sort((a, b) => {
+                            const gapA = parseInt(a.dataset.gap);
+                            const gapB = parseInt(b.dataset.gap);
+                            
+                            switch (sortBy) {
+                                case 'gap':
+                                    return gapA - gapB;
+                                case 'early':
+                                    return gapA - gapB; // Fallback to gap sorting
+                                case 'late':
+                                    return gapB - gapA;
+                                case 'compact':
+                                    return gapA - gapB;
+                                default:
+                                    return gapA - gapB;
+                            }
+                        });
+                    }
+
+                    // Reset the container order by reordering DOM elements
+                    const container = document.getElementById('schedules-container');
+                    
+                    // Temporarily hide all schedules
+                    allSchedules.forEach(schedule => {
+                        schedule.classList.add('hidden');
+                        schedule.style.display = 'none';
+                    });
+                    
+                    // Reorder DOM elements based on filtered and sorted order
+                    filteredSchedules.forEach((schedule, index) => {
+                        container.appendChild(schedule);
+                        schedule.dataset.filteredIndex = index;
+                    });
+                    
+                    // Reset pagination settings after filtering/sorting
+                    setupAdaptiveLoading();
+                    
+                    // Reset visibility count and show initial schedules
+                    const initialShow = Math.min(currentlyVisible, filteredSchedules.length);
+                    currentlyVisible = initialShow;
+                    showSchedules(currentlyVisible);
+                    updateLoadMoreButton();
+                    updateShowAllButton();
+                    updateBulkLoadButton();
+                    
+                } catch (error) {
+                    console.error('Error during filtering/sorting:', error);
+                } finally {
+                    // Hide loading indicator
+                    document.getElementById('sorting-loading').style.display = 'none';
+                    document.getElementById('schedules-container').style.opacity = '1';
+                }
+            }, 100); // Small delay to show loading indicator
+        }
+
+        // Calculate gap distribution score (higher is better)
+        function calculateGapScore(totalGap) {
+            // Ideal gap range is 30-90 minutes
+            const idealMin = 30;
+            const idealMax = 90;
+            const optimalGap = 60;
+            
+            if (totalGap >= idealMin && totalGap <= idealMax) {
+                // Within ideal range - score based on proximity to optimal
+                const proximityToOptimal = Math.abs(totalGap - optimalGap);
+                return 100 - proximityToOptimal;
+            } else if (totalGap < idealMin) {
+                // Too little gap time - penalize heavily
+                return Math.max(0, 30 - (idealMin - totalGap));
+            } else {
+                // Too much gap time - penalize moderately
+                const excess = totalGap - idealMax;
+                return Math.max(0, 50 - (excess * 0.5));
+            }
+        }
+
+        // Export functionality
+        function exportSchedule(index) {
+            const schedule = filteredSchedules[index];
+            if (!schedule) return;
+            
+            // Create a simple CSV export
+            const courses = Array.from(schedule.querySelectorAll('.course-badge'))
+                .map(badge => badge.textContent);
+            const gap = schedule.dataset.gap;
+            
+            const csvContent = "Course Code,Total Gap Time\n" + 
+                courses.map(course => `${course},${gap}`).join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `schedule_${index + 1}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function printSchedule(index) {
+            const schedule = filteredSchedules[index];
+            if (!schedule) return;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Schedule ${index + 1}</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; }
+                            .schedule { margin: 20px; }
+                            .course-badge { background: #007bff; color: white; padding: 4px 8px; border-radius: 10px; margin: 2px; display: inline-block; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="schedule">
+                            <h2>Schedule ${index + 1}</h2>
+                            ${schedule.outerHTML}
+                        </div>
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function exportAllSchedules() {
+            let csvContent = "Schedule,Course Codes,Total Gap Time\n";
+            
+            filteredSchedules.forEach((schedule, index) => {
+                const courses = Array.from(schedule.querySelectorAll('.course-badge'))
+                    .map(badge => badge.textContent);
+                const gap = schedule.dataset.gap;
+                csvContent += `${index + 1},"${courses.join(', ')}",${gap}\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'all_schedules.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Performance optimization: Debounce search and async sort
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            initializeSchedules();
+            
+            // Debounced search and filter events for better performance
+            const debouncedFilter = debounce(filterSchedules, 300);
+            document.getElementById('search-filter').addEventListener('input', debouncedFilter);
+            
+            // Sort immediately on change (no debounce needed for dropdown)
+            document.getElementById('sort-filter').addEventListener('change', filterSchedules);
+            document.getElementById('load-more-btn').addEventListener('click', loadMoreSchedules);
+            
+            // Add show all button listener
+            const showAllBtn = document.getElementById('show-all-btn');
+            if (showAllBtn) {
+                showAllBtn.addEventListener('click', showAllSchedules);
+            }
+            
+            // Add bulk load button listener  
+            const bulkLoadBtn = document.getElementById('bulk-load-btn');
+            if (bulkLoadBtn) {
+                bulkLoadBtn.addEventListener('click', bulkLoadSchedules);
+            }
+            
+            // Update button visibility on initialization
+            updateShowAllButton();
+            updateBulkLoadButton();
+            
+            // Intersection Observer for lazy loading optimization
+            const observerOptions = {
+                root: null,
+                rootMargin: '50px',
+                threshold: 0.1
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                        lazyLoadScheduleVisuals(entry.target);
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all schedule cards for smooth animations
+            document.querySelectorAll('.schedule-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                observer.observe(card);
+            });
+            
+            // Add keyboard shortcuts for power users
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 'f':
+                            e.preventDefault();
+                            document.getElementById('search-filter').focus();
+                            break;
+                        case 'a':
+                            if (e.shiftKey) {
+                                e.preventDefault();
+                                showAllSchedules();
+                            }
+                            break;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
