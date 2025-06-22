@@ -14,111 +14,97 @@
     
     <style>
         :root {
-            /* Light theme */
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --bg-tertiary: #e9ecef;
-            --text-primary: #212529;
-            --text-secondary: #6c757d;
-            --text-muted: #adb5bd;
-            --border-color: #dee2e6;
-            --primary-color: #0d6efd;
-            --success-color: #198754;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
-            --info-color: #0dcaf0;
-            --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+            /* Dark theme - Always active */
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-tertiary: #16213e;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-primary: #f7fafc;
+            --text-secondary: #e2e8f0;
+            --text-muted: #a0aec0;
+            --border-color: #2d3748;
+            --primary-color: #667eea;
+            --primary-light: #a5b4fc;
+            --success-color: #68d391;
+            --warning-color: #f6ad55;
+            --danger-color: #fc8181;
+            --info-color: #63b3ed;
+            --accent-color: #b794f6;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
         }
 
-        [data-theme="dark"] {
-            /* Dark theme */
-            --bg-primary: #1e1e2e;
-            --bg-secondary: #313244;
-            --bg-tertiary: #45475a;
-            --text-primary: #cdd6f4;
-            --text-secondary: #bac2de;
-            --text-muted: #a6adc8;
-            --border-color: #585b70;
-            --primary-color: #89b4fa;
-            --success-color: #a6e3a1;
-            --warning-color: #f9e2af;
-            --danger-color: #f38ba8;
-            --info-color: #94e2d5;
-            --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.6);
-        }
-
-        [data-theme="dark"] .navbar {
+        .navbar {
             background: var(--bg-secondary) !important;
         }
 
-        [data-theme="dark"] .card {
+        .card {
             background: var(--bg-secondary);
             border-color: var(--border-color);
         }
 
-        [data-theme="dark"] .card-header {
+        .card-header {
             background: var(--bg-tertiary);
             border-color: var(--border-color);
         }
 
-        [data-theme="dark"] .form-control:focus,
-        [data-theme="dark"] .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             background: var(--bg-primary);
             border-color: var(--primary-color);
             color: var(--text-primary);
             box-shadow: 0 0 0 0.2rem rgba(137, 180, 250, 0.25);
         }
 
-        [data-theme="dark"] .suggestions-dropdown {
+        .suggestions-dropdown {
             background: var(--bg-secondary);
             border-color: var(--border-color);
         }
 
-        [data-theme="dark"] .suggestion-item:hover {
+        .suggestion-item:hover {
             background: var(--bg-tertiary);
         }
 
-        [data-theme="dark"] .time-preset-btn,
-        [data-theme="dark"] .class-time-btn {
+        .time-preset-btn,
+        .class-time-btn {
             background: var(--bg-tertiary);
             border-color: var(--border-color);
             color: var(--text-primary);
         }
 
-        [data-theme="dark"] .time-preset-btn:hover,
-        [data-theme="dark"] .class-time-btn:hover {
+        .time-preset-btn:hover,
+        .class-time-btn:hover {
             background: var(--primary-color);
             border-color: var(--primary-color);
             color: var(--bg-primary);
         }
 
-        [data-theme="dark"] .advanced-options {
+        .advanced-options {
             background: var(--bg-tertiary);
         }
 
-        [data-theme="dark"] .text-muted,
-        [data-theme="dark"] small.text-muted {
+        .text-muted,
+        small.text-muted {
             color: var(--text-muted) !important;
         }
 
-        [data-theme="dark"] .btn-outline-secondary {
+        .btn-outline-secondary {
             color: var(--text-primary);
             border-color: var(--border-color);
         }
 
-        [data-theme="dark"] .btn-outline-secondary:hover {
+        .btn-outline-secondary:hover {
             background: var(--bg-tertiary);
             border-color: var(--border-color);
             color: var(--text-primary);
         }
 
-        [data-theme="dark"] .semester-card small {
+        .semester-card small {
             color: var(--text-muted) !important;
         }
 
-        [data-theme="dark"] .semester-card.active small {
+        .semester-card.active small {
             color: rgba(255, 255, 255, 0.8) !important;
         }
 
@@ -128,46 +114,169 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.6;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
         }
 
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(157, 123, 191, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(72, 187, 120, 0.1) 0%, transparent 50%);
+            z-index: -1;
+            opacity: 0.6;
+            animation: backgroundMove 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundMove {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-20px, -10px) scale(1.05); }
+            66% { transform: translate(20px, 10px) scale(0.95); }
+        }
+
+        /* Enhanced Navigation */
         .navbar {
-            background: var(--bg-secondary) !important;
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: var(--shadow);
+            background: rgba(26, 26, 46, 0.95) !important;
+            backdrop-filter: blur(20px);
+            border: none;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            height: 70px;
+            padding: 0;
         }
 
         .navbar-brand {
-            font-weight: 700;
+            font-weight: 800;
             color: var(--text-primary) !important;
+            font-size: 1.6rem;
+            background: var(--bg-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-right: 2rem;
         }
 
-        .main-container {
-            background: var(--bg-primary);
-            min-height: 100vh;
-            padding: 2rem 0;
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-left: auto;
         }
 
-        .card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            box-shadow: var(--shadow-lg);
-            color: var(--text-primary);
-            margin-bottom: 2rem;
+        .nav-section-btn {
+            background: none;
+            border: 2px solid transparent;
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
             overflow: hidden;
         }
 
+        .nav-section-btn.active {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .nav-section-btn:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        /* Full height layout */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 70px);
+            padding: 0;
+            margin: 0;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 100%;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Section management */
+        .app-section {
+            display: none;
+            flex: 1;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .app-section.active {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Configuration Section */
+        .config-section {
+            padding: 2rem 0;
+        }
+
+
+
+        .card {
+            background: rgba(26, 26, 46, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: var(--shadow-xl);
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
         .card-header {
-            background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+            background: transparent;
             border-bottom: 1px solid var(--border-color);
             font-weight: 600;
-            padding: 1.5rem;
+            padding: 2rem 2rem 1.5rem;
+            position: relative;
         }
 
         .card-body {
@@ -175,270 +284,687 @@
         }
 
         .form-control, .form-select {
-            background: var(--bg-primary);
+            background: var(--bg-secondary);
             border: 2px solid var(--border-color);
             color: var(--text-primary);
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            transition: all 0.3s ease;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-size: 1rem;
+            font-weight: 500;
         }
 
         .form-control:focus, .form-select:focus {
-            background: var(--bg-primary);
+            background: var(--bg-secondary);
             border-color: var(--primary-color);
             color: var(--text-primary);
-            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
             outline: none;
+            transform: translateY(-1px);
         }
 
         .form-control::placeholder {
             color: var(--text-muted);
+            font-weight: 400;
         }
 
         .form-label {
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 0.75rem;
+            font-size: 1rem;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+            background: var(--bg-gradient);
             border: none;
-            border-radius: 12px;
+            border-radius: 16px;
             font-weight: 600;
-            padding: 1rem 2.5rem;
+            padding: 1.25rem 3rem;
             font-size: 1.1rem;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 1rem 2rem rgba(13, 110, 253, 0.3);
-            filter: brightness(1.1);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 20px 40px -12px rgba(102, 126, 234, 0.4);
         }
 
         .btn-primary:active {
-            transform: translateY(-1px);
+            transform: translateY(-1px) scale(0.98);
         }
 
         .course-tag {
             display: inline-flex;
             align-items: center;
-            background: var(--primary-color);
+            background: var(--bg-gradient);
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
+            padding: 0.75rem 1.25rem;
+            border-radius: 25px;
             margin: 0.25rem;
             font-size: 0.9rem;
-            font-weight: 500;
-            animation: fadeIn 0.3s ease;
+            font-weight: 600;
+            animation: slideInScale 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: var(--shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
 
-        .course-tag .remove-btn {
-            background: none;
+        .course-tag .course-time-btn {
+            background: rgba(255, 255, 255, 0.2);
             border: none;
             color: white;
-            margin-left: 0.5rem;
+            margin-left: 0.75rem;
             cursor: pointer;
-            opacity: 0.8;
-            transition: opacity 0.2s ease;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
         }
 
-        .course-tag .remove-btn:hover {
-            opacity: 1;
+        .course-tag .course-time-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
         }
 
-        .course-time-constraint {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            animation: fadeIn 0.3s ease;
+        .course-tag .course-time-btn.has-constraints {
+            background: var(--warning-color);
+            color: white;
         }
 
-        .course-time-constraint .course-code {
+        .course-time-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(26, 26, 46, 0.95);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            padding: 1.5rem;
+            z-index: 1000;
+            display: none;
+            margin-top: 0.5rem;
+            min-width: 300px;
+            backdrop-filter: blur(20px);
+        }
+
+        .course-time-dropdown.show {
+            display: block;
+            animation: slideInScale 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .course-time-dropdown h6 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
             font-weight: 600;
-            color: var(--primary-color);
+        }
+
+        .course-time-dropdown .time-input-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .course-time-dropdown .time-input-group {
+            flex: 1;
+        }
+
+        .course-time-dropdown .time-input-group label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
             margin-bottom: 0.5rem;
         }
 
-        .time-input-group {
+        .course-time-dropdown .form-control {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .course-time-dropdown .btn-group {
             display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        .course-time-dropdown .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* Results Section Styles */
+        .results-section {
+            padding: 1rem 0;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .results-header {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideInScale 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--bg-gradient);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            animation: slideInScale 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            animation-delay: calc(var(--delay) * 0.1s);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .results-controls {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 0.25rem;
+            border: 2px solid var(--border-color);
+        }
+
+        .view-btn {
+            background: none;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .view-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .schedule-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .schedule-grid.grid-view {
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        }
+
+        .schedule-grid.list-view {
+            grid-template-columns: 1fr;
+        }
+
+        .schedule-card {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideInScale 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: calc(var(--delay) * 0.05s);
+        }
+
+        .schedule-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .schedule-rank {
+            background: var(--bg-gradient);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .schedule-score {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .course-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .course-item {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .course-code {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .course-section {
+            background: var(--info-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .schedule-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .schedule-type {
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 80px;
+        }
+
+        .schedule-time {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .schedule-days {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Enhanced loading animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 3000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+            animation: fadeInUp 0.5s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(102, 126, 234, 0.3);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 2rem;
+        }
+
+        .loading-content h4 {
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            background: var(--bg-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .loading-content p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* Success animation for when results load */
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .results-success {
+            animation: successPulse 0.6s ease;
+        }
+
+        /* Enhanced animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInScale {
+            from { 
+                opacity: 0; 
+                transform: translateY(-20px) scale(0.8); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .theme-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-light);
+        }
+
+        /* Enhanced form elements */
+        .form-floating {
+            position: relative;
+        }
+
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label {
+            opacity: 0.65;
+            transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+        }
+
+        /* Button group styles */
+        .btn-group-modern {
+            display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
         }
 
-        .time-input-group input[type="time"] {
-            min-width: 120px;
+        /* Stats and info cards */
+        .info-badge {
+            background: linear-gradient(135deg, var(--info-color), var(--primary-color));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
         }
 
-        .remove-constraint-btn {
-            background: var(--danger-color);
+        /* Responsive design improvements */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 2rem 0;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .card-body {
+                padding: 1.5rem;
+            }
+            
+            .course-tag {
+                font-size: 0.8rem;
+                padding: 0.5rem 1rem;
+            }
+            
+            .btn-primary {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+            
+            .time-preset-btn, .class-time-btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .card {
+                border-radius: 16px;
+            }
+            
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Dark theme specific enhancements */
+        [data-theme="dark"] body::before {
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(157, 123, 191, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(72, 187, 120, 0.15) 0%, transparent 50%);
+        }
+
+        [data-theme="dark"] .form-control:focus,
+        [data-theme="dark"] .form-select:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        [data-theme="dark"] .suggestion-item:hover {
+            background: var(--primary-color);
             color: white;
+        }
+
+        .course-tag-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 0.25rem;
+        }
+
+        .course-tag:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .course-tag .remove-btn {
+            background: rgba(255, 255, 255, 0.2);
             border: none;
-            border-radius: 4px;
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
+            color: white;
+            margin-left: 0.75rem;
             cursor: pointer;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.2s ease;
         }
 
-        .remove-constraint-btn:hover {
-            background: #dc2626;
-            transform: translateY(-1px);
-        }
-
-        .time-preset-btn {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: 6px;
-            padding: 0.5rem 1rem;
-            margin: 0.25rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.875rem;
-        }
-
-        .time-preset-btn:hover {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        .class-time-btn {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: 20px;
-            padding: 0.5rem 1rem;
-            margin: 0.25rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .class-time-btn:hover {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-            transform: translateY(-1px);
-        }
-
-        .class-time-btn.selected {
-            background: var(--success-color);
-            color: white;
-            border-color: var(--success-color);
-        }
-
-        .time-slot-tag {
-            display: inline-flex;
-            align-items: center;
-            background: var(--success-color);
-            color: white;
-            padding: 0.4rem 0.8rem;
-            border-radius: 15px;
-            margin: 0.25rem;
-            font-size: 0.8rem;
-            font-weight: 500;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .time-slot-tag .remove-btn {
-            background: none;
-            border: none;
-            color: white;
-            margin-left: 0.5rem;
-            cursor: pointer;
-            opacity: 0.8;
-            transition: opacity 0.2s ease;
-        }
-
-        .time-slot-tag .remove-btn:hover {
-            opacity: 1;
-        }
-
-        .suggestion-item {
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            color: var(--text-primary);
-        }
-
-        .suggestion-item:hover {
-            background: var(--bg-tertiary);
-        }
-
-        .suggestions-dropdown {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-shadow: var(--shadow-lg);
-            max-height: 300px;
-            overflow-y: auto;
-            color: var(--text-primary);
-        }
-
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle:hover {
-            background: var(--bg-tertiary);
-        }
-
-        .advanced-options {
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .stats-card {
-            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
-            color: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            padding: 2rem;
+        .course-tag .remove-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
         }
 
         .semester-card {
-            background: var(--bg-primary);
+            background: var(--bg-secondary);
             border: 2px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.25rem;
+            border-radius: 20px;
+            padding: 1.5rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
             box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .semester-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-gradient);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .semester-card.active::before {
+            left: 0;
+            opacity: 1;
         }
 
         .semester-card.active {
             border-color: var(--primary-color);
-            background: linear-gradient(135deg, var(--primary-color), #3b82f6);
             color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.3);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--shadow-xl);
         }
 
         .semester-card:hover:not(.active) {
@@ -448,340 +974,1563 @@
         }
 
         .semester-card i {
-            font-size: 1.5rem;
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .semester-card .fw-semibold,
+        .semester-card small {
+            position: relative;
+            z-index: 1;
+        }
+
+        .time-preset-btn, .class-time-btn {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 16px;
+            padding: 0.75rem 1.25rem;
+            margin: 0.25rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.9rem;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .time-preset-btn::before, .class-time-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-gradient);
+            transition: all 0.3s ease;
+            z-index: 0;
+        }
+
+        .time-preset-btn:hover::before, .class-time-btn:hover::before {
+            left: 0;
+        }
+
+        .time-preset-btn:hover, .class-time-btn:hover {
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .time-preset-btn span, .class-time-btn span,
+        .time-preset-btn i, .class-time-btn i {
+            position: relative;
+            z-index: 1;
+        }
+
+        .class-time-btn.selected {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+            transform: scale(1.05);
+        }
+
+        .class-time-btn.selected::before {
+            left: 0;
+            background: linear-gradient(135deg, var(--success-color), #38a169);
+        }
+
+        .time-slot-tag {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--success-color), #38a169);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin: 0.25rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            animation: slideInScale 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: var(--shadow);
+        }
+
+        .time-slot-tag .remove-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .time-slot-tag .remove-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .suggestions-dropdown {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            max-height: 300px;
+            overflow-y: auto;
+            color: var(--text-primary);
+            backdrop-filter: blur(20px);
+        }
+
+        .suggestion-item {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .suggestion-item:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Results Section Styles */
+        .results-section {
+            padding: 1rem 0;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .results-header {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--bg-gradient);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
             margin-bottom: 0.5rem;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.9rem;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        .results-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
-        .pulse {
-            animation: pulse 2s infinite;
+        .view-toggle {
+            display: flex;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 0.25rem;
+            border: 2px solid var(--border-color);
         }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease;
+        .view-btn {
+            background: none;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        .theme-transition {
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        .view-btn.active {
+            background: var(--primary-color);
+            color: white;
         }
 
-        ::-webkit-scrollbar {
-            width: 8px;
+        .schedule-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
 
-        ::-webkit-scrollbar-track {
+        .schedule-grid.grid-view {
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        }
+
+        .schedule-grid.list-view {
+            grid-template-columns: 1fr;
+        }
+
+        .schedule-card {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .schedule-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .schedule-rank {
+            background: var(--bg-gradient);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .schedule-score {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .course-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .course-item {
             background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 4px;
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
+        .course-code {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .course-section {
+            background: var(--info-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .schedule-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .schedule-type {
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 80px;
+        }
+
+        .schedule-time {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .schedule-days {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .advanced-options {
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Results Section Styles */
+        .results-section {
+            padding: 2rem 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .schedule-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .schedule-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .schedule-header {
+            background: var(--bg-tertiary);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .schedule-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .schedule-number {
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .gap-time {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        .course-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .course-badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .schedule-body {
+            padding: 1.5rem;
+        }
+
+        .weekly-schedule {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .day-column {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .day-header {
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .time-slot {
+            background: var(--bg-gradient);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .time-slot:last-child {
+            margin-bottom: 0;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .controls-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .filters-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 150px;
+        }
+
+        .search-input {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .results-header {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--bg-gradient);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .results-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 0.25rem;
+            border: 2px solid var(--border-color);
+        }
+
+        .view-btn {
+            background: none;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .view-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .schedule-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .schedule-grid.grid-view {
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        }
+
+        .schedule-grid.list-view {
+            grid-template-columns: 1fr;
+        }
+
+        .schedule-rank {
+            background: var(--bg-gradient);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .schedule-score {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .course-item {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .course-code {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .course-section {
+            background: var(--info-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .schedule-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .schedule-type {
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 80px;
+        }
+
+        .schedule-time {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .schedule-days {
+            color: var(--primary-color);
+            font-weight: 600;
         }
 
         @media (max-width: 768px) {
-            .main-container {
-                padding: 1rem 0;
+            .weekly-schedule {
+                grid-template-columns: 1fr;
             }
             
-            .course-tag {
-                font-size: 0.8rem;
-                padding: 0.4rem 0.8rem;
+            .filters-row {
+                flex-direction: column;
+                align-items: stretch;
             }
+            
+            .schedule-grid.grid-view {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-controls {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .weekly-calendar {
+                grid-template-columns: 60px repeat(5, 1fr);
+                font-size: 0.8rem;
+            }
+
+            .pagination-controls {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Calendar View Styles */
+        .calendar-view {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .calendar-view.active {
+            display: block;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .calendar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .calendar-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .schedule-selector {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            min-width: 150px;
+        }
+
+        .weekly-calendar-container {
+            position: relative;
+        }
+
+        /* Calendar Save Controls */
+        .calendar-save-controls {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .save-controls-header h6 {
+            color: var(--text-primary);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .save-controls-header p {
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .selected-schedules {
+            margin-bottom: 1.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .selected-schedule-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .selected-schedule-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .selected-schedule-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .selected-schedule-details {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .remove-schedule-btn {
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            padding: 0.25rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .remove-schedule-btn:hover {
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        .save-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .save-buttons .btn {
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+
+        .visual-schedule {
+            position: relative;
+            height: 600px;
+            display: flex;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .time-column {
+            width: 70px;
+            background: linear-gradient(to bottom, var(--bg-tertiary), var(--bg-secondary));
+            border-right: 2px solid var(--border-color);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .time-header {
+            background: var(--bg-tertiary);
+            height: 60px;
+        }
+
+        .time-marker {
+            position: absolute;
+            right: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            transform: translateY(45%);
+            opacity: 0.9;
+            background: var(--bg-primary);
+            padding: 0.2rem 0.1rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            min-width: 50px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .day-column {
+            flex: 1;
+            position: relative;
+            border-right: 1px solid var(--border-color);
+            min-width: 120px;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(to bottom, var(--bg-primary), var(--bg-secondary));
+        }
+
+        .day-column:last-child {
+            border-right: none;
+        }
+
+        .day-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            color: white;
+            padding: 1rem 0.5rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-bottom: 2px solid var(--border-color);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 0.5px;
+        }
+
+        .day-content {
+            position: relative;
+            flex: 1;
+            height: calc(100% - 60px);
+            padding: 12px 8px;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 35px,
+                var(--border-color) 35px,
+                var(--border-color) 36px
+            );
+        }
+
+        .course-block {
+            position: absolute;
+            left: 6px;
+            right: 6px;
+            border-radius: 8px;
+            padding: 0.4rem 0.3rem;
+            color: white;
+            font-size: 0.65rem;
+            line-height: 1.2;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 1;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+            min-height: 30px;
+            margin-bottom: 10px;
+        }
+
+        .course-block:hover {
+            transform: scale(1.05) translateY(-2px);
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .course-block.lecture {
+            background: linear-gradient(145deg, #ef4444, #dc2626);
+            border-left: 4px solid #fca5a5;
+        }
+
+        .course-block.seminar {
+            background: linear-gradient(145deg, #3b82f6, #2563eb);
+            border-left: 4px solid #93c5fd;
+        }
+
+        .course-block.lab {
+            background: linear-gradient(145deg, #10b981, #059669);
+            border-left: 4px solid #6ee7b7;
+        }
+
+        .course-info {
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            gap: 0.2rem;
+            height: 100%;
+        }
+
+        .course-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+
+        .course-code-cal {
+            font-size: 0.7rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .course-section-cal {
+            font-size: 0.6rem;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .course-type-cal {
+            font-size: 0.6rem;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-top: 0.1rem;
+        }
+
+        .course-time {
+            font-size: 0.65rem;
+            opacity: 0.95;
+            font-weight: 600;
+            text-align: right;
+            flex-shrink: 0;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-top: auto;
+            margin-bottom: 0.15rem;
+            align-self: flex-end;
+        }
+
+        /* Course layout components for calendar */
+        .course-left {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+            flex: 1;
+        }
+
+        .course-right {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+            align-items: flex-end;
+        }
+
+        /* Enhanced Calendar Styles for All Schedules */
+        .all-schedules-calendar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .schedule-calendar-section {
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideInUp 0.6s ease-out forwards;
+        }
+
+        .schedule-calendar-section:nth-child(1) { animation-delay: 0.1s; }
+        .schedule-calendar-section:nth-child(2) { animation-delay: 0.2s; }
+        .schedule-calendar-section:nth-child(3) { animation-delay: 0.3s; }
+        .schedule-calendar-section:nth-child(4) { animation-delay: 0.4s; }
+        .schedule-calendar-section:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes slideInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .schedule-calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .schedule-calendar-header h4 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .schedule-meta-info {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .gap-time-badge {
+            background: var(--success-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .more-schedules-notice {
+            background: var(--info-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        /* Enhanced Calendar Course Display */
+
+        /* Sort Controls - Updated for consistent height and centering */
+        .sort-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            height: 100%;
+        }
+
+        .sort-controls label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .sort-select {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            min-width: 180px;
+            height: 100%;
+            font-size: 0.85rem;
+        }
+
+        .sort-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+            outline: none;
+        }
+
+        .sort-info {
+            flex: 1;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Load More Controls */
+        .load-more-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .load-more-info {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .page-info {
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Saved Schedules Section */
+        .saved-schedules-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .saved-schedules-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .saved-schedules-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .saved-schedule-card {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .saved-schedule-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-color);
+        }
+
+        .saved-schedule-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .saved-schedule-name {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .saved-schedule-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-save-schedule {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save-schedule:hover {
+            background: #38a169;
+            transform: translateY(-1px);
+        }
+
+        .empty-saved-schedules {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .schedule-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .schedule-header {
+            flex-wrap: wrap;
+            gap: 1rem;
         }
     </style>
 </head>
 
 <body class="theme-transition">
-    <!-- Navigation -->
+    <!-- Main Navigation -->
     <nav class="navbar navbar-expand-lg">
-        <div class="container">
+        <div class="container-fluid px-4">
             <a class="navbar-brand" href="#">
                 <i class="fas fa-calendar-alt me-2"></i>
                 Schedule Optimizer
             </a>
             
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-warning btn-sm me-2" onclick="clearAllData()" title="Clear All Saved Data">
-                    <i class="fas fa-eraser me-1"></i>
-                    Clear Data
+            <div class="nav-menu">
+                <button class="nav-section-btn active" data-section="configure" id="nav-configure">
+                    <i class="fas fa-cog me-2"></i>
+                    Configure
                 </button>
-                <button class="theme-toggle me-3" onclick="toggleTheme()" title="Toggle Dark Mode">
-                    <i class="fas fa-moon" id="theme-icon"></i>
+                <button class="nav-section-btn" data-section="results" id="nav-results">
+                    <i class="fas fa-list me-2"></i>
+                    Results
+                    <span class="badge bg-primary ms-2" id="results-count" style="display: none;">0</span>
                 </button>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
+    <!-- Main Content Container -->
     <div class="main-container">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <!-- Header -->
-                    <div class="text-center mb-4 fade-in">
-                        <h1 class="display-5 fw-bold mb-3">
-                            <i class="fas fa-graduation-cap text-primary me-3"></i>
-                            Course Schedule Optimizer
-                        </h1>
-                        <p class="lead text-muted">Create the perfect class schedule with intelligent optimization</p>
-                    </div>
-
-                    <!-- Main Form Card -->
-                    <div class="card fade-in">
-                        <div class="card-header">
-                            <h5 class="mb-0">
-                                <i class="fas fa-cog me-2"></i>
-                                Schedule Configuration
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <form method="POST" action="/" id="schedule-form">
-                                <!-- Semester Selection -->
-                                <div class="mb-4">
-                                    <label class="form-label fw-semibold">
-                                        <i class="fas fa-calendar me-2"></i>
-                                        Select Semester
-                                    </label>
-                                    <div class="row g-2" id="semester-selection">
-                                        <div class="col-6 col-md-4">
-                                            <div class="semester-card active" data-semester="Summer 2025">
-                                                <i class="fas fa-sun mb-2 d-block"></i>
-                                                <div class="fw-semibold">Summer 2025</div>
-                                                <small class="text-muted">Current</small>
-                                            </div>
-                                        </div>
-                                        <div class="col-6 col-md-4">
-                                            <div class="semester-card" data-semester="Fall 2025">
-                                                <i class="fas fa-leaf mb-2 d-block"></i>
-                                                <div class="fw-semibold">Fall 2025</div>
-                                                <small class="text-muted">Upcoming</small>
-                                            </div>
-                                        </div>
-                                        <div class="col-6 col-md-4">
-                                            <div class="semester-card" data-semester="Winter 2026">
-                                                <i class="fas fa-snowflake mb-2 d-block"></i>
-                                                <div class="fw-semibold">Winter 2026</div>
-                                                <small class="text-muted">Future</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <input type="hidden" name="semester" id="selected-semester" value="Summer 2025">
+        <div class="content-wrapper">
+            
+            <!-- Configuration Section -->
+            <div class="app-section active" id="section-configure">
+                <div class="config-section">
+                    <!-- Configuration Form Card -->
+                    <div class="row justify-content-center">
+                        <div class="col-12">
+                            <div class="card fade-in">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-cog me-2"></i>
+                                        Schedule Configuration
+                                    </h5>
                                 </div>
-
-                                <!-- Course Selection -->
-                                <div class="mb-4">
-                                    <label for="course-input" class="form-label fw-semibold">
-                                        <i class="fas fa-book me-2"></i>
-                                        Course Codes
-                                    </label>
-                                    <div class="position-relative">
-                                        <input type="text" 
-                                               id="course-input" 
-                                               name="courses[]" 
-                                               class="form-control" 
-                                               placeholder="Enter course code (e.g., CIS*2750, MATH*1200)"
-                                               autocomplete="off">
-                                        <div id="course-suggestions" class="suggestions-dropdown position-absolute w-100" style="display: none; z-index: 1000;"></div>
-                                    </div>
-                                    <div class="mt-2" id="selected-courses"></div>
-                                    <small class="text-muted">
-                                        <i class="fas fa-info-circle me-1"></i>
-                                        Press Enter after typing each course code
-                                    </small>
-                                    
-                                    <!-- Course-Specific Time Constraints -->
-                                    <div class="mt-3" id="course-time-constraints" style="display: none;">
-                                        <label class="form-label fw-semibold">
-                                            <i class="fas fa-clock me-2"></i>
-                                            Course-Specific Time Preferences
-                                        </label>
-                                        <small class="text-muted d-block mb-2">Set specific time ranges for individual courses:</small>
-                                        <div id="course-time-list"></div>
-                                        <input type="hidden" name="course_time_constraints" id="course-time-constraints-input" value="">
-                                    </div>
-                                </div>
-
-                                <!-- Time Constraints -->
-                                <div class="mb-4">
-                                    <label class="form-label fw-semibold">
-                                        <i class="fas fa-clock me-2"></i>
-                                        Time Preferences (Optional)
-                                    </label>
-                                    
-                                    <!-- Quick Time Presets -->
-                                    <div class="mb-3">
-                                        <small class="text-muted d-block mb-2">Quick Presets:</small>
-                                        <div class="d-flex flex-wrap">
-                                            <button type="button" class="time-preset-btn" data-start="08:00" data-end="17:00">
-                                                <i class="fas fa-briefcase me-1"></i> Business Hours
-                                            </button>
-                                            <button type="button" class="time-preset-btn" data-start="09:00" data-end="15:00">
-                                                <i class="fas fa-coffee me-1"></i> Morning Person
-                                            </button>
-                                            <button type="button" class="time-preset-btn" data-start="11:00" data-end="19:00">
-                                                <i class="fas fa-moon me-1"></i> Night Owl
-                                            </button>
-                                            <button type="button" class="time-preset-btn" data-start="" data-end="">
-                                                <i class="fas fa-times me-1"></i> No Preference
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Time Range -->
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label for="earliest" class="form-label">
-                                                <i class="fas fa-sunrise me-1"></i> Earliest Time
-                                            </label>
-                                            <input type="time" id="earliest" name="earliest" class="form-control">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="latest" class="form-label">
-                                                <i class="fas fa-sunset me-1"></i> Latest Time
-                                            </label>
-                                            <input type="time" id="latest" name="latest" class="form-control">
-                                        </div>
-                                    </div>
-
-                                    <!-- Class Time Preferences -->
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">
-                                            <i class="fas fa-clock me-2"></i>
-                                            Preferred Class Times
-                                        </label>
-                                        <small class="text-muted d-block mb-2">Select your preferred time slots for classes:</small>
-                                        <div class="d-flex flex-wrap gap-2">
-                                            <button type="button" class="class-time-btn" data-time="08:30">
-                                                <i class="fas fa-sunrise me-1"></i> 8:30 AM
-                                            </button>
-                                            <button type="button" class="class-time-btn" data-time="09:30">
-                                                <i class="fas fa-sun me-1"></i> 9:30 AM
-                                            </button>
-                                            <button type="button" class="class-time-btn" data-time="10:30">
-                                                <i class="fas fa-sun me-1"></i> 10:30 AM
-                                            </button>
-                                            <button type="button" class="class-time-btn" data-time="11:30">
-                                                <i class="fas fa-sun me-1"></i> 11:30 AM
-                                            </button>
-                                            <button type="button" class="class-time-btn" data-time="12:30">
-                                                <i class="fas fa-sun me-1"></i> 12:30 PM
-                                            </button>
-                                            <button type="button" class="class-time-btn" data-time="13:30">
-                                                <i class="fas fa-sun me-1"></i> 1:30 PM
-                                            </button>
-                                            <button type="button" class="class-time-btn" data-time="14:30">
-                                                <i class="fas fa-sun me-1"></i> 2:30 PM
-                                            </button>
-                                            <button type="button" class="class-time-btn" data-time="15:30">
-                                                <i class="fas fa-sun me-1"></i> 3:30 PM
-                                            </button>
-                                            <button type="button" class="class-time-btn" data-time="16:30">
-                                                <i class="fas fa-sunset me-1"></i> 4:30 PM
-                                            </button>
-                                            <button type="button" class="class-time-btn" data-time="17:30">
-                                                <i class="fas fa-moon me-1"></i> 5:30 PM
-                                            </button>
-                                            <button type="button" class="class-time-btn" data-time="18:30">
-                                                <i class="fas fa-moon me-1"></i> 6:30 PM
-                                            </button>
-                                            <button type="button" class="class-time-btn" data-time="19:30">
-                                                <i class="fas fa-moon me-1"></i> 7:30 PM
-                                            </button>
-                                        </div>
-                                        <input type="hidden" name="preferred_times" id="preferred-times" value="">
-                                        <div class="mt-2" id="selected-time-slots"></div>
-                                        <small class="text-muted">
-                                            <i class="fas fa-info-circle me-1"></i>
-                                            Click to toggle preferred class time slots
-                                        </small>
-                                    </div>
-                                </div>
-
-                                <!-- Advanced Options -->
-                                <div class="mb-4">
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#advanced-options">
-                                        <i class="fas fa-cogs me-2"></i>
-                                        Advanced Options
-                                    </button>
-                                    
-                                    <div class="collapse" id="advanced-options">
-                                        <div class="advanced-options">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label for="sort-preference" class="form-label">
-                                                        Sort By:
-                                                        <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" 
-                                                           title="Choose how to prioritize your schedule results"></i>
+                                <div class="card-body">
+                                    <form method="POST" action="/" id="schedule-form">
+                                        <div class="row g-4">
+                                            <div class="col-lg-6">
+                                                <!-- Course Selection -->
+                                                <div class="mb-4">
+                                                    <label for="course-input" class="form-label fw-semibold">
+                                                        <i class="fas fa-book me-2 text-primary"></i>
+                                                        Course Codes
                                                     </label>
-                                                    <select id="sort-preference" name="sort_preference" class="form-select">
-                                                        <option value="smart_gaps" selected>Smart Gaps (Recommended)</option>
-                                                        <option value="minimal_gaps">Minimal Time Between Classes</option>
-                                                        <option value="best_gaps">Best Gaps Distribution</option>
-                                                        <option value="fewer_days">Fewer Days on Campus</option>
-                                                        <option value="early_start">Early Start Times</option>
-                                                        <option value="late_start">Late Start Times</option>
-                                                        <option value="compact">Most Compact Schedule</option>
-                                                    </select>
-                                                    <div class="form-text mt-1">
-                                                        <small id="sort-description" class="text-muted">
-                                                            Balances good gaps (30-90 min) with fewer back-to-back classes and compact daily schedules.
-                                                        </small>
+                                                    <div class="position-relative">
+                                                        <input type="text" 
+                                                               id="course-input" 
+                                                               name="courses[]" 
+                                                               class="form-control" 
+                                                               placeholder="Enter course code (e.g., CIS*2750, MATH*1200)"
+                                                               autocomplete="off">
+                                                        <div id="course-suggestions" class="suggestions-dropdown position-absolute w-100" style="display: none; z-index: 1000;"></div>
+                                                    </div>
+                                                    <div class="mt-3" id="selected-courses"></div>
+                                                    
+                                                    <!-- Hidden input for course time constraints -->
+                                                    <input type="hidden" name="course_time_constraints" id="course-time-constraints-input" value="">
+                                                    
+                                                    <!-- Hidden input for preferred times -->
+                                                    <input type="hidden" name="preferred_times" id="preferred-times" value="">
+                                                </div>
+
+                                                <!-- Submit Button -->
+                                                <div class="text-center mt-4">                                                <button type="button" class="btn btn-primary btn-lg" id="generate-btn" onclick="console.log('Button clicked!'); submitForm();">
+                                                    <i class="fas fa-magic me-2"></i>
+                                                    Generate Perfect Schedule
+                                                </button>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-lg-6">
+                                                <!-- Semester Selection -->
+                                                <div class="mb-4">
+                                                    <label for="semester" class="form-label fw-semibold">
+                                                        <i class="fas fa-calendar me-2 text-primary"></i>
+                                                        Select Semester
+                                                    </label>
+                                                    <div class="row g-3" id="semester-selection">
+                                                        <div class="col-4">
+                                                            <div class="semester-card active" data-semester="Summer 2025">
+                                                                <i class="fas fa-sun mb-2 d-block"></i>
+                                                                <div class="fw-semibold">Summer</div>
+                                                                <small>2025</small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <div class="semester-card" data-semester="Fall 2025">
+                                                                <i class="fas fa-leaf mb-2 d-block"></i>
+                                                                <div class="fw-semibold">Fall</div>
+                                                                <small>2025</small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <div class="semester-card" data-semester="Winter 2026">
+                                                                <i class="fas fa-snowflake mb-2 d-block"></i>
+                                                                <div class="fw-semibold">Winter</div>
+                                                                <small>2026</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <input type="hidden" name="semester" id="selected-semester" value="Summer 2025">
+                                                </div>
+
+                                                <!-- Time Constraints -->
+                                                <div class="mb-4">
+                                                    <label class="form-label fw-semibold">
+                                                        <i class="fas fa-clock me-2 text-primary"></i>
+                                                        Time Preferences
+                                                    </label>
+                                                    
+                                                    <!-- Time Range -->
+                                                    <div class="row mb-3">
+                                                        <div class="col-6">
+                                                            <label for="earliest" class="form-label">
+                                                                <i class="fas fa-sunrise me-1 text-warning"></i> Earliest
+                                                            </label>
+                                                            <input type="time" id="earliest" name="earliest" class="form-control">
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label for="latest" class="form-label">
+                                                                <i class="fas fa-sunset me-1 text-orange"></i> Latest
+                                                            </label>
+                                                            <input type="time" id="latest" name="latest" class="form-control">
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Quick Time Presets -->
+                                                    <div class="mb-3">
+                                                        <small class="text-muted d-block mb-2">Quick Presets:</small>
+                                                        <div class="btn-group-modern">
+                                                            <button type="button" class="time-preset-btn" data-start="08:00" data-end="17:00">
+                                                                <i class="fas fa-briefcase me-1"></i>
+                                                                <span>Business Hours</span>
+                                                            </button>
+                                                            <button type="button" class="time-preset-btn" data-start="09:00" data-end="15:00">
+                                                                <i class="fas fa-coffee me-1"></i>
+                                                                <span>Morning</span>
+                                                            </button>
+                                                            <button type="button" class="time-preset-btn" data-start="13:00" data-end="19:00">
+                                                                <i class="fas fa-moon me-1"></i>
+                                                                <span>Afternoon</span>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <label for="max-results" class="form-label">Max Results:</label>
-                                                    <select id="max-results" name="max_results" class="form-select">
-                                                        <option value="100">100 schedules</option>
-                                                        <option value="250">250 schedules</option>
-                                                        <option value="500" selected>500 schedules</option>
-                                                        <option value="1000">1000 schedules</option>
-                                                        <option value="2500">2500 schedules</option>
-                                                        <option value="5000">5000 schedules (Max)</option>
-                                                    </select>
+
+                                                <!-- Advanced Options -->
+                                                <div class="mb-4">
+                                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#advanced-options">
+                                                        <i class="fas fa-cogs me-2"></i>
+                                                        Advanced Options
+                                                    </button>
+                                                    
+                                                    <div class="collapse" id="advanced-options">
+                                                        <div class="advanced-options">
+                                                            <div class="row g-3">
+                                                                <div class="col-12">
+                                                                    <label for="sort-preference" class="form-label">
+                                                                        <i class="fas fa-sort me-2 text-info"></i>
+                                                                        Sort By:
+                                                                    </label>
+                                                                    <select id="sort-preference" name="sort_preference" class="form-select">
+                                                                        <option value="smart_gaps" selected>Smart Gaps (Recommended)</option>
+                                                                        <option value="minimal_gaps">Minimal Time Between Classes</option>
+                                                                        <option value="best_gaps">Best Gaps Distribution</option>
+                                                                        <option value="fewer_days">Fewer Days on Campus</option>
+                                                                        <option value="early_start">Early Start Times</option>
+                                                                        <option value="late_start">Late Start Times</option>
+                                                                        <option value="compact">Most Compact Schedule</option>
+                                                                    </select>
+                                                                    <div class="mt-2">
+                                                                        <small id="sort-description" class="text-muted">
+                                                                            <i class="fas fa-lightbulb me-1"></i>
+                                                                            Balances good gaps (30-90 min) with fewer back-to-back classes and compact daily schedules.
+                                                                        </small>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-12">
+                                                                    <label for="max-results" class="form-label">
+                                                                        <i class="fas fa-list me-2 text-success"></i>
+                                                                        Max Results:
+                                                                    </label>
+                                                                    <select id="max-results" name="max_results" class="form-select">
+                                                                        <option value="100">100 schedules</option>
+                                                                        <option value="250">250 schedules</option>
+                                                                        <option value="500" selected>500 schedules</option>
+                                                                        <option value="1000">1000 schedules</option>
+                                                                        <option value="2500">2500 schedules</option>
+                                                                        <option value="5000">5000 schedules (Max)</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </form>
                                 </div>
-
-                                <!-- Submit Button -->
-                                <div class="text-center">
-                                    <button type="submit" class="btn btn-primary btn-lg pulse" id="generate-btn">
-                                        <i class="fas fa-magic me-2"></i>
-                                        Generate Optimal Schedules
-                                    </button>
-                                </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Loading Spinner -->
-                    <div class="loading-spinner" id="loading">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                    
+                    <!-- Saved Schedules Section -->
+                    <div class="saved-schedules-section" id="saved-schedules-section">
+                        <div class="saved-schedules-header">
+                            <div class="saved-schedules-title">
+                                <i class="fas fa-star me-2"></i>
+                                My Saved Schedules
+                            </div>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="clearSavedSchedules()">
+                                <i class="fas fa-tr ash me-1"></i>
+                                Clear All
+                            </button>
                         </div>
-                        <div class="mt-3">
-                            <h5>Optimizing your schedule...</h5>
-                            <p class="text-muted">This may take a few moments</p>
+                        <div id="saved-schedules-list">
+                            <div class="empty-saved-schedules">
+                                <i class="fas fa-bookmark me-2"></i>
+                                No saved schedules yet. Generate schedules and save your favorites!
+                            </div>
                         </div>
                     </div>
-
-
                 </div>
             </div>
+
+            <!-- Results Section -->
+            <div class="app-section" id="section-results">
+                <div class="results-section">
+                    <!-- Results will be populated here -->
+                    <div class="empty-state" id="results-empty">
+                        <i class="fas fa-calendar-check"></i>
+                        <h3>No Schedules Generated Yet</h3>
+                        <p>Configure your preferences and generate schedules to see results here.</p>
+                        <button class="btn btn-primary mt-3" onclick="switchToSection('configure')">
+                            <i class="fas fa-cog me-2"></i>
+                            Go to Configuration
+                        </button>
+                    </div>
+                    <div id="results-content" style="display: none;">
+                        <!-- Results content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h4>Optimizing Your Schedule</h4>
+            <p>Analyzing course combinations...</p>
         </div>
     </div>
 
@@ -793,6 +2542,7 @@
         let selectedCourses = [];
         let selectedSemester = 'Summer 2025';
         let courseSearchTimeout;
+        let courseTimeConstraints = {};
 
         // Storage keys
         const STORAGE_KEYS = {
@@ -859,8 +2609,11 @@
                     try {
                         courseTimeConstraints = JSON.parse(savedCourseConstraints);
                         document.getElementById('course-time-constraints-input').value = savedCourseConstraints;
-                        updateCourseTimeConstraints(); // Update the display
                         console.log('Loaded course constraints:', courseTimeConstraints);
+                        // Update course display after constraints are loaded
+                        setTimeout(() => {
+                            updateSelectedCoursesDisplay();
+                        }, 100);
                     } catch (error) {
                         console.error('Error parsing saved course constraints:', error);
                         courseTimeConstraints = {};
@@ -936,7 +2689,7 @@
                 
                 // Reset checkboxes and selects
                 document.getElementById('sort-preference').value = 'minimal_gaps';
-                document.getElementById('max-results').value = '100';
+                document.getElementById('max-results').value = '500';
                 document.getElementById('include-full').checked = false;
                 document.getElementById('allow-overlap').checked = false;
                 
@@ -958,29 +2711,738 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadSavedData(); // Load saved data first
             setupEventListeners();
-            initializeTheme(); // Use consistent theme function
+            setupNavigationSystem();
             loadSemesterInfo();
         });
 
-        // Theme management
-        function initializeTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            updateThemeIcon(savedTheme);
+        // Navigation System
+        function setupNavigationSystem() {
+            const navButtons = document.querySelectorAll('.nav-section-btn');
+            navButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const section = this.dataset.section;
+                    switchToSection(section);
+                });
+            });
         }
 
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        function switchToSection(sectionName) {
+            // Update navigation buttons
+            document.querySelectorAll('.nav-section-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.section === sectionName);
+            });
+
+            // Update sections
+            document.querySelectorAll('.app-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            const targetSection = document.getElementById(`section-${sectionName}`);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+        }
+
+        // Enhanced form submission with AJAX
+        function handleFormSubmit(e) {
+            e.preventDefault(); // Always prevent default form submission
             
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
+            if (selectedCourses.length === 0) {
+                alert('Please select at least one course!');
+                return;
+            }
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('courses[]', selectedCourses.join(','));
+            formData.append('semester', selectedSemester);
+            formData.append('earliest', document.getElementById('earliest').value);
+            formData.append('latest', document.getElementById('latest').value);
+            formData.append('preferred_times', document.getElementById('preferred-times').value || '');
+            formData.append('sort_preference', document.getElementById('sort-preference').value);
+            formData.append('max_results', document.getElementById('max-results').value);
+            formData.append('course_time_constraints', JSON.stringify(courseTimeConstraints));
+
+            // Show loading with enhanced animation
+            showLoading();
+
+            // Submit via AJAX with proper headers for JSON response
+            fetch('/', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                hideLoading();
+                
+                // Check if response contains error
+                if (data.error) {
+                    alert(`Error: ${data.error}`);
+                    return;
+                }
+                
+                // Display results with animation
+                displayResultsWithAnimation(data);
+                
+                // Switch to results section with smooth transition
+                setTimeout(() => {
+                    switchToSection('results');
+                }, 500);
+                
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Error:', error);
+                alert('An error occurred while generating schedules. Please check your course selections and try again.');
+            });
         }
 
-        function updateThemeIcon(theme) {
-            const icon = document.getElementById('theme-icon');
-            icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        // Enhanced results display with animations
+        function displayResultsWithAnimation(data) {
+            const resultsContent = document.getElementById('results-content');
+            const resultsEmpty = document.getElementById('results-empty');
+            const resultsCount = document.getElementById('results-count');
+            
+            // Clear any previous schedule selections
+            clearScheduleSelection();
+            
+            if (!data.combinations || data.combinations.length === 0) {
+                resultsContent.style.display = 'none';
+                resultsEmpty.style.display = 'block';
+                resultsCount.style.display = 'none';
+                return;
+            }
+            
+            // Store results data globally
+            currentResultsData = data;
+            maxResultsToShow = Math.min(currentResultsPageSize, data.combinations.length);
+            
+            // Update results count badge with animation
+            resultsCount.textContent = data.combinations.length;
+            resultsCount.style.display = 'inline-block';
+            resultsCount.classList.add('results-success');
+            
+            // Hide empty state and show results
+            resultsEmpty.style.display = 'none';
+            resultsContent.style.display = 'block';
+            
+            // Build results HTML with staggered animations
+            const resultsHTML = `
+                <div class="results-header">
+                    <div class="stats-grid">
+                        <div class="stat-card" style="--delay: 0">
+                            <div class="stat-number">${data.combinations.length}</div>
+                            <div class="stat-label">Optimal Schedules</div>
+                        </div>
+                        <div class="stat-card" style="--delay: 1">
+                            <div class="stat-number">${data.stats.total_found || data.combinations.length}</div>
+                            <div class="stat-label">Total Found</div>
+                        </div>
+                        <div class="stat-card" style="--delay: 2">
+                            <div class="stat-number">${data.stats.processing_time}s</div>
+                            <div class="stat-label">Processing Time</div>
+                        </div>
+                        <div class="stat-card" style="--delay: 3">
+                            <div class="stat-number">${selectedCourses.length}</div>
+                            <div class="stat-label">Courses Selected</div>
+                        </div>
+                    </div>
+                    
+                    <div class="results-controls">
+                        <div class="view-toggle">
+                            <button class="view-btn" data-view="grid" onclick="switchView('grid')">
+                                <i class="fas fa-th me-2"></i>Grid View
+                            </button>
+                            <button class="view-btn" data-view="list" onclick="switchView('list')">
+                                <i class="fas fa-list me-2"></i>List View
+                            </button>
+                            <button class="view-btn active" data-view="calendar" onclick="switchView('calendar')">
+                                <i class="fas fa-calendar me-2"></i>Calendar
+                            </button>
+                            
+                            <!-- Sort Controls positioned near Calendar button -->
+                            <div class="sort-controls ms-3">
+                                <label for="results-sort-select">
+                                    <i class="fas fa-sort me-1"></i>Sort:
+                                </label>
+                                <select id="results-sort-select" class="sort-select" onchange="sortResults()">
+                                    <option value="rank">Original Ranking</option>
+                                    <option value="gap-time">Gap Time</option>
+                                    <option value="early-start">Earliest Start</option>
+                                    <option value="late-start">Latest Start</option>
+                                    <option value="compact">Most Compact</option>
+                                    <option value="fewer-days">Fewer Days</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="switchToSection('configure')">
+                            <i class="fas fa-edit me-2"></i>Modify Configuration
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Calendar View -->
+                <div class="calendar-view active" id="calendar-view">
+                    <div class="calendar-header">
+                        <div class="calendar-title">
+                            <i class="fas fa-calendar-week me-2"></i>
+                            All Schedules - Weekly View
+                        </div>
+                        <div class="calendar-summary" id="calendar-summary">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="all-schedules-calendar" id="all-schedules-calendar">
+                        <!-- All schedules will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Enhanced Grid/List View -->
+                <div class="schedule-grid grid-view" id="schedule-grid" style="display: none;">
+                    ${data.combinations.slice(0, maxResultsToShow).map((combination, index) => generateScheduleCard(combination, index)).join('')}
+                </div>
+                
+                <!-- Load More Controls -->
+                <div class="load-more-controls" id="load-more-controls" style="display: none;">
+                    <div class="pagination-controls">
+                        <button class="btn btn-outline-primary btn-sm" id="load-more-btn" onclick="loadMoreResults()">
+                            <i class="fas fa-plus me-2"></i>Load More
+                        </button>
+                        <div class="page-info" id="page-info">
+                            Showing 1-${Math.min(data.combinations.length, maxResultsToShow)} of ${data.combinations.length}
+                        </div>
+                        <button class="btn btn-outline-secondary btn-sm" id="show-all-btn" onclick="showAllResults()" style="display: none;">
+                            <i class="fas fa-expand me-2"></i>Show All
+                        </button>
+                    </div>
+                    <div class="load-more-info">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Use pagination to browse through results efficiently
+                    </div>
+                </div>
+            `;
+            
+            resultsContent.innerHTML = resultsHTML;
+            
+            // Initialize new features
+            updateLoadMoreControls();
+            
+            // Switch to calendar view by default
+            setTimeout(() => {
+                switchView('calendar');
+            }, 100);
+            
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                resultsCount.classList.remove('results-success');
+            }, 600);
+        }
+
+        function generateScheduleCard(combination, index) {
+            return `
+                <div class="schedule-card" style="--delay: ${index}">
+                    <div class="schedule-header">
+                        <div class="schedule-rank">Rank #${combination.rank}</div>
+                        <div class="schedule-actions">
+                            <button class="btn-save-schedule" onclick="saveSchedule(${index})" title="Save this schedule">
+                                <i class="fas fa-star me-1"></i>Save
+                            </button>
+                        </div>
+                        <div class="schedule-score">Gap Time: ${combination.total_time} min</div>
+                    </div>
+                    
+                    <div class="course-list">
+                        ${combination.courses.map(course => generateCourseItem(course)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateCourseItem(course) {
+            const courseCode = course.section_id.split('*')[0] + '*' + course.section_id.split('*')[1];
+            const sectionNum = course.section_id.split('*')[2];
+            
+            return `
+                <div class="course-item">
+                    <div class="course-header">
+                        <div class="course-code">${courseCode}</div>
+                        <div class="course-section">Section ${sectionNum}</div>
+                    </div>
+                    
+                    <div class="schedule-details">
+                        ${course.lecture ? generateScheduleDetail('Lecture', course.lecture) : ''}
+                        ${course.seminar ? generateScheduleDetail('Seminar', course.seminar) : ''}
+                        ${course.lab ? generateScheduleDetail('Lab', course.lab) : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateScheduleDetail(type, schedule) {
+            const startTime = formatMinutesToTime(schedule.start);
+            const endTime = formatMinutesToTime(schedule.finish);
+            const daysText = schedule.days.join(', ');
+            
+            return `
+                <div class="schedule-item">
+                    <div class="schedule-type">${type}</div>
+                    <div class="schedule-time">${startTime} - ${endTime}</div>
+                    <div class="schedule-days">${daysText}</div>
+                </div>
+            `;
+        }
+
+        function formatMinutesToTime(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            const period = hours >= 12 ? 'PM' : 'AM';
+            const displayHour = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+            return `${displayHour}:${mins.toString().padStart(2, '0')} ${period}`;
+        }
+
+        function switchView(view) {
+            const viewButtons = document.querySelectorAll('.view-btn');
+            const scheduleGrid = document.getElementById('schedule-grid');
+            const calendarView = document.getElementById('calendar-view');
+            
+            viewButtons.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.view === view);
+            });
+            
+            if (view === 'calendar') {
+                scheduleGrid.style.display = 'none';
+                calendarView.classList.add('active');
+                updateAllSchedulesCalendarView();
+            } else {
+                scheduleGrid.style.display = 'grid';
+                scheduleGrid.className = `schedule-grid ${view}-view`;
+                calendarView.classList.remove('active');
+            }
+        }
+
+        // Global variables for results management
+        let currentResultsData = null;
+        let currentResultsPageSize = 20;
+        let currentResultsPage = 1;
+        let maxResultsToShow = 20;
+
+        // Calendar view functionality - Show all schedules
+        function updateAllSchedulesCalendarView() {
+            const calendar = document.getElementById('all-schedules-calendar');
+            const summary = document.getElementById('calendar-summary');
+            
+            if (!currentResultsData || !currentResultsData.combinations) return;
+            
+            const totalSchedules = currentResultsData.combinations.length;
+            
+            // Update summary
+            if (summary) {
+                summary.innerHTML = `
+                    <div class="info-badge">
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        Showing all ${totalSchedules} schedule${totalSchedules !== 1 ? 's' : ''} in calendar view
+                    </div>
+                `;
+            }
+            
+            // Show loading indicator for large numbers of schedules
+            if (totalSchedules > 50) {
+                calendar.innerHTML = `
+                    <div class="text-center p-4">
+                        <div class="loading-spinner" style="width: 40px; height: 40px; margin: 0 auto 1rem;"></div>
+                        <p class="text-muted">Loading ${totalSchedules} schedules in calendar view...</p>
+                        <small class="text-muted">This may take a moment for large numbers of schedules.</small>
+                    </div>
+                `;
+                
+                // Use setTimeout to allow the loading message to show
+                setTimeout(() => {
+                    calendar.innerHTML = generateAllSchedulesCalendarGrid(currentResultsData.combinations);
+                    updateSaveButtonState();
+                }, 100);
+            } else {
+                // Generate calendar grid for all schedules immediately
+                calendar.innerHTML = generateAllSchedulesCalendarGrid(currentResultsData.combinations);
+                updateSaveButtonState();
+            }
+        }
+
+        function generateAllSchedulesCalendarGrid(schedules) {
+            let html = '';
+            
+            // Show all schedules (removed artificial limit)
+            const schedulesToShow = schedules.length;
+            
+            schedules.slice(0, schedulesToShow).forEach((schedule, scheduleIndex) => {
+                html += `
+                    <div class="schedule-calendar-section">
+                        <div class="schedule-calendar-header">
+                            <h4>Schedule #${scheduleIndex + 1} (Rank #${schedule.rank})</h4>
+                            <div class="schedule-meta-info">
+                                <span class="gap-time-badge">Gap Time: ${schedule.total_time} min</span>
+                                <button class="btn-save-schedule" onclick="saveScheduleFromCalendar(${scheduleIndex})" title="Save this schedule">
+                                    <i class="fas fa-star me-1"></i>Save
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="visual-schedule">
+                            <!-- Time Column -->
+                            <div class="time-column">
+                                <div class="time-header" style="height: 60px;"></div>
+                `;
+                
+                // Add time markers (8 AM to 10 PM)
+                for (let hour = 8; hour <= 22; hour++) {
+                    const topPosition = ((hour - 8) * 36) + 60; // 60px for header, 36px per hour
+                    html += `
+                        <div class="time-marker" style="top: ${topPosition}px;">
+                            ${formatHour(hour)}
+                        </div>
+                    `;
+                }
+                
+                html += `
+                            </div>
+                            
+                            <!-- Day Columns -->
+                `;
+                
+                const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                days.forEach((dayName, dayIndex) => {
+                    const dayAbbr = getDayAbbreviation(dayName);
+                    
+                    html += `
+                        <div class="day-column">
+                            <div class="day-header">${dayName}</div>
+                            <div class="day-content">
+                    `;
+                    
+                    // Add courses for this day
+                    if (schedule && schedule.courses) {
+                        schedule.courses.forEach(course => {
+                            if (course) {
+                                // Check lecture, seminar, and lab
+                                [
+                                    {item: course.lecture, type: 'lecture'}, 
+                                    {item: course.seminar, type: 'seminar'}, 
+                                    {item: course.lab, type: 'lab'}
+                                ].forEach(({item, type}) => {
+                                    if (item && item.days && Array.isArray(item.days) && item.days.includes(dayAbbr)) {
+                                        // Handle different data structures for course codes
+                                        let courseCode = '';
+                                        let sectionNum = '';
+                                        if (course.section_id) {
+                                            const parts = course.section_id.split('*');
+                                            courseCode = parts[0] + '*' + parts[1];
+                                            sectionNum = parts[2];
+                                        } else if (course.courseCode) {
+                                            courseCode = course.courseCode;
+                                        } else if (course.course_code) {
+                                            courseCode = course.course_code;
+                                        }
+                                        
+                                        const startTime = formatMinutesToTime(item.start);
+                                        const endTime = formatMinutesToTime(item.finish);
+                                        const timeRange = `${startTime}-${endTime}`;
+                                        const shortTime = startTime.replace(' ', '');
+                                        
+                                        // Calculate positioning to match time markers exactly
+                                        const dayStart = 8 * 60; // 8 AM in minutes  
+                                        const totalCalendarHeight = 540; // 15 hours * 36px per hour
+                                        const headerHeight = 60; // day header height
+                                        
+                                        // Convert minutes to pixels from 8AM baseline
+                                        const startPixels = ((item.start - dayStart) / 60) * 36;
+                                        const heightPixels = ((item.finish - item.start) / 60) * 36;
+                                        
+                                        // Convert to percentage of day-content area
+                                        const topPercentage = (startPixels / totalCalendarHeight) * 100;
+                                        const heightPercentage = (heightPixels / totalCalendarHeight) * 100;
+                                        
+                                        html += `
+                                            <div class="course-block ${type}" 
+                                                 style="top: ${topPercentage}%; height: ${heightPercentage}%;"
+                                                 title="${courseCode} Section ${sectionNum} - ${type.charAt(0).toUpperCase() + type.slice(1)} | ${timeRange} | Days: ${item.days.join(', ')}">
+                                                <div class="course-info">
+                                                    <div class="course-main">
+                                                        <div class="course-code-cal">${courseCode}*${sectionNum} (${type.slice(0,3).toUpperCase()})</div>
+                                                    </div>
+                                                    <div class="course-time">${shortTime}</div>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Remove the artificial limit message since we're showing all schedules
+            
+            return html;
+        }
+
+        function formatHour(hour) {
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+            return `${displayHour}${period}`;
+        }
+
+        function getDayAbbreviation(dayName) {
+            const dayMap = {
+                'Monday': 'M',
+                'Tuesday': 'T',
+                'Wednesday': 'W',
+                'Thursday': 'Th',
+                'Friday': 'F'
+            };
+            return dayMap[dayName];
+        }
+
+        // Enhanced sorting functionality
+        function sortResults() {
+            const sortSelect = document.getElementById('results-sort-select');
+            const scheduleGrid = document.getElementById('schedule-grid');
+            
+            if (!currentResultsData || !currentResultsData.combinations) return;
+            
+            const sortType = sortSelect.value;
+            let sortedCombinations = [...currentResultsData.combinations];
+            
+            // Apply sorting
+            switch (sortType) {
+                case 'gap-time':
+                    sortedCombinations.sort((a, b) => a.total_time - b.total_time);
+                    break;
+                case 'early-start':
+                    sortedCombinations.sort((a, b) => calculateEarliestStart(a) - calculateEarliestStart(b));
+                    break;
+                case 'late-start':
+                    sortedCombinations.sort((a, b) => calculateLatestStart(b) - calculateLatestStart(a));
+                    break;
+                case 'compact':
+                    sortedCombinations.sort((a, b) => calculateCompactness(a) - calculateCompactness(b));
+                    break;
+                case 'fewer-days':
+                    sortedCombinations.sort((a, b) => calculateDaysOnCampus(a) - calculateDaysOnCampus(b));
+                    break;
+                default: // rank
+                    sortedCombinations.sort((a, b) => a.rank - b.rank);
+                    break;
+            }
+            
+            // Update the display
+            currentResultsData.combinations = sortedCombinations;
+            updateScheduleDisplay();
+            
+            // Update calendar view if it's active
+            const calendarView = document.getElementById('calendar-view');
+            if (calendarView && calendarView.classList.contains('active')) {
+                updateAllSchedulesCalendarView();
+            }
+        }
+
+        function calculateEarliestStart(schedule) {
+            let earliest = 24 * 60; // Start with end of day
+            schedule.courses.forEach(course => {
+                [course.lecture, course.seminar, course.lab].forEach(item => {
+                    if (item && item.start < earliest) {
+                        earliest = item.start;
+                    }
+                });
+            });
+            return earliest;
+        }
+
+        function calculateLatestStart(schedule) {
+            let latest = 0;
+            schedule.courses.forEach(course => {
+                [course.lecture, course.seminar, course.lab].forEach(item => {
+                    if (item && item.start > latest) {
+                        latest = item.start;
+                    }
+                });
+            });
+            return latest;
+        }
+
+        function calculateCompactness(schedule) {
+            const dailySpans = {};
+            schedule.courses.forEach(course => {
+                [course.lecture, course.seminar, course.lab].forEach(item => {
+                    if (item) {
+                        item.days.forEach(day => {
+                            if (!dailySpans[day]) {
+                                dailySpans[day] = { earliest: item.start, latest: item.finish };
+                            } else {
+                                dailySpans[day].earliest = Math.min(dailySpans[day].earliest, item.start);
+                                dailySpans[day].latest = Math.max(dailySpans[day].latest, item.finish);
+                            }
+                        });
+                    }
+                });
+            });
+            
+            let totalSpan = 0;
+            Object.values(dailySpans).forEach(span => {
+                totalSpan += span.latest - span.earliest;
+            });
+            return totalSpan;
+        }
+
+        function calculateDaysOnCampus(schedule) {
+            const days = new Set();
+            schedule.courses.forEach(course => {
+                [course.lecture, course.seminar, course.lab].forEach(item => {
+                    if (item) {
+                        item.days.forEach(day => days.add(day));
+                    }
+                });
+            });
+            return days.size;
+        }
+
+        // Load more functionality
+        function loadMoreResults() {
+            if (!currentResultsData) return;
+            
+            const totalResults = currentResultsData.combinations.length;
+            const currentlyShowing = maxResultsToShow;
+            const nextPageSize = Math.min(currentResultsPageSize, totalResults - currentlyShowing);
+            
+            if (nextPageSize <= 0) return;
+            
+            maxResultsToShow += nextPageSize;
+            updateScheduleDisplay();
+            updateLoadMoreControls();
+        }
+
+        function showAllResults() {
+            if (!currentResultsData) return;
+            
+            const totalResults = currentResultsData.combinations.length;
+            
+            if (totalResults > 100) {
+                const confirmed = confirm(`This will load all ${totalResults} schedules at once. This may slow down your browser. Continue?`);
+                if (!confirmed) return;
+            }
+            
+            maxResultsToShow = totalResults;
+            updateScheduleDisplay();
+            updateLoadMoreControls();
+        }
+
+        function updateScheduleDisplay() {
+            const scheduleGrid = document.getElementById('schedule-grid');
+            if (!currentResultsData || !scheduleGrid) return;
+            
+            const combinationsToShow = currentResultsData.combinations.slice(0, maxResultsToShow);
+            scheduleGrid.innerHTML = combinationsToShow.map((combination, index) => 
+                generateScheduleCard(combination, index)
+            ).join('');
+            
+            updateLoadMoreControls();
+            
+            // Update calendar view if it's active
+            const calendarView = document.getElementById('calendar-view');
+            if (calendarView && calendarView.classList.contains('active')) {
+                updateAllSchedulesCalendarView();
+            }
+        }
+
+        function updateLoadMoreControls() {
+            const loadMoreControls = document.getElementById('load-more-controls');
+            const loadMoreBtn = document.getElementById('load-more-btn');
+            const showAllBtn = document.getElementById('show-all-btn');
+            const pageInfo = document.getElementById('page-info');
+            
+            if (!currentResultsData || !loadMoreControls) return;
+            
+            const totalResults = currentResultsData.combinations.length;
+            const currentlyShowing = Math.min(maxResultsToShow, totalResults);
+            const hasMore = currentlyShowing < totalResults;
+            
+            // Show/hide controls
+            if (totalResults > currentResultsPageSize) {
+                loadMoreControls.style.display = 'flex';
+            } else {
+                loadMoreControls.style.display = 'none';
+                return;
+            }
+            
+            // Update page info
+            pageInfo.textContent = `Showing 1-${currentlyShowing} of ${totalResults}`;
+            
+            // Update load more button
+            if (hasMore) {
+                const remaining = totalResults - currentlyShowing;
+                const nextIncrement = Math.min(currentResultsPageSize, remaining);
+                loadMoreBtn.innerHTML = `<i class="fas fa-plus me-2"></i>Load ${nextIncrement} More`;
+                loadMoreBtn.style.display = 'block';
+            } else {
+                loadMoreBtn.style.display = 'none';
+            }
+            
+            // Update show all button
+            if (hasMore && totalResults - currentlyShowing > currentResultsPageSize) {
+                showAllBtn.style.display = 'block';
+            } else {
+                showAllBtn.style.display = 'none';
+            }
+        }
+
+        function showLoading() {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.style.display = 'flex';
+            document.getElementById('generate-btn').disabled = true;
+            
+            // Add some dynamic text changes during loading
+            const loadingMessages = [
+                'Analyzing course combinations...',
+                'Optimizing schedules...',
+                'Finding the best options...',
+                'Almost done...'
+            ];
+            
+            let messageIndex = 0;
+            const loadingText = document.querySelector('.loading-content p');
+            
+            const messageInterval = setInterval(() => {
+                if (overlay.style.display === 'none') {
+                    clearInterval(messageInterval);
+                    return;
+                }
+                loadingText.textContent = loadingMessages[messageIndex % loadingMessages.length];
+                messageIndex++;
+            }, 1500);
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+            document.getElementById('generate-btn').disabled = false;
         }
 
         // Class time button functionality
@@ -1004,7 +3466,7 @@
                 container.innerHTML = selectedTimes.map(time => `
                     <span class="time-slot-tag">
                         <i class="fas fa-clock me-1"></i>
-                        ${time}
+                        ${formatTime(time)}
                         <button type="button" class="remove-btn" onclick="removeTimeSlot('${time}')">
                             <i class="fas fa-times"></i>
                         </button>
@@ -1016,10 +3478,74 @@
             saveData(); // Save data after time slot change
         }
 
+        function formatTime(time) {
+            const [hours, minutes] = time.split(':');
+            const hour = parseInt(hours);
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+            return `${displayHour}:${minutes} ${period}`;
+        }
+
         function removeTimeSlot(time) {
             document.querySelector(`.class-time-btn[data-time="${time}"]`).classList.remove('selected');
             updateSelectedTimeSlotsDisplay();
         }
+
+        // Course time constraint dropdown functions
+        function toggleCourseTimeDropdown(courseCode) {
+            // Close all other dropdowns first
+            document.querySelectorAll('.course-time-dropdown').forEach(dropdown => {
+                if (dropdown.id !== `dropdown-${courseCode}`) {
+                    dropdown.classList.remove('show');
+                }
+            });
+            
+            const dropdown = document.getElementById(`dropdown-${courseCode}`);
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+
+        function closeCourseTimeDropdown(courseCode) {
+            const dropdown = document.getElementById(`dropdown-${courseCode}`);
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+            // Update the course display to reflect any constraint changes
+            updateSelectedCoursesDisplay();
+        }
+
+        function clearCourseTimeConstraint(courseCode) {
+            courseTimeConstraints[courseCode] = { earliest: '', latest: '' };
+            updateCourseTimeConstraintsInput();
+            saveData();
+            // Update the dropdown inputs and course display
+            updateSelectedCoursesDisplay();
+        }
+
+        function updateCourseTimeConstraint(courseCode, type, value) {
+            if (!courseTimeConstraints[courseCode]) {
+                courseTimeConstraints[courseCode] = { earliest: '', latest: '' };
+            }
+            courseTimeConstraints[courseCode][type] = value;
+            updateCourseTimeConstraintsInput();
+            saveData();
+            // Update the course tag to show constraint status
+            const timeBtn = document.querySelector(`[onclick="toggleCourseTimeDropdown('${courseCode}')"]`);
+            if (timeBtn) {
+                const hasConstraints = courseTimeConstraints[courseCode].earliest || courseTimeConstraints[courseCode].latest;
+                timeBtn.classList.toggle('has-constraints', hasConstraints);
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.course-tag-wrapper')) {
+                document.querySelectorAll('.course-time-dropdown').forEach(dropdown => {
+                    dropdown.classList.remove('show');
+                });
+            }
+        });
 
         // Event listeners setup
         function setupEventListeners() {
@@ -1054,8 +3580,11 @@
             // Class time buttons
             setupClassTimeButtons();
 
-            // Form submission
-            document.getElementById('schedule-form').addEventListener('submit', handleFormSubmit);
+            // Form submission - ALWAYS use AJAX
+            const form = document.getElementById('schedule-form');
+            if (form) {
+                form.addEventListener('submit', handleFormSubmit);
+            }
 
             // Click outside to hide suggestions
             document.addEventListener('click', function(e) {
@@ -1100,20 +3629,16 @@
         }
 
         // Course management
-        let courseTimeConstraints = {};
-
         function displayCourse(courseCode) {
             // This function is called when loading saved courses
             // The actual display is handled by updateSelectedCoursesDisplay
             updateSelectedCoursesDisplay();
-            updateCourseTimeConstraints();
         }
 
         function addCourse(courseCode) {
             if (!selectedCourses.includes(courseCode)) {
                 selectedCourses.push(courseCode);
                 updateSelectedCoursesDisplay();
-                updateCourseTimeConstraints();
                 saveData(); // Save data after adding course
             }
         }
@@ -1122,58 +3647,66 @@
             selectedCourses = selectedCourses.filter(c => c !== courseCode);
             delete courseTimeConstraints[courseCode];
             updateSelectedCoursesDisplay();
-            updateCourseTimeConstraints();
             saveData(); // Save data after removing course
         }
 
         function updateSelectedCoursesDisplay() {
             const container = document.getElementById('selected-courses');
-            container.innerHTML = selectedCourses.map(course => `
-                <span class="course-tag">
-                    <i class="fas fa-book me-1"></i>
-                    ${course}
-                    <button type="button" class="remove-btn" onclick="removeCourse('${course}')">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </span>
-            `).join('');
-        }
-
-        function updateCourseTimeConstraints() {
-            const container = document.getElementById('course-time-list');
-            const constraintsSection = document.getElementById('course-time-constraints');
-            
-            if (selectedCourses.length === 0) {
-                constraintsSection.style.display = 'none';
-                return;
-            }
-            
-            constraintsSection.style.display = 'block';
-            
             container.innerHTML = selectedCourses.map(course => {
-                const constraint = courseTimeConstraints[course] || { earliest: '', latest: '' };
+                const hasConstraints = courseTimeConstraints[course] && 
+                    (courseTimeConstraints[course].earliest || courseTimeConstraints[course].latest);
+                
                 return `
-                    <div class="course-time-constraint">
-                        <div class="course-code">${course}</div>
-                        <div class="time-input-group">
-                            <label class="small">Earliest:</label>
-                            <input type="time" class="form-control form-control-sm" 
-                                   value="${constraint.earliest}" 
-                                   onchange="updateCourseTimeConstraint('${course}', 'earliest', this.value)">
-                            <label class="small">Latest:</label>
-                            <input type="time" class="form-control form-control-sm" 
-                                   value="${constraint.latest}" 
-                                   onchange="updateCourseTimeConstraint('${course}', 'latest', this.value)">
-                            <button type="button" class="remove-constraint-btn" 
-                                    onclick="clearCourseTimeConstraint('${course}')">
-                                <i class="fas fa-times"></i> Clear
+                    <div class="course-tag-wrapper">
+                        <span class="course-tag">
+                            <i class="fas fa-book me-1"></i>
+                            ${course}
+                            <button type="button" class="course-time-btn ${hasConstraints ? 'has-constraints' : ''}" 
+                                    onclick="toggleCourseTimeDropdown('${course}')" 
+                                    title="Set time preferences for this course">
+                                <i class="fas fa-clock"></i>
                             </button>
+                            <button type="button" class="remove-btn" onclick="removeCourse('${course}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </span>
+                        
+                        <div class="course-time-dropdown" id="dropdown-${course}">
+                            <h6>Time Preferences for ${course}</h6>
+                            <div class="time-input-row">
+                                <div class="time-input-group">
+                                    <label class="form-label">Earliest Start Time:</label>
+                                    <input type="time" class="form-control" 
+                                           value="${hasConstraints ? courseTimeConstraints[course].earliest : ''}" 
+                                           onchange="updateCourseTimeConstraint('${course}', 'earliest', this.value)">
+                                </div>
+                                <div class="time-input-group">
+                                    <label class="form-label">Latest End Time:</label>
+                                    <input type="time" class="form-control" 
+                                           value="${hasConstraints ? courseTimeConstraints[course].latest : ''}" 
+                                           onchange="updateCourseTimeConstraint('${course}', 'latest', this.value)">
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" 
+                                        onclick="clearCourseTimeConstraint('${course}')">
+                                    <i class="fas fa-eraser me-1"></i>Clear
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm" 
+                                        onclick="closeCourseTimeDropdown('${course}')">
+                                    <i class="fas fa-check me-1"></i>Done
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
             }).join('');
-            
+        }
+
+        function updateCourseTimeConstraints() {
+            // This function now just updates the hidden input and course display
             updateCourseTimeConstraintsInput();
+            updateSelectedCoursesDisplay();
         }
 
         function updateCourseTimeConstraint(courseCode, type, value) {
@@ -1182,13 +3715,19 @@
             }
             courseTimeConstraints[courseCode][type] = value;
             updateCourseTimeConstraintsInput();
-            saveData(); // Save changes to localStorage
+            saveData();
+            // Update the course tag to show constraint status
+            const timeBtn = document.querySelector(`[onclick="toggleCourseTimeDropdown('${courseCode}')"]`);
+            if (timeBtn) {
+                const hasConstraints = courseTimeConstraints[courseCode].earliest || courseTimeConstraints[courseCode].latest;
+                timeBtn.classList.toggle('has-constraints', hasConstraints);
+            }
         }
 
         function clearCourseTimeConstraint(courseCode) {
             courseTimeConstraints[courseCode] = { earliest: '', latest: '' };
             updateCourseTimeConstraints();
-            saveData(); // Save changes to localStorage
+            saveData();
         }
 
         function updateCourseTimeConstraintsInput() {
@@ -1246,7 +3785,6 @@
 
         // Semester info loading
         async function loadSemesterInfo() {
-            // This function is kept for potential future use but doesn't display stats
             try {
                 const response = await fetch(`/api/semester-info?semester=${encodeURIComponent(selectedSemester)}`);
                 const data = await response.json();
@@ -1262,28 +3800,274 @@
             }
         }
 
-        // Form submission
+        // Submit form function (called by button click)
+        function submitForm() {
+            console.log('submitForm called');
+            
+            // Check if we have selected courses
+            if (!selectedCourses || selectedCourses.length === 0) {
+                alert('Please select at least one course first!');
+                return;
+            }
+            
+            console.log('Selected courses:', selectedCourses);
+            console.log('Calling handleFormSubmit...');
+            
+            // Call the form submission handler
+            const fakeEvent = { preventDefault: () => {} };
+            handleFormSubmit(fakeEvent);
+        }
+
+        // Enhanced form submission with AJAX
         function handleFormSubmit(e) {
+            e.preventDefault(); // ALWAYS prevent default form submission
+            console.log('handleFormSubmit called');
+            
             if (selectedCourses.length === 0) {
-                e.preventDefault();
                 alert('Please select at least one course!');
                 return;
             }
 
-            // Update hidden input with selected courses
-            const coursesInput = document.querySelector('input[name="courses[]"]');
-            coursesInput.value = selectedCourses.join(',');
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('courses[]', selectedCourses.join(','));
+            formData.append('semester', selectedSemester);
+            formData.append('earliest', document.getElementById('earliest').value || '');
+            formData.append('latest', document.getElementById('latest').value || '');
+            formData.append('preferred_times', document.getElementById('preferred-times').value || '');
+            formData.append('sort_preference', document.getElementById('sort-preference').value);
+            formData.append('max_results', document.getElementById('max-results').value);
+            formData.append('course_time_constraints', JSON.stringify(courseTimeConstraints));
 
-            // Update course time constraints input before submission
-            updateCourseTimeConstraintsInput();
+            // Show enhanced loading animation
+            showLoading();
+
+            // Submit via AJAX with proper headers for JSON response
+            fetch('/', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                hideLoading();
+                
+                // Check if response contains error
+                if (data.error) {
+                    alert(`Error: ${data.error}`);
+                    return;
+                }
+                
+                // Display results with enhanced animations
+                displayResultsWithAnimation(data);
+                
+                // Switch to results section with smooth transition
+                setTimeout(() => {
+                    switchToSection('results');
+                }, 500);
+                
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Error:', error);
+                alert('An error occurred while generating schedules. Please check your course selections and try again.');
+            });
+        }
+
+        // Saved schedules functionality
+        let savedSchedules = [];
+        const SAVED_SCHEDULES_KEY = 'saved_schedules';
+
+        function loadSavedSchedules() {
+            try {
+                const saved = localStorage.getItem(SAVED_SCHEDULES_KEY);
+                savedSchedules = saved ? JSON.parse(saved) : [];
+                updateSavedSchedulesDisplay();
+            } catch (error) {
+                console.error('Error loading saved schedules:', error);
+                savedSchedules = [];
+            }
+        }
+
+        function saveSchedule(index) {
+            if (!currentResultsData || !currentResultsData.combinations) {
+                alert('No schedule data available to save');
+                return;
+            }
+
+            const schedule = currentResultsData.combinations[index];
+            if (!schedule) {
+                alert('Schedule not found');
+                return;
+            }
+
+            // Prompt for schedule name
+            const scheduleName = prompt('Enter a name for this schedule:', `Schedule ${savedSchedules.length + 1}`);
+            if (!scheduleName) return;
+
+            // Check if name already exists
+            if (savedSchedules.some(s => s.name === scheduleName)) {
+                const overwrite = confirm('A schedule with this name already exists. Overwrite?');
+                if (!overwrite) return;
+                
+                // Remove existing schedule with same name
+                savedSchedules = savedSchedules.filter(s => s.name !== scheduleName);
+            }
+
+            // Create saved schedule object
+            const savedSchedule = {
+                id: Date.now(),
+                name: scheduleName,
+                schedule: schedule,
+                savedDate: new Date().toISOString(),
+                courses: schedule.courses.map(course => {
+                    // Handle different data structures
+                    let courseCode = '';
+                    if (course.section_id) {
+                        const parts = course.section_id.split('*');
+                        courseCode = parts[0] + '*' + parts[1];
+                    } else if (course.courseCode) {
+                        courseCode = course.courseCode;
+                    }
+                    return courseCode;
+                })
+            };
+
+            savedSchedules.unshift(savedSchedule); // Add to beginning
             
-            // Debug: Log what we're sending
-            console.log('Submitting course time constraints:', courseTimeConstraints);
-            console.log('Hidden input value:', document.getElementById('course-time-constraints-input').value);
+            // Keep only last 10 saved schedules
+            if (savedSchedules.length > 10) {
+                savedSchedules = savedSchedules.slice(0, 10);
+            }
 
-            // Show loading spinner
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('generate-btn').disabled = true;
+            // Save to localStorage
+            try {
+                localStorage.setItem(SAVED_SCHEDULES_KEY, JSON.stringify(savedSchedules));
+                updateSavedSchedulesDisplay();
+                
+                // Show success message
+                const btn = event.target.closest('.btn-save-schedule');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check me-1"></i>Saved!';
+                btn.style.background = '#38a169';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            } catch (error) {
+                console.error('Error saving schedule:', error);
+                alert('Error saving schedule. Please try again.');
+            }
+        }
+
+        function updateSavedSchedulesDisplay() {
+            const container = document.getElementById('saved-schedules-list');
+            if (!container) return;
+
+            if (savedSchedules.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-saved-schedules">
+                        <i class="fas fa-bookmark me-2"></i>
+                        No saved schedules yet. Generate schedules and save your favorites!
+                    </div>
+                `;
+                return;
+            }
+
+            const html = savedSchedules.map(saved => `
+                <div class="saved-schedule-card" onclick="loadSavedSchedule('${saved.id}')">
+                    <div class="saved-schedule-meta">
+                        <div class="saved-schedule-name">${saved.name}</div>
+                        <div class="saved-schedule-actions" onclick="event.stopPropagation()">
+                            <button class="btn btn-outline-primary btn-sm" onclick="viewSavedScheduleCalendar('${saved.id}')" title="View in calendar">
+                                <i class="fas fa-calendar"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteSavedSchedule('${saved.id}')" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="saved-schedule-courses">
+                        <small class="text-muted">
+                            <i class="fas fa-book me-1"></i>
+                            ${saved.courses.join(', ')}
+                        </small>
+                    </div>
+                    <div class="saved-schedule-date">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            Saved: ${new Date(saved.savedDate).toLocaleDateString()}
+                        </small>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        function loadSavedSchedule(savedId) {
+            const saved = savedSchedules.find(s => s.id == savedId);
+            if (!saved) return;
+
+            // Switch to results section
+            switchToSection('results');
+            
+            // Display the saved schedule
+            const fakeData = {
+                combinations: [saved.schedule],
+                stats: {
+                    processing_time: 'N/A',
+                    total_found: 1
+                }
+            };
+            
+            displayResultsWithAnimation(fakeData);
+        }
+
+        function viewSavedScheduleCalendar(savedId) {
+            const saved = savedSchedules.find(s => s.id == savedId);
+            if (!saved) return;
+
+            // Load the schedule and switch to calendar view
+            const fakeData = {
+                combinations: [saved.schedule],
+                stats: {
+                    processing_time: 'N/A',
+                    total_found: 1
+                }
+            };
+            
+            displayResultsWithAnimation(fakeData);
+            switchToSection('results');
+            
+            // Switch to calendar view after a short delay
+            setTimeout(() => {
+                switchView('calendar');
+            }, 500);
+        }
+
+        function deleteSavedSchedule(savedId) {
+            if (!confirm('Are you sure you want to delete this saved schedule?')) return;
+            
+            savedSchedules = savedSchedules.filter(s => s.id != savedId);
+            localStorage.setItem(SAVED_SCHEDULES_KEY, JSON.stringify(savedSchedules));
+            updateSavedSchedulesDisplay();
+        }
+
+        function clearSavedSchedules() {
+            if (!confirm('Are you sure you want to clear all saved schedules?')) return;
+            
+            savedSchedules = [];
+            localStorage.removeItem(SAVED_SCHEDULES_KEY);
+            updateSavedSchedulesDisplay();
         }
 
         // Sort preference descriptions
@@ -1308,8 +4092,193 @@
             }
         }
 
+        // Calendar save functionality
+        let selectedSchedulesForSave = new Set();
+
+        function saveScheduleFromCalendar(scheduleIndex) {
+            if (!currentResultsData || !currentResultsData.combinations) {
+                alert('No schedule data available to save');
+                return;
+            }
+
+            const schedule = currentResultsData.combinations[scheduleIndex];
+            if (!schedule) {
+                alert('Schedule not found');
+                return;
+            }
+
+            // Use the existing saveSchedule function
+            saveSchedule(scheduleIndex);
+        }
+
+        function toggleScheduleSelection(scheduleIndex) {
+            if (selectedSchedulesForSave.has(scheduleIndex)) {
+                selectedSchedulesForSave.delete(scheduleIndex);
+            } else {
+                selectedSchedulesForSave.add(scheduleIndex);
+            }
+            
+            updateSelectedSchedulesDisplay();
+            updateSaveButtonState();
+        }
+
+        function updateSelectedSchedulesDisplay() {
+            const container = document.getElementById('selected-schedules');
+            if (!container) return;
+            
+            if (selectedSchedulesForSave.size === 0) {
+                container.innerHTML = '<p class="text-muted">No schedules selected for saving.</p>';
+                return;
+            }
+            
+            const html = Array.from(selectedSchedulesForSave).map(index => {
+                const schedule = currentResultsData.combinations[index];
+                if (!schedule) return '';
+                
+                const courseNames = schedule.courses.map(course => {
+                    if (course.section_id) {
+                        const parts = course.section_id.split('*');
+                        return parts[0] + '*' + parts[1];
+                    }
+                    return course.courseCode || course.course_code || 'Unknown';
+                }).join(', ');
+                
+                return `
+                    <div class="selected-schedule-item">
+                        <div class="selected-schedule-info">
+                            <div class="selected-schedule-title">Schedule #${index + 1} (Rank #${schedule.rank})</div>
+                            <div class="selected-schedule-details">
+                                Courses: ${courseNames} | Gap Time: ${schedule.total_time} min
+                            </div>
+                        </div>
+                        <button class="remove-schedule-btn" onclick="toggleScheduleSelection(${index})" title="Remove from selection">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+
+        function updateSaveButtonState() {
+            const saveBtn = document.getElementById('save-selected-btn');
+            const clearBtn = document.getElementById('clear-selection-btn');
+            const saveControls = document.getElementById('calendar-save-controls');
+            
+            if (saveBtn) {
+                saveBtn.disabled = selectedSchedulesForSave.size === 0;
+            }
+            
+            // Show/hide the save controls based on selection
+            if (saveControls) {
+                if (selectedSchedulesForSave.size > 0) {
+                    saveControls.style.display = 'block';
+                } else {
+                    saveControls.style.display = 'none';
+                }
+            }
+        }
+
+        function saveSelectedSchedules() {
+            if (selectedSchedulesForSave.size === 0) {
+                alert('No schedules selected for saving');
+                return;
+            }
+            
+            if (!currentResultsData || !currentResultsData.combinations) {
+                alert('No schedule data available');
+                return;
+            }
+            
+            let savedCount = 0;
+            const errors = [];
+            
+            Array.from(selectedSchedulesForSave).forEach((index, i) => {
+                const schedule = currentResultsData.combinations[index];
+                if (!schedule) {
+                    errors.push(`Schedule #${index + 1} not found`);
+                    return;
+                }
+                
+                // Generate a default name
+                const defaultName = `Batch Save ${new Date().toLocaleDateString()} - Schedule ${i + 1}`;
+                const scheduleName = prompt(`Enter name for Schedule #${index + 1}:`, defaultName);
+                
+                if (!scheduleName) {
+                    return; // User cancelled
+                }
+                
+                // Check if name already exists
+                if (savedSchedules.some(s => s.name === scheduleName)) {
+                    const overwrite = confirm(`A schedule named "${scheduleName}" already exists. Overwrite?`);
+                    if (!overwrite) return;
+                    
+                    // Remove existing schedule with same name
+                    savedSchedules = savedSchedules.filter(s => s.name !== scheduleName);
+                }
+                
+                // Create saved schedule object
+                const savedSchedule = {
+                    id: Date.now() + i, // Add index to ensure unique IDs
+                    name: scheduleName,
+                    schedule: schedule,
+                    savedDate: new Date().toISOString(),
+                    courses: schedule.courses.map(course => {
+                        let courseCode = '';
+                        if (course.section_id) {
+                            const parts = course.section_id.split('*');
+                            courseCode = parts[0] + '*' + parts[1];
+                        } else if (course.courseCode) {
+                            courseCode = course.courseCode;
+                        } else if (course.course_code) {
+                            courseCode = course.course_code;
+                        }
+                        return courseCode;
+                    })
+                };
+                
+                savedSchedules.unshift(savedSchedule);
+                savedCount++;
+            });
+            
+            // Keep only last 20 saved schedules to accommodate multiple saves
+            if (savedSchedules.length > 20) {
+                savedSchedules = savedSchedules.slice(0, 20);
+            }
+            
+            // Save to localStorage
+            try {
+                localStorage.setItem(SAVED_SCHEDULES_KEY, JSON.stringify(savedSchedules));
+                updateSavedSchedulesDisplay();
+                
+                // Clear selection after successful save
+                clearScheduleSelection();
+                
+                // Show success message
+                if (savedCount > 0) {
+                    alert(`Successfully saved ${savedCount} schedule(s)!${errors.length > 0 ? '\n\nErrors: ' + errors.join(', ') : ''}`);
+                }
+            } catch (error) {
+                console.error('Error saving schedules:', error);
+                alert('Error saving schedules. Please try again.');
+            }
+        }
+
+        function clearScheduleSelection() {
+            selectedSchedulesForSave.clear();
+            updateSelectedSchedulesDisplay();
+            updateSaveButtonState();
+            
+            // Update all checkboxes in the calendar view
+            document.querySelectorAll('.schedule-checkbox input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
         // Initialize sort description and add event listener
         document.addEventListener('DOMContentLoaded', function() {
+            loadSavedSchedules(); // Load saved schedules first
             updateSortDescription();
             document.getElementById('sort-preference').addEventListener('change', updateSortDescription);
             

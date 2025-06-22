@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import json
 import time  # Import the time module
+import re
 from CourseUtil import ScheduleItem, CourseSection, CoursePlanner
 from sortingMethods import filterByEarliestAtSchool, filterByLatestAtSchool, filterByTotalMinTimeBetweenClasses
 from functools import lru_cache
@@ -240,9 +241,7 @@ def schedule():
         if len(course_codes) == 0:
             print("No Courses Entered")
             error_code = "No_Course_Entered"
-            return render_template('error.html', error_code=error_code)
-
-        # Get earliest and latest times
+            return render_template('error.html', error_code=error_code)        # Get earliest and latest times
         earliest = request.form.get('earliest', None)
         latest = request.form.get('latest', None)
         
@@ -268,11 +267,16 @@ def schedule():
         else:
             latestAtSchool = 0  # Default: 12:00 AM (Midnight)
 
+        print(f"Parsed times: earliest='{earliest}' -> {earliestAtSchool} minutes ({earliestAtSchool//60}:{earliestAtSchool%60:02d})")
+        print(f"Parsed times: latest='{latest}' -> {latestAtSchool} minutes ({latestAtSchool//60}:{latestAtSchool%60:02d})")
+
         # Check if times are valid
         if earliestAtSchool > latestAtSchool:
             error_code = "Invalid_Times"
             print("User entered invalid times")
-            return render_template('error.html', error_code=error_code)        # Load the correct file based on the selected semester
+            return render_template('error.html', error_code=error_code)
+
+        # Load the correct file based on the selected semester
         semester = request.form.get('semester')
         
         # Use cached data loading
@@ -287,9 +291,7 @@ def schedule():
         allCourseData = []
 
         # Initialize a list to store invalid course codes
-        invalid_courses = []
-
-        # Check if courses are available in the data
+        invalid_courses = []        # Check if courses are available in the data
         for course_code in course_codes:
             if course_code in data:
                 course_info = data[course_code]
@@ -302,10 +304,12 @@ def schedule():
                                                    sec["LEC"]["date"])
                     except KeyError:
                         lectureTime = None
+                    
                     try:
                         semTime = ScheduleItem("Seminar", sec["SEM"]["start"], sec["SEM"]["end"], sec["SEM"]["date"])
                     except KeyError:
                         semTime = None
+                    
                     try:
                         labTime = ScheduleItem("Lab", sec["LAB"]["start"], sec["LAB"]["end"], sec["LAB"]["date"])
                     except KeyError:
@@ -316,8 +320,28 @@ def schedule():
                     # Apply course-specific time constraints
                     if section_meets_time_constraints(newSection, course_code, course_time_constraints):
                         allCourseData[-1].append(newSection)
+                
+                # Sort course sections by their latest end time to prioritize earlier-ending sections
+                if latestAtSchool > 0 and allCourseData[-1]:
+                    def get_section_latest_end_time(section):
+                        latest_end = 0
+                        for schedule_item in [section.lecture, section.seminar, section.lab]:
+                            if schedule_item:
+                                latest_end = max(latest_end, schedule_item.finish)
+                        return latest_end
+                    
+                    allCourseData[-1].sort(key=get_section_latest_end_time)
+                    
+                    # Debug: Show section prioritization
+                    if len(allCourseData[-1]) > 1:
+                        earliest_end = get_section_latest_end_time(allCourseData[-1][0])
+                        latest_end = get_section_latest_end_time(allCourseData[-1][-1])
+                        print(f"Course {course_code}: Prioritized {len(allCourseData[-1])} sections by end time "
+                              f"({earliest_end//60}:{earliest_end%60:02d} to {latest_end//60}:{latest_end%60:02d})")
             else:
-                invalid_courses.append(course_code)        # If there are invalid courses, trigger an error
+                invalid_courses.append(course_code)
+        
+        # If there are invalid courses, trigger an error
         if invalid_courses:
             print("Invalid Course Codes")
             print(invalid_courses)
@@ -325,6 +349,18 @@ def schedule():
             return render_template('error.html', error_code=error_code, invalid_courses=invalid_courses)
 
         comb = CoursePlanner(allCourseData)
+        
+        # Estimate total combinations before processing
+        total_estimate = 1
+        for course_list in allCourseData:
+            total_estimate *= len(course_list)
+        
+        print(f"Estimated combinations to check: {total_estimate:,}")
+          # Warn if too many combinations
+        if total_estimate > 200000:
+            print(f"WARNING: Very large number of combinations ({total_estimate:,}). This may take a while...")
+            # Could add early filtering here if needed
+        
         validCombination = comb.nonOverlapped()
 
         if len(validCombination) == 0:
@@ -332,30 +368,85 @@ def schedule():
             error_code = "No_Combinations"
             return render_template('error.html', error_code=error_code)
 
+        # Removed verbose log: Found valid combinations before filters
+        print(f"Time constraints: earliest={earliestAtSchool}, latest={latestAtSchool}")
+
         validCombination = filterByEarliestAtSchool(validCombination, earliestAtSchool)
+        print(f"After earliest time filter: {len(validCombination)}")
+        
         validCombination = filterByLatestAtSchool(validCombination, latestAtSchool)
+        print(f"After latest time filter: {len(validCombination)}")
+
+        # Limit combinations before expensive gap calculation
+        if len(validCombination) > 5000:
+            print(f"Limiting to first 5000 combinations for performance")
+            validCombination = validCombination[:5000]
+
+        # Check if we have any valid combinations before proceeding
+        if len(validCombination) == 0:
+            print("No valid combinations after applying time filters")
+            error_code = "No_Combinations"
+            return render_template('error.html', error_code=error_code)
 
         validCombination, sortedTimeIndices1, times1 = filterByTotalMinTimeBetweenClasses(validCombination)
 
         print("Post Processed Valid Combinations:")
-        print(len(validCombination))        # Get max results and sort preference from form
+        print(len(validCombination))
+        
+        # Check again after gap calculation
+        if len(validCombination) == 0 or len(sortedTimeIndices1) == 0:
+            print("No valid combinations after gap calculation")
+            error_code = "No_Combinations"
+            return render_template('error.html', error_code=error_code)# Get max results and sort preference from form
         max_results = int(request.form.get('max_results', 500))  # Increased default
-        max_results = min(max_results, 5000)  # Cap at 5000 for performance
+        max_results = min(max_results, 2000)  # Reduced cap for better performance
         sort_preference = request.form.get('sort_preference', 'smart_gaps')  # Changed default to smart_gaps
         
         print(f"Sort preference: {sort_preference}")
+        print(f"Max results requested: {max_results}")
         
-        # Apply sorting based on preference
+        # Limit the number of combinations we process for performance
+        processing_limit = min(len(validCombination), 5000)
+        if len(validCombination) > processing_limit:
+            print(f"Limiting processing to {processing_limit} combinations for performance")
+            validCombination = validCombination[:processing_limit]
+            sortedTimeIndices1 = sortedTimeIndices1[:processing_limit]
+            times1 = times1[:processing_limit]        # Apply sorting based on preference
         if sort_preference == 'smart_gaps' or sort_preference == 'minimal_gaps':
-            # Use comprehensive schedule scoring (new default)
+            # Use comprehensive schedule scoring (new default) - optimized version
+            print("Calculating comprehensive scores...")
             comprehensive_scores = []
-            for i in range(len(sortedTimeIndices1)):
-                idx = sortedTimeIndices1[i]
-                combination = validCombination[idx]
+            
+            # Ensure we have valid combinations to process
+            if len(sortedTimeIndices1) == 0:
+                print("No combinations to score")
+                error_code = "No_Combinations"
+                return render_template('error.html', error_code=error_code)
+            
+            # Process in smaller batches for better performance
+            batch_size = min(1000, len(sortedTimeIndices1))
+            if batch_size == 0:
+                batch_size = 1  # Fallback to prevent division by zero
                 
-                # Calculate comprehensive score
-                comp_score, metrics = calculate_comprehensive_schedule_score(combination)
-                comprehensive_scores.append((comp_score, idx, times1[idx], metrics))
+            process_count = min(len(sortedTimeIndices1), max_results * 3)  # Process 3x more than needed
+            
+            for i in range(0, process_count, batch_size):
+                batch_end = min(i + batch_size, process_count)
+                
+                for j in range(i, batch_end):
+                    if j >= len(sortedTimeIndices1):
+                        break
+                        
+                    idx = sortedTimeIndices1[j]
+                    combination = validCombination[idx]
+                    
+                    # Calculate comprehensive score
+                    comp_score, metrics = calculate_comprehensive_schedule_score(combination)
+                    comprehensive_scores.append((comp_score, idx, times1[idx], metrics))
+                
+                # Progress update
+                if batch_end % 500 == 0:
+                    print(f"Scored {batch_end}/{process_count} combinations...")
             
             # Sort by comprehensive score (highest score first)
             comprehensive_scores.sort(key=lambda x: x[0], reverse=True)
@@ -369,6 +460,10 @@ def schedule():
                 best_score = comprehensive_scores[0]
                 print(f"Best schedule score: {best_score[0]:.1f}")
                 print(f"Metrics: {best_score[3]}")
+            else:
+                print("No combinations were scored")
+                error_code = "No_Combinations"
+                return render_template('error.html', error_code=error_code)
             
         elif sort_preference == 'best_gaps':
             # Legacy gap scoring for backward compatibility
@@ -512,6 +607,64 @@ def schedule():
         end_time = time.time()
         elapsed_time = end_time - start_time
 
+        # Check if this is an AJAX request (for single-page app)
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.headers.get('Content-Type') == 'application/json':
+            # Return JSON response for AJAX requests
+            response_data = {
+                'combinations': [],
+                'stats': {
+                    'total_found': len(sortedTimeIndices1),
+                    'processing_time': round(elapsed_time, 2),
+                    'earliest_time': earliestAtSchool,
+                    'latest_time': latestAtSchool
+                }
+            }
+            
+            # Convert combinations to JSON-friendly format
+            for i, combination in enumerate(combinations):
+                combo_data = {
+                    'rank': i + 1,
+                    'total_time': combination['total_time'],
+                    'courses': []
+                }
+                for course in combination['courses']:
+                    course_data = {
+                        'section_id': course.courseCode,
+                        'lecture': None,
+                        'seminar': None,
+                        'lab': None
+                    }
+                    if course.lecture:
+                        course_data['lecture'] = {
+                            'type': course.lecture.item_type,
+                            'start': course.lecture.start,
+                            'finish': course.lecture.finish,
+                            'days': course.lecture.days
+                        }
+                    
+                    if course.seminar:
+                        course_data['seminar'] = {
+                            'type': course.seminar.item_type,
+                            'start': course.seminar.start,
+                            'finish': course.seminar.finish,
+                            'days': course.seminar.days
+                        }
+                    
+                    if course.lab:
+                        course_data['lab'] = {
+                            'type': course.lab.item_type,
+                            'start': course.lab.start,
+                            'finish': course.lab.finish,
+                            'days': course.lab.days
+                        }
+                    
+                    combo_data['courses'].append(course_data)
+                
+                response_data['combinations'].append(combo_data)
+            
+            return jsonify(response_data)
+        
+        # Traditional response for non-AJAX requests
         return render_template('result.html', combinations=combinations, earliestAtSchool=earliestAtSchool,
                                latestAtSchool=latestAtSchool, elapsed_time=elapsed_time,
                                total_possible=len(sortedTimeIndices1))
@@ -523,7 +676,7 @@ def schedule():
 
 @app.route('/api/search-courses')
 def api_search_courses():
-    """Search for courses by query string"""
+    """Search for courses by query string with improved matching"""
     query = request.args.get('q', '').strip()
     semester = request.args.get('semester', 'Summer 2025')
     
@@ -541,29 +694,54 @@ def api_search_courses():
     query_upper = query.upper()
     query_lower = query.lower()
     
+    # Format query to include * if missing (for better course code matching)
+    formatted_query = query_upper
+    if '*' not in query_upper and re.match(r'^[A-Z]+\d+', query_upper):
+        formatted_query = re.sub(r'([A-Z]+)(\d+)', r'\1*\2', query_upper)
+    
     for course_code, course_info in course_data.items():
         if course_code in seen_codes:
             continue
             
-        # Check if query matches course code
-        code_match = query_upper in course_code
-          # Check if query matches course title or description
+        # Multiple matching strategies
+        code_match = False
+        section_match = False
         title_match = False
         description_match = False
+        
+        # 1. Direct code matching (with and without *)
+        code_without_star = course_code.replace('*', '')
+        if (query_upper in course_code or 
+            formatted_query in course_code or 
+            query_upper in code_without_star or
+            course_code.startswith(query_upper) or
+            course_code.startswith(formatted_query)):
+            code_match = True
+        
+        # 2. Section number matching
+        sections = course_info.get('Sections', [])
+        for section in sections:
+            section_id = str(section.get('id', ''))
+            if query_upper in section_id.upper():
+                section_match = True
+                break
+        
+        # Extract course information
         title = "Course"
         description = ""
         credits = ""
         
-        # Extract course information from the main course object
         if 'Title' in course_info:
             title = course_info['Title']
+            # 3. Title matching (search in course title)
             title_match = query_lower in title.lower()
         
         if 'Description' in course_info:
             description = course_info['Description']
+            # 4. Description matching
             description_match = query_lower in description.lower()
             
-        # Extract credits from title (format: "COURSE*1234 Course Name (X.X Credits)")
+        # Extract credits from title
         if title and "(" in title and "Credits)" in title:
             try:
                 credits_part = title.split("(")[1].split(" Credits)")[0]
@@ -572,28 +750,46 @@ def api_search_courses():
                 credits = ""
         
         # Include if any match is found
-        if code_match or title_match or description_match:
+        if code_match or section_match or title_match or description_match:
             seen_codes.add(course_code)
             
             # Count sections
-            section_count = len(course_info.get('Sections', []))
+            section_count = len(sections)
             
-            results.append({
+            # Create result with match type for better sorting
+            result = {
                 'code': course_code,
                 'title': title,
                 'description': description[:100] + "..." if len(description) > 100 else description,
                 'credits': credits,
-                'sections': section_count
-            })
+                'sections': section_count,
+                'match_score': 0
+            }
+            
+            # Calculate match score for sorting
+            if course_code.upper() == formatted_query:
+                result['match_score'] = 100  # Exact match
+            elif course_code.startswith(formatted_query) or course_code.startswith(query_upper):
+                result['match_score'] = 90   # Starts with query
+            elif code_match:
+                result['match_score'] = 80   # Contains query
+            elif section_match:
+                result['match_score'] = 70   # Section match
+            elif title.lower().startswith(query_lower):
+                result['match_score'] = 60   # Title starts with query
+            elif title_match:
+                result['match_score'] = 50   # Title contains query
+            elif description_match:
+                result['match_score'] = 40   # Description match
+            
+            results.append(result)
     
-    # Sort by relevance (exact code match first, then title match, then description match)
-    def sort_key(x):
-        code_exact = x['code'] == query_upper
-        code_starts = x['code'].startswith(query_upper)
-        title_starts = x['title'].lower().startswith(query_lower)
-        return (not code_exact, not code_starts, not title_starts, x['code'])
+    # Sort by match score (highest first), then by course code
+    results.sort(key=lambda x: (-x['match_score'], x['code']))
     
-    results.sort(key=sort_key)
+    # Remove match_score from results before returning
+    for result in results:
+        del result['match_score']
     
     # Limit results to prevent overwhelming the UI
     return jsonify(results[:15])
@@ -656,188 +852,6 @@ if __name__ == '__main__':
 
 
 
-
-
-
-
-
-
-
-
-#
-# from flask import Flask, render_template
-#
-# import M68k_Tutorial.routes
-# from CoursePlaner.routes import course_planer_bp
-# from M68k_Tutorial.routes import m68k_bp
-#
-# app = Flask(__name__)
-#
-# # Register the blueprint
-# app.register_blueprint(course_planer_bp)
-#
-# # Register the blueprint
-# app.register_blueprint(M68k_Tutorial.routes.m68k_bp)
-#
-# @app.route('/')
-# def landing_page():
-#     return render_template('landing_page.html')
-#
-# if __name__ == '__main__':
-#     app.run(debug=False)
-
-#
-#
-#
-#
-#
-#
-#
-# from flask import Flask, render_template, Blueprint, request
-# import json
-# import time
-# import re
-# from CourseUtil import ScheduleItem, CourseSection, CoursePlanner
-# from sortingMethods import filterByEarliestAtSchool, filterByLatestAtSchool, filterByTotalMinTimeBetweenClasses
-#
-#
-# # Course Planner Blueprint
-# course_planer_bp = Blueprint('course_planer', __name__, template_folder='templates', static_folder='static')
-#
-# error_codes = ["No_Course_Entered", "Course_Not_Available", "Invalid_Times", "None", "No_Combinations"]
-#
-# def correct_course_codes(course_codes):
-#     corrected_codes = []
-#     for code in course_codes:
-#         if '*' not in code:
-#             corrected_code = re.sub(r'([A-Za-z]+)(\d+)', r'\1*\2', code)
-#             corrected_codes.append(corrected_code)
-#         else:
-#             corrected_codes.append(code)
-#     return corrected_codes
-#
-# @course_planer_bp.route('/course-planner', methods=['GET', 'POST'])
-# def schedule():
-#     if request.method == 'POST':
-#         error_code = "None"
-#         start_time = time.time()
-#
-#         # Get the course codes and correct the format
-#         course_codes = ''.join(request.form.getlist('courses[]')[0].split()).upper().split(',')
-#         print("Received Course Codes:", course_codes)
-#
-#         course_codes = [code for code in course_codes if code]
-#         course_codes = correct_course_codes(course_codes)
-#
-#         if not course_codes:
-#             error_code = "No_Course_Entered"
-#             return render_template('error.html', error_code=error_code)
-#
-#         earliest = request.form.get('earliest', None)
-#         latest = request.form.get('latest', None)
-#         if earliest:
-#             earliestAtSchool = int(earliest.split(":")[0]) * 60 + int(earliest.split(":")[1])
-#         else:
-#             earliestAtSchool = 0
-#
-#         if latest:
-#             latestAtSchool = int(latest.split(":")[0]) * 60 + int(latest.split(":")[1])
-#         else:
-#             latestAtSchool = 0
-#
-#         if earliestAtSchool > latestAtSchool:
-#             error_code = "Invalid_Times"
-#             return render_template('error.html', error_code=error_code)
-#
-#         semester = request.form.get('semester')
-#         if semester == "Fall 2024":
-#             json_file = 'CoursePlaner/outputF24.json'
-#         elif semester == "Winter 2025":
-#             json_file = 'CoursePlaner/outputW25NoProfNoRooms.json'
-#         else:
-#             error_code = "Invalid_Semester"
-#             return render_template('error.html', error_code=error_code)
-#
-#         try:
-#             with open(json_file, 'r') as file:
-#                 data = json.load(file)
-#         except FileNotFoundError:
-#             error_code = "File_Not_Found"
-#             return render_template('error.html', error_code=error_code)
-#
-#         allCourseData = []
-#         invalid_courses = []
-#         for course_code in course_codes:
-#             if course_code in data:
-#                 course_info = data[course_code]
-#                 allCourseData.append([])
-#                 cData = course_info.get("Sections", [])
-#                 for sec in cData:
-#                     try:
-#                         lectureTime = ScheduleItem("Lecture", sec["LEC"]["start"], sec["LEC"]["end"],
-#                                                    sec["LEC"]["date"])
-#                     except KeyError:
-#                         lectureTime = None
-#                     try:
-#                         semTime = ScheduleItem("Seminar", sec["SEM"]["start"], sec["SEM"]["end"], sec["SEM"]["date"])
-#                     except KeyError:
-#                         semTime = None
-#                     try:
-#                         labTime = ScheduleItem("Lab", sec["LAB"]["start"], sec["LAB"]["end"], sec["LAB"]["date"])
-#                     except KeyError:
-#                         labTime = None
-#
-#                     newSection = CourseSection(sec["id"], lectureTime, semTime, labTime)
-#                     allCourseData[-1].append(newSection)
-#             else:
-#                 invalid_courses.append(course_code)
-#
-#         if invalid_courses:
-#             error_code = "Course_Not_Available"
-#             return render_template('error.html', error_code=error_code, invalid_courses=invalid_courses)
-#
-#         comb = CoursePlanner(allCourseData)
-#         validCombination = comb.nonOverlapped()
-#
-#         if not validCombination:
-#             error_code = "No_Combinations"
-#             return render_template('error.html', error_code=error_code)
-#
-#         validCombination = filterByEarliestAtSchool(validCombination, earliestAtSchool)
-#         validCombination = filterByLatestAtSchool(validCombination, latestAtSchool)
-#         validCombination, sortedTimeIndices1, times1 = filterByTotalMinTimeBetweenClasses(validCombination)
-#
-#         combinations = []
-#         for i in sortedTimeIndices1:
-#             combination = {"total_time": times1[i], "courses": validCombination[i]}
-#             combinations.append(combination)
-#
-#         end_time = time.time()
-#         elapsed_time = end_time - start_time
-#
-#         return render_template(
-#             'result.html',
-#             combinations=combinations,
-#             earliestAtSchool=earliestAtSchool,
-#             latestAtSchool=latestAtSchool,
-#             elapsed_time=elapsed_time,
-#             total_possible=len(comb.combinations),
-#         )
-#
-#     return render_template('index.html')
-#
-#
-# # Main Flask App
-# app = Flask(__name__)
-#
-# app.register_blueprint(course_planer_bp)
-#
-# @app.route('/')
-# def landing_page():
-#     return render_template('index.html')
-#
-# if __name__ == '__main__':
-#     app.run(debug=True)
 
 
 

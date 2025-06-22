@@ -87,46 +87,86 @@ class CourseSection:
 class CoursePlanner:
     def __init__(self, courses):
         self.courses = courses
-        self.combinations = self.generate_combinations()
+        self.combinations = None  # Generate lazily
+        self._conflict_cache = {}
 
     def generate_combinations(self):
-        return list(itertools.product(*self.courses))
+        """Generate combinations lazily to save memory"""
+        if self.combinations is None:
+            self.combinations = list(itertools.product(*self.courses))
+        return self.combinations
 
     def nonOverlapped(self):
-        dateToIndexMap = {"M": 0, "T": 1, "W": 2, "Th": 3, "F": 4, "Sa": 5}
-
+        """Optimized conflict detection using early termination and caching"""
         validCombinations = []
+        
+        # Pre-filter courses by time constraints if needed
+        filtered_courses = []
+        for course_sections in self.courses:
+            # Keep all sections for now, could add pre-filtering here
+            filtered_courses.append(course_sections)
+        
+        total_combinations = 1
+        for course_sections in filtered_courses:
+            total_combinations *= len(course_sections)
+            
+        print(f"Checking {total_combinations} total combinations...")
+        
+        # Use generator to avoid creating all combinations at once
+        combination_count = 0
+        for combination in itertools.product(*filtered_courses):
+            combination_count += 1
+            
+            # Progress indicator for large numbers
+            if combination_count % 10000 == 0:
+                print(f"Processed {combination_count}/{total_combinations} combinations...")
+            
+            # Early termination: check conflicts as we build the combination
+            if self._is_valid_combination_optimized(combination):
+                validCombinations.append(combination)
+                
+            # Limit to prevent memory issues
+            if len(validCombinations) >= 30000:
+    
+                break
 
-        # Locate One Of The Possible Options
-        for possibleCombination in self.combinations:
-            week = [[], [], [], [], [], []]  # Create an empty list for each day (M-F)
-
-            for course in possibleCombination:
-                for schedule_item in [course.lecture, course.seminar, course.lab]:
-                    if schedule_item is not None:
-                        for day in schedule_item.days:
-                            week[dateToIndexMap[day]].append((schedule_item.start, schedule_item.finish))
-
-            isValid = True
-            for w in range(len(week)):
-                # sort low to high based on the start times
-                week[w] = sorted(week[w], key=lambda x: x[0])
-
-                for c in range(1, len(week[w])):
-                    if week[w][c - 1][1] >= week[w][c][0]:  # Check if finish time overlaps with next start
-                        isValid = False
-                        break
-
-                if not isValid:
-                    break
-
-            if isValid:
-                # print("Found Valid Combination!")
-                validCombinations.append(possibleCombination)
-
-        print(f"Valid: {len(validCombinations)} Total: {len(self.combinations)}")
-
+        print(f"Valid: {len(validCombinations)} Total Checked: {combination_count}")
         return validCombinations
+
+    def _is_valid_combination_optimized(self, combination):
+        """Optimized conflict checking with early termination"""
+        # Use pairwise conflict checking instead of day-by-day checking
+        for i in range(len(combination)):
+            for j in range(i + 1, len(combination)):
+                if self._sections_conflict(combination[i], combination[j]):
+                    return False
+        return True
+    
+    def _sections_conflict(self, section1, section2):
+        """Check if two sections conflict using cached results"""
+        # Create a cache key
+        cache_key = (id(section1), id(section2))
+        if cache_key in self._conflict_cache:
+            return self._conflict_cache[cache_key]
+        
+        # Check for conflicts between all schedule items
+        for item1 in section1.get_schedule_items():
+            for item2 in section2.get_schedule_items():
+                if self._items_overlap(item1, item2):
+                    self._conflict_cache[cache_key] = True
+                    return True
+        
+        self._conflict_cache[cache_key] = False
+        return False
+    
+    def _items_overlap(self, item1, item2):
+        """Fast overlap checking"""
+        # Check if they share any common days
+        if not (set(item1.days) & set(item2.days)):
+            return False
+        
+        # Check time overlap
+        return not (item1.finish <= item2.start or item2.finish <= item1.start)
 
     def print_all_schedules(self):
         combinations = self.nonOverlapped()
