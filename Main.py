@@ -392,14 +392,16 @@ def schedule():
 
         print("Post Processed Valid Combinations:")
         print(len(validCombination))
-        
-        # Check again after gap calculation
+          # Check again after gap calculation
         if len(validCombination) == 0 or len(sortedTimeIndices1) == 0:
             print("No valid combinations after gap calculation")
             error_code = "No_Combinations"
-            return render_template('error.html', error_code=error_code)# Get max results and sort preference from form
-        max_results = int(request.form.get('max_results', 500))  # Increased default
-        max_results = min(max_results, 2000)  # Reduced cap for better performance
+            return render_template('error.html', error_code=error_code)
+        
+        # Get max results and sort preference from form
+        # For pagination, we always fetch ALL results (up to 5000) and handle pagination in frontend
+        max_results = 5000  # Always fetch all results for pagination
+        print(f"Fetching all available schedules (max: {max_results}) for pagination")
         sort_preference = request.form.get('sort_preference', 'smart_gaps')  # Changed default to smart_gaps
         
         print(f"Sort preference: {sort_preference}")
