@@ -197,7 +197,22 @@
         .btn-close-white { filter: invert(1) grayscale(100%) brightness(200%); } 
         #modal-calendar-content .visual-schedule-display { height: 500px; } 
         #modal-calendar-content .time-label-col { font-size: 0.6rem; }
-        #modal-calendar-content .course-block-visual span { font-size: 0.55rem; } 
+        #modal-calendar-content .course-block-visual { 
+            align-items: center; /* Center vertically, good for single line */
+            padding: 2px 3px; 
+        }
+        #modal-calendar-content .course-block-visual span { 
+            font-size: 0.55rem; /* Slightly larger for modal */
+            font-weight: 500; /* Bolder */
+            line-height: 1.2; 
+            white-space: nowrap; /* Keep on one line */
+            text-align: left; /* Align to left for horizontal text */
+            display: block;
+            width: 100%;
+            text-overflow: ellipsis; /* In case it's still too long */
+            overflow: hidden;
+            text-shadow: 0 0 2px rgba(0,0,0,0.7); /* For better visibility */
+        } 
         #modal-course-list-content ul { padding-left: 0; list-style: none; }
         #modal-course-list-content li { margin-bottom: 0.25rem; font-size: 0.9rem; }
 
@@ -233,7 +248,7 @@
                         </div>
                         <input type="hidden" name="courses[]" id="courses-hidden-input">
                     </div>
-                    <div>
+                    <div class="mb-3"> 
                         <label for="semester" class="form-label-custom">Select Semester:</label>
                         <div class="semester-pills" id="semester-pills-container">
                             <button type="button" class="semester-pill" data-semester="Summer 2025"><i class="fas fa-sun"></i>S25</button>
@@ -281,15 +296,15 @@
             <div class="filter-grid">
                 <div>
                     <label for="earliest" class="form-label-custom">Earliest Start Time:</label>
-                    <input type="time" id="earliest" name="earliest-filter" class="form-control-custom">
+                    <input type="time" id="earliest" class="form-control-custom">
                 </div>
                 <div>
                     <label for="latest" class="form-label-custom">Latest End Time:</label>
-                    <input type="time" id="latest" name="latest-filter" class="form-control-custom">
+                    <input type="time" id="latest" class="form-control-custom">
                 </div>
                 <div>
                     <label for="sort-preference" class="form-label-custom">Sort Schedules By:</label>
-                    <select id="sort-preference" name="sort_preference-filter" class="form-select-custom">
+                    <select id="sort-preference" class="form-select-custom">
                         <option value="smart_gaps" selected>Smart Gaps (Default)</option>
                         <option value="minimal_gaps">Minimal Gaps</option>
                         <option value="fewer_days">Fewer Days</option>
@@ -300,7 +315,7 @@
                 </div>
                 <div>
                     <label for="items-per-page" class="form-label-custom">Schedules Per Page:</label>
-                    <select id="items-per-page" name="items_per_page-filter" class="form-select-custom"> {/* Changed name */}
+                    <select id="items-per-page" class="form-select-custom">
                         <option value="5">5</option>
                         <option value="10" selected>10</option>
                         <option value="20">20</option>
@@ -492,7 +507,7 @@
         }
         function toggleSavedSchedulesPanel() {
             const panel = document.getElementById('saved-schedules-panel');
-            panel.style.display = panel.style.display === 'none' || panel.style.display === '' ? 'flex' : 'none'; // Use flex for column layout
+            panel.style.display = panel.style.display === 'none' || panel.style.display === '' ? 'flex' : 'none'; 
         }
         
         function resetForm() {
@@ -727,16 +742,11 @@
             
             formData.append('semester', document.getElementById('selected-semester').value);
             formData.append('courses[]', selectedCourses.join(',')); 
-            formData.append('course_time_constraints', JSON.stringify(courseTimeConstraints)); 
+            formData.append('course_time_constraints', document.getElementById('course-time-constraints-input').value);
             formData.append('earliest', document.getElementById('earliest').value || '');
             formData.append('latest', document.getElementById('latest').value || '');
             formData.append('sort_preference', document.getElementById('sort-preference').value);
-            formData.append('items_per_page', document.getElementById('items-per-page').value);
             formData.append('preferred_times', document.getElementById('preferred-times').value || '');
-
-            // console.log("Submitting FormData:", Object.fromEntries(formData));
-            // console.log("Course-specific constraints being sent to backend:", formData.get('course_time_constraints'));
-
 
             try {
                 const response = await fetch('/', {
@@ -849,6 +859,7 @@
                 visualGridHtml += `<div class="day-col-visual" data-day="${dayAbbr}" style="grid-column: ${dayIndex + 2};">`;
                 combination.courses.forEach(course => {
                     const courseCodeBase = course.section_id.split('*').slice(0, 2).join('*'); 
+                    const sectionNumOnly = course.section_id.split('*')[2];
                     
                     ['lecture', 'seminar', 'lab'].forEach(type => {
                         const item = course[type];
@@ -862,14 +873,19 @@
                                 const clampedEndHour = Math.min(endHour, calendarEndHour);
                                 const heightPercent = Math.max(0, (clampedEndHour - Math.max(startHour, calendarStartHour)) / totalCalendarHours * 100);
                                 
-                                const blockText = courseCodeBase; // Use base course code for both views now
+                                let blockTextContent = courseCodeBase; // Default for main grid
+                                if (isModal) {
+                                    const componentTypeAbbr = type.substring(0,3).toUpperCase();
+                                    const timeFormatted = `${formatTime(item.start)}-${formatTime(item.finish)}`;
+                                    blockTextContent = `${courseCodeBase}*${sectionNumOnly} (${componentTypeAbbr}) ${timeFormatted}`;
+                                }
 
                                 if (heightPercent > 0.1) { 
                                      visualGridHtml += `
                                         <div class="course-block-visual ${type.toLowerCase()}" 
                                              style="top: ${topPercent}%; height: ${heightPercent}%;"
                                              title="${course.section_id} ${type.toUpperCase()} ${formatTime(item.start)}-${formatTime(item.finish)}">
-                                             <span>${blockText}</span>
+                                             <span>${blockTextContent}</span>
                                         </div>`;
                                 }
                             }
@@ -881,7 +897,7 @@
             visualGridHtml += '</div>';
 
             if (isModal) { 
-                return visualGridHtml + coursesHtml; // This will be further processed by viewScheduleDetail
+                return visualGridHtml + coursesHtml; 
             }
 
             return `
@@ -906,14 +922,12 @@
 
             modalTitle.textContent = `Schedule Detail (Rank #${schedule.rank || (globalIndex + 1)})`;
             
-            // Generate HTML for modal (isModal = true)
             const modalContentHtml = generateVisualScheduleCard(schedule, globalIndex, true);
             const tempElement = document.createElement('div');
             tempElement.innerHTML = modalContentHtml;
 
-            // Extract calendar and course list parts
             const calendarVisualForModal = tempElement.querySelector('.visual-schedule-display');
-            const courseListForModal = tempElement.querySelector('.schedule-details-list'); // Assuming this class
+            const courseListForModal = tempElement.querySelector('.schedule-details-list'); 
 
             if (calendarVisualForModal) {
                 modalCalendarContent.innerHTML = calendarVisualForModal.outerHTML;
@@ -1002,17 +1016,15 @@
                 alert("Saved schedule not found.");
                 return;
             }
+            // Instead of re-rendering the main grid, directly show the modal
+            // We still need currentResultsData to have this one item for viewScheduleDetail to work
             currentResultsData = {
-                combinations: [scheduleItem.data], 
-                stats: { total_found: 1, processing_time: "N/A" } 
+                combinations: [scheduleItem.data],
+                stats: { total_found: 1, processing_time: "N/A" }
             };
-            currentPage = 1;
-            displayPaginatedResults();
+            viewScheduleDetail(0); // View the first (and only) schedule in this temporary set
+
             document.getElementById('saved-schedules-panel').style.display = 'none'; 
-            const resultsSection = document.querySelector('.results-display-section');
-            if (resultsSection) {
-                resultsSection.scrollIntoView({ behavior: 'smooth' });
-            }
         }
 
         function deleteScheduleFromStorage(scheduleId) {
