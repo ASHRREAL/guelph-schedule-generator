@@ -126,7 +126,7 @@ class CoursePlanner:
                 validCombinations.append(combination)
                 
             # Limit to prevent memory issues
-            if len(validCombinations) >= 30000:
+            if len(validCombinations) >= 10000:
     
                 break
 
