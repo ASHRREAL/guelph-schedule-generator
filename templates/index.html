@@ -876,30 +876,37 @@
         function generateVisualScheduleCard(combination, globalIndex, isModal = false) {
             const scheduleId = `schedule-card-${globalIndex}${isModal ? '-modal' : ''}`;
             let coursesHtml = `<ul class="list-unstyled schedule-details-list ${isModal ? 'fs-sm' : ''}">`;
-            combination.courses.forEach(course => {
+            
+            combination.courses.forEach(course => { // course has .LEC, .SEM, .LAB properties
                 const courseCodeParts = course.section_id.split('*');
-                const courseCode = courseCodeParts[0] + '*' + courseCodeParts[1];
+                const courseCodeDisplay = courseCodeParts[0] + '*' + courseCodeParts[1];
                 const sectionNum = courseCodeParts[2];
-                coursesHtml += `<li><strong>${courseCode} (${sectionNum})</strong>: `;
+                coursesHtml += `<li><strong>${courseCodeDisplay} (${sectionNum})</strong>: `;
+                
                 let times = [];
-                // Check if course.lecture, course.seminar, course.lab exist and are arrays
-                // This function needs to be updated if the scraper changes format to lists of meetings
-                const processMeeting = (meeting, typeAbbr) => {
-                    if (meeting && meeting.start !== undefined && meeting.finish !== undefined && meeting.days) { // Basic check for a single meeting object
-                       return `${typeAbbr} ${formatTime(meeting.start)}-${formatTime(meeting.finish)} ${meeting.days.join('')}`;
-                    } else if (Array.isArray(meeting)) { // If it's an array of meetings
-                        return meeting.map(m => `${typeAbbr} ${formatTime(m.start)}-${formatTime(m.finish)} ${m.days.join('')}`).join('; ');
+                const processMeeting = (meetingData, typeAbbr) => {
+                    if (!meetingData) return ''; // If the component (e.g., LEC) doesn't exist for the course
+                    
+                    let meetings = meetingData;
+                    if (!Array.isArray(meetings)) {
+                        meetings = [meetings]; // Ensure we always iterate over an array
                     }
-                    return '';
+                    
+                    return meetings.map(m => {
+                        if (m && m.start !== undefined && m.finish !== undefined && m.days) {
+                           return `${typeAbbr} ${formatTime(m.start)}-${formatTime(m.finish)} ${m.days.join('')}`;
+                        }
+                        return '';
+                    }).filter(s => s).join('; '); // Filter out empty strings and join
                 };
         
-                let lecTime = processMeeting(course.lecture, 'LEC');
+                let lecTime = processMeeting(course.LEC, 'LEC');
                 if (lecTime) times.push(lecTime);
         
-                let semTime = processMeeting(course.seminar, 'SEM');
+                let semTime = processMeeting(course.SEM, 'SEM');
                 if (semTime) times.push(semTime);
         
-                let labTime = processMeeting(course.lab, 'LAB');
+                let labTime = processMeeting(course.LAB, 'LAB');
                 if (labTime) times.push(labTime);
 
                 coursesHtml += times.join(', ') + '</li>';
@@ -929,18 +936,26 @@
             
             daysOfWeek.forEach((dayAbbr, dayIndex) => {
                 visualGridHtml += `<div class="day-col-visual" data-day="${dayAbbr}" style="grid-column: ${dayIndex + 2};">`;
-                combination.courses.forEach(course => {
+                
+                combination.courses.forEach(course => { // course has .LEC, .SEM, .LAB
                     const courseCodeBase = course.section_id.split('*').slice(0, 2).join('*'); 
                     const sectionNumOnly = course.section_id.split('*')[2];
                     
-                    ['lecture', 'seminar', 'lab'].forEach(type => {
-                        let itemsToProcess = course[type];
-                        if (itemsToProcess && !Array.isArray(itemsToProcess)) { // Ensure it's an array for consistent processing
-                            itemsToProcess = [itemsToProcess];
+                    const componentTypes = [
+                        { key: 'LEC', nameForClass: 'lecture' }, 
+                        { key: 'SEM', nameForClass: 'seminar' }, 
+                        { key: 'LAB', nameForClass: 'lab' }
+                    ];
+
+                    componentTypes.forEach(compType => {
+                        let itemsToProcess = course[compType.key]; // Access using uppercase key, e.g., course.LEC
+
+                        if (itemsToProcess && !Array.isArray(itemsToProcess)) {
+                            itemsToProcess = [itemsToProcess]; // Ensure it's an array
                         }
 
                         if (itemsToProcess && itemsToProcess.length > 0) {
-                            itemsToProcess.forEach(item => { // Iterate if it's an array of meetings
+                            itemsToProcess.forEach(item => { // item is a single meeting object
                                 if (item && item.days && item.days.includes(dayAbbr)) {
                                     const startHour = item.start / 60;
                                     const endHour = item.finish / 60;
@@ -953,16 +968,15 @@
                                         
                                         let blockTextContent = courseCodeBase;
                                         if (isModal) {
-                                            const componentTypeAbbr = type.substring(0,3).toUpperCase();
                                             const timeFormatted = `${formatTime(item.start)}-${formatTime(item.finish)}`;
-                                            blockTextContent = `${courseCodeBase}*${sectionNumOnly} (${componentTypeAbbr}) ${timeFormatted}`;
+                                            blockTextContent = `${courseCodeBase}*${sectionNumOnly} (${compType.key}) ${timeFormatted}`;
                                         }
 
                                         if (heightPercent > 0.1) { 
                                              visualGridHtml += `
-                                                <div class="course-block-visual ${type.toLowerCase()}" 
+                                                <div class="course-block-visual ${compType.nameForClass}" 
                                                      style="top: ${topPercent}%; height: ${heightPercent}%;"
-                                                     title="${course.section_id} ${type.toUpperCase()} ${formatTime(item.start)}-${formatTime(item.finish)}">
+                                                     title="${course.section_id} ${compType.key} ${formatTime(item.start)}-${formatTime(item.finish)}">
                                                      <span>${blockTextContent}</span>
                                                 </div>`;
                                         }
@@ -972,9 +986,9 @@
                         }
                     });
                 });
-                visualGridHtml += `</div>`;
+                visualGridHtml += `</div>`; // Close day-col-visual
             });
-            visualGridHtml += '</div>';
+            visualGridHtml += '</div>'; // Close visual-schedule-display
 
             if (isModal) { 
                 return visualGridHtml + coursesHtml; 

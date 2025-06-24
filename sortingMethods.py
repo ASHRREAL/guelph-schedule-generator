@@ -1,214 +1,201 @@
 def filterByEarliestAtSchool(schedule, startTime):
-    # If the user does not want to filter by this
+
     if startTime == 0:
         return schedule
 
     dateToIndexMap = {"M": 0, "T": 1, "W": 2, "Th": 3, "F": 4, "Sa": 5}
-
     validCombinations = []
 
-    # Locate One Of The Possible Options
-    for possibleCombination in schedule:
-        week = [[], [], [], [], [], []]  # Create an empty list for each day (M-S)
+    for possibleCombination in schedule: 
+        week = [[], [], [], [], [], []]  
+        isValidCombination = True 
 
-        for course in possibleCombination:
-            for schedule_item in [course.lecture, course.seminar, course.lab]:
+        for course_section in possibleCombination: 
+
+            for schedule_item in course_section.get_schedule_items(): 
                 if schedule_item is not None:
+
+                    if schedule_item.start < startTime:
+                        isValidCombination = False
+                        break 
+
                     for day in schedule_item.days:
-                        week[dateToIndexMap[day]].append((schedule_item.start, schedule_item.finish))
+                        if day in dateToIndexMap:
+                             week[dateToIndexMap[day]].append((schedule_item.start, schedule_item.finish))
+            if not isValidCombination:
+                break 
 
-        isValid = True
-        for w in range(len(week)):
-            # sort low to high based on the start times
-            week[w] = sorted(week[w], key=lambda x: x[0])
+        if not isValidCombination: 
+            continue
 
-            if week[w] and week[w][0][0] < startTime:
-                isValid = False
-                break
+        isTrulyValid = True
+        for w_idx in range(len(week)):
+            if week[w_idx]:
+                week[w_idx] = sorted(week[w_idx], key=lambda x: x[0]) 
+                if week[w_idx][0][0] < startTime:
+                    isTrulyValid = False
+                    break
 
-        if isValid:
+        if isTrulyValid:
             validCombinations.append(possibleCombination)
-
-    # print(f"After: {len(validCombinations)} Before: {len(schedule)}")
 
     return validCombinations
 
-
 def filterByLatestAtSchool(schedule, endTime):
-    # If the user does not want to filter by this
+
     if endTime == 0:
         return schedule
 
     dateToIndexMap = {"M": 0, "T": 1, "W": 2, "Th": 3, "F": 4, "Sa": 5}
+    validCombinations = [] 
 
-    # Use tiered filtering approach: prioritize combinations that fit within constraints,
-    # but don't completely eliminate options if user is too restrictive
-    perfect_combinations = []  # Combinations that fit exactly within time constraints
-    acceptable_combinations = []  # Combinations that fit within a small buffer
-    fallback_combinations = []  # Combinations that fit within a larger buffer
-
-    # Debug: Track what's being filtered out
-    filtered_out_count = 0
-    sample_violations = []
-
-    # Locate One Of The Possible Options
     for possibleCombination in schedule:
-        week = [[], [], [], [], [], []]  # Create an empty list for each day (M-S)
+        week = [[], [], [], [], [], []]
+        max_end_time_for_combination = 0
+        has_classes = False
 
-        for course in possibleCombination:
-            for schedule_item in [course.lecture, course.seminar, course.lab]:
+        for course_section in possibleCombination:
+            for schedule_item in course_section.get_schedule_items():
                 if schedule_item is not None:
+                    has_classes = True
+                    max_end_time_for_combination = max(max_end_time_for_combination, schedule_item.finish)
+
                     for day in schedule_item.days:
-                        week[dateToIndexMap[day]].append((schedule_item.start, schedule_item.finish))
+                        if day in dateToIndexMap:
+                            week[dateToIndexMap[day]].append((schedule_item.start, schedule_item.finish))
 
-        # Find the latest end time for this combination
-        latest_end_time = 0
-        for w in range(len(week)):
-            week[w] = sorted(week[w], key=lambda x: x[0])
-            if week[w]:
-                latest_end_time = max(latest_end_time, week[w][-1][-1])
+        if not has_classes: 
+            validCombinations.append(possibleCombination)
+            continue
 
-        # Categorize combinations based on how well they fit time constraints
-        if latest_end_time <= endTime:
-            # Perfect fit - ends exactly on time or earlier
-            perfect_combinations.append(possibleCombination)
-        elif latest_end_time <= endTime + 30:
-            # Acceptable - ends within 30 minutes of preferred time
-            acceptable_combinations.append(possibleCombination)
-        elif latest_end_time <= endTime + 60:
-            # Fallback - ends within 60 minutes of preferred time
-            fallback_combinations.append(possibleCombination)
-        else:
-            # Too late - track for debugging
-            filtered_out_count += 1
-            if len(sample_violations) < 5:
-                sample_violations.append({
-                    'latest_end': latest_end_time,
-                    'limit': endTime,
-                    'latest_end_hours': f"{latest_end_time // 60}:{latest_end_time % 60:02d}",
-                    'limit_hours': f"{endTime // 60}:{endTime % 60:02d}"
-                })
+        isTrulyValid = True
+        for w_idx in range(len(week)):
+            if week[w_idx]:
+                week[w_idx] = sorted(week[w_idx], key=lambda x: x[1], reverse=True) 
+                if week[w_idx][0][1] > endTime: 
+                    isTrulyValid = False
+                    break
 
-    # Return combinations in order of preference: perfect first, then acceptable, then fallback
-    if perfect_combinations:
-        validCombinations = perfect_combinations
-        print(f"Latest time filter: Found {len(perfect_combinations)} combinations ending by {endTime // 60}:{endTime % 60:02d}")
-    elif acceptable_combinations:
-        validCombinations = acceptable_combinations
-        print(f"Latest time filter: Found {len(acceptable_combinations)} combinations ending within 30 min of {endTime // 60}:{endTime % 60:02d}")
-    elif fallback_combinations:
-        validCombinations = fallback_combinations
-        print(f"Latest time filter: Found {len(fallback_combinations)} combinations ending within 60 min of {endTime // 60}:{endTime % 60:02d}")
-    else:
-        # If nothing fits even with 60-minute buffer, return a subset of original combinations
-        # This prevents the system from returning zero results
-        validCombinations = schedule[:min(1000, len(schedule))]
-        print(f"Latest time filter: Time constraints too strict, showing best {len(validCombinations)} combinations")
-
-    # Debug output for rejected combinations
-    if filtered_out_count > 0:
-        print(f"Latest time filter removed {filtered_out_count} combinations that end too late")
-        if sample_violations:
-            print("Sample violations (past 60-minute buffer):")
-            for violation in sample_violations:
-                print(f"  - Class ends at {violation['latest_end_hours']}, limit is {endTime // 60}:{endTime % 60:02d}")
+        if isTrulyValid:
+            validCombinations.append(possibleCombination)
 
     return validCombinations
 
+def filterBySpecificDayOff(schedule, daysOff): 
+    if not daysOff:
+        return schedule
 
-def filterBySpecificDayOff(schedule, daysOff):
-    pass
+    validCombinations = []
+    days_off_set = set(daysOff)
 
+    for possibleCombination in schedule:
+        hasClassOnDayOff = False
+        for course_section in possibleCombination:
+            for schedule_item in course_section.get_schedule_items():
+                if schedule_item is not None:
+
+                    if not set(schedule_item.days).isdisjoint(days_off_set):
+                        hasClassOnDayOff = True
+                        break 
+            if hasClassOnDayOff:
+                break 
+
+        if not hasClassOnDayOff:
+            validCombinations.append(possibleCombination)
+
+    return validCombinations
 
 def filterByAmountOfDaysOff(schedule, numberOfDaysOff):
-    pass
+    if numberOfDaysOff is None or numberOfDaysOff < 0: 
+        return schedule
 
+    validCombinations = []
+    all_possible_week_days = {"M", "T", "W", "Th", "F"} 
+
+    for possibleCombination in schedule:
+        days_on_campus = set()
+        for course_section in possibleCombination:
+            for schedule_item in course_section.get_schedule_items():
+                if schedule_item is not None:
+                    days_on_campus.update(d for d in schedule_item.days if d in all_possible_week_days)
+
+        actual_days_off = len(all_possible_week_days - days_on_campus)
+
+        if actual_days_off >= numberOfDaysOff:
+            validCombinations.append(possibleCombination)
+
+    return validCombinations
 
 def filterByTotalMinTimeBetweenClasses(schedule):
-    """Optimized gap calculation with caching"""
+    """Calculates total gap time for each schedule combination."""
     if not schedule:
-        return schedule, [], []
-    
+        return [], [], [] 
+
     dateToIndexMap = {"M": 0, "T": 1, "W": 2, "Th": 3, "F": 4, "Sa": 5}
-    times = []
-    
-    print(f"Calculating gaps for {len(schedule)} combinations...")
+    gap_times_list = [] 
 
-    # Process in batches for progress indication
-    batch_size = 1000
-    for batch_start in range(0, len(schedule), batch_size):
-        batch_end = min(batch_start + batch_size, len(schedule))
-        
-        for i in range(batch_start, batch_end):
-            possibleCombination = schedule[i]
-            week = [[] for _ in range(6)]  # M-Sa
-            
-            # Build schedule for this combination
-            for course in possibleCombination:
-                for schedule_item in [course.lecture, course.seminar, course.lab]:
-                    if schedule_item is not None:
-                        for day in schedule_item.days:
-                            day_idx = dateToIndexMap[day]
-                            week[day_idx].append((schedule_item.start, schedule_item.finish))
-            
-            # Calculate total gap time
-            total_gap = 0
-            for day_schedule in week:
-                if len(day_schedule) > 1:
-                    day_schedule.sort(key=lambda x: x[0])  # Sort by start time
-                    for j in range(1, len(day_schedule)):
-                        gap = day_schedule[j][0] - day_schedule[j-1][1]
-                        total_gap += max(0, gap)  # Only count positive gaps
-            
-            times.append(total_gap)
-        
-        # Progress indicator
-        if batch_end % 5000 == 0 or batch_end == len(schedule):
-            print(f"Processed {batch_end}/{len(schedule)} combinations...")
+    for i in range(len(schedule)):
+        possibleCombination = schedule[i]
+        week_schedule = [[] for _ in range(6)]  
 
-    # Sort indices by gap time (minimal gaps first)
-    sortedTimeIndices = sorted(range(len(times)), key=times.__getitem__)
-    
-    return schedule, sortedTimeIndices, times
+        for course_section in possibleCombination:
+            for schedule_item in course_section.get_schedule_items():
+                if schedule_item is not None:
+                    for day_char in schedule_item.days:
+                        if day_char in dateToIndexMap:
+                            day_idx = dateToIndexMap[day_char]
+                            week_schedule[day_idx].append((schedule_item.start, schedule_item.finish))
 
+        total_gap_for_combination = 0
+        for daily_meetings in week_schedule:
+            if len(daily_meetings) > 1:
+                daily_meetings.sort(key=lambda x: x[0])  
+                for j in range(len(daily_meetings) - 1):
+                    gap = daily_meetings[j+1][0] - daily_meetings[j][1] 
+                    if gap > 0: 
+                        total_gap_for_combination += gap
+
+        gap_times_list.append(total_gap_for_combination)
+
+    sorted_indices_by_gap = sorted(range(len(gap_times_list)), key=gap_times_list.__getitem__)
+
+    return schedule, sorted_indices_by_gap, gap_times_list
 
 def filterByAvgStartTime(schedule, sortByLatest=False):
+
+    if not schedule:
+        return [], [], []
+
     dateToIndexMap = {"M": 0, "T": 1, "W": 2, "Th": 3, "F": 4, "Sa": 5}
+    avg_start_times = []
 
-    times = []
-
-    # Locate One Of The Possible Options
     for possibleCombination in schedule:
-        week = [[], [], [], [], [], []]  # Create an empty list for each day (M-S)
+        week_first_class_starts = [[] for _ in range(6)]
 
-        for course in possibleCombination:
-            for schedule_item in [course.lecture, course.seminar, course.lab]:
+        for course_section in possibleCombination:
+            for schedule_item in course_section.get_schedule_items():
                 if schedule_item is not None:
-                    for day in schedule_item.days:
-                        week[dateToIndexMap[day]].append((schedule_item.start, schedule_item.finish))
+                    for day_char in schedule_item.days:
+                        if day_char in dateToIndexMap:
 
-        t = 0
-        daysOnCampus = 0
+                            week_first_class_starts[dateToIndexMap[day_char]].append(schedule_item.start)
 
-        for w in range(len(week)):
-            # sort low to high based on the start times
-            week[w] = sorted(week[w], key=lambda x: x[0])
+        sum_of_daily_first_starts = 0
+        days_on_campus_count = 0
 
-            if week[w]:
-                daysOnCampus += 1
-                t += week[w][0][0]
+        for daily_starts in week_first_class_starts:
+            if daily_starts: 
+                days_on_campus_count += 1
+                sum_of_daily_first_starts += min(daily_starts) 
 
-        times.append(t / daysOnCampus)
+        if days_on_campus_count > 0:
+            avg_start_times.append(sum_of_daily_first_starts / days_on_campus_count)
+        else:
+            avg_start_times.append(float('inf') if not sortByLatest else float('-inf')) 
 
-    # Yoinked from https://stackoverflow.com/a/6423325/11521629
-    # Better than using np since there is no dependency
+    sorted_indices = sorted(range(len(avg_start_times)), key=avg_start_times.__getitem__)
 
-    sortedTimeIndices = sorted(range(len(times)), key=times.__getitem__)
+    if sortByLatest: 
+        sorted_indices.reverse()
 
-    # reverse to show the latest classes
-    if sortByLatest:
-        sortedTimeIndices.reverse()
-
-    # print(f"After: {len(validCombinations)} Before: {len(schedule)}")
-
-    return schedule, sortedTimeIndices, times
+    return schedule, sorted_indices, avg_start_times

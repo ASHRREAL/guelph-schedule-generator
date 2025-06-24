@@ -28,35 +28,6 @@
             }
         ]
     },
-    "ACCT*2230": {
-        "Title": "ACCT*2230 Management Accounting (0.5 Credits)",
-        "Description": "This course emphasizes the use of accounting information to facilitate effective management decisions. Topics include cost determination, cost control and analysis, budgeting, profit-volume analysis and capital investment analysis.\n\nOffering(s):\nAlso offered through Distance Education format.\nRestriction(s):\nThis is a Priority Access Course. Enrolment may be restricted to particular programs or specializations. See department for more information.\nDepartment(s):\nDepartment of Management",
-        "Offering": "Also offered through Distance Education format.",
-        "Restriction": "This is a Priority Access Course. Enrolment may be restricted to particular programs or specializations. See department for more information.",
-        "Department": "Department of Management",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "ACCT*2230*DE01",
-                "DISTANCE EDUCATION": {
-                    "start": 0,
-                    "end": 0,
-                    "date": [],
-                    "location": "Guelph"
-                },
-                "EXAM": {
-                    "start": 510,
-                    "end": 630,
-                    "date": [
-                        "T"
-                    ],
-                    "location": "Guelph"
-                }
-            }
-        ]
-    },
     "ACCT*3230": {
         "Title": "ACCT*3230 Intermediate Mgmt Accounting (0.5 Credits)",
         "Description": "This course continues the managerial decision making focus of ACCT*2230. Topics include process costing, transfer pricing, the decision making process, variances and performance measurement.\n\nOffering(s):\nAlso offered through Distance Education format.\nEquate(s):\nBUS*3230\nRestriction(s):\nEnrolment may be restricted to particular degrees or programs. See department for more information.\nDepartment(s):\nDepartment of Management",
@@ -142,38 +113,6 @@
                 "EXAM": {
                     "start": 1140,
                     "end": 1260,
-                    "date": [
-                        "T"
-                    ],
-                    "location": "Guelph"
-                }
-            }
-        ]
-    },
-    "ACCT*3340": {
-        "Title": "ACCT*3340 Intermed Financial Account II (0.5 Credits)",
-        "Description": "This course focuses on how entities account for current and non-current liabilities and equity accounts, including, income taxes, leases, pensions and other post retirement benefits, share equity and retained earnings, stock options. Additional topics may include earnings per share, restatements and statement analysis.\n\nDepartment(s):\nDepartment of Management",
-        "Offering": "",
-        "Restriction": "",
-        "Department": "Department of Management",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "ACCT*3340*01",
-                "LEC": {
-                    "start": 780,
-                    "end": 860,
-                    "date": [
-                        "T",
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "EXAM": {
-                    "start": 870,
-                    "end": 990,
                     "date": [
                         "T"
                     ],
@@ -680,6 +619,39 @@
             }
         ]
     },
+    "BADM*4040": {
+        "Title": "BADM*4040 E-Commerce (0.5 Credits)",
+        "Description": "Students in this course analyze current business models developed for the Internet, and the characteristics of business to business and retail e-commerce sites. A variety of design and technology issues are explored, including servers and credit security. Students design the storefront for a proposed b2b or retail site, as well as implement site traffic analysis and community building strategies. Also offered through distance education format.\n\nDepartment(s):\nBusiness Administration",
+        "Offering": "",
+        "Restriction": "",
+        "Department": "Business Administration",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph-Humber Campus",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "BADM*4040*S2",
+                "LEC": [
+                    {
+                        "start": 645,
+                        "end": 805,
+                        "date": [
+                            "M"
+                        ],
+                        "location": "Guelph-Humber Campus, ,, AD-S, VIRTUAL"
+                    },
+                    {
+                        "start": 645,
+                        "end": 805,
+                        "date": [
+                            "W"
+                        ],
+                        "location": "Guelph-Humber Campus, ,, AD-S, VIRTUAL"
+                    }
+                ]
+            }
+        ]
+    },
     "BADM*4070": {
         "Title": "BADM*4070 Personal Financial Planning (0.5 Credits)",
         "Description": "This course develops the knowledge and skills necessary to provide sound financial planning advice. This course also develops financial judgement, decision making and communication skills. The emphasis in this course is on personal investing. Simulations and case analysis are used extensively in this course.\n\nOffering(s):\nOffered through Distance Education format only.\nDepartment(s):\nBusiness Administration",
@@ -713,29 +685,6 @@
         "Sections": [
             {
                 "id": "BADM*4200*S2",
-                "LEC": {
-                    "start": 865,
-                    "end": 1025,
-                    "date": [
-                        "W"
-                    ],
-                    "location": "Guelph-Humber Campus, ,"
-                }
-            }
-        ]
-    },
-    "BADM*4340": {
-        "Title": "BADM*4340 Leadership in Business (0.5 Credits)",
-        "Description": "In this course, students will examine a number of theories pertaining to leadership as well as describe and evaluate specific leadership styles. Through guest lecturers and case studies, students will appreciate and analyze different perspectives on how leadership is evolving in a variety of large, small, private, not-for-profit and public organizations within Canada and internationally.\n\nDepartment(s):\nBusiness Administration",
-        "Offering": "",
-        "Restriction": "",
-        "Department": "Business Administration",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph-Humber Campus",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "BADM*4340*S1",
                 "LEC": {
                     "start": 865,
                     "end": 1025,
@@ -789,157 +738,6 @@
                         "T"
                     ],
                     "location": "Guelph-Humber Campus, ,"
-                }
-            }
-        ]
-    },
-    "BIOC*2580": {
-        "Title": "BIOC*2580 Introduction to Biochemistry (0.5 Credits)",
-        "Description": "This course introduces students to the evolution, chemical structure, and biological roles of the major molecular components of the cell: including proteins, nucleic acids, lipids, and carbohydrates. Topics and processes integrated through understanding biological macromolecules include enzymology and intermediary metabolism, with emphasis on catabolic processes. Students will gain basic investigative skills through hands-on experiences in a laboratory setting.\n\nDepartment(s):\nDepartment of Molecular and Cellular Biology",
-        "Offering": "",
-        "Restriction": "",
-        "Department": "Department of Molecular and Cellular Biology",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "BIOC*2580*0101",
-                "LEC": {
-                    "start": 540,
-                    "end": 650,
-                    "date": [
-                        "M",
-                        "W",
-                        "F"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "LAB": {
-                    "start": 870,
-                    "end": 1040,
-                    "date": [
-                        "T"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            },
-            {
-                "id": "BIOC*2580*0102",
-                "LEC": {
-                    "start": 540,
-                    "end": 650,
-                    "date": [
-                        "M",
-                        "W",
-                        "F"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "LAB": {
-                    "start": 870,
-                    "end": 1040,
-                    "date": [
-                        "T"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            },
-            {
-                "id": "BIOC*2580*0103",
-                "LEC": {
-                    "start": 540,
-                    "end": 650,
-                    "date": [
-                        "M",
-                        "W",
-                        "F"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "LAB": {
-                    "start": 870,
-                    "end": 1040,
-                    "date": [
-                        "W"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            },
-            {
-                "id": "BIOC*2580*0104",
-                "LEC": {
-                    "start": 540,
-                    "end": 650,
-                    "date": [
-                        "M",
-                        "W",
-                        "F"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "LAB": {
-                    "start": 870,
-                    "end": 1040,
-                    "date": [
-                        "W"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            },
-            {
-                "id": "BIOC*2580*0105",
-                "LEC": {
-                    "start": 540,
-                    "end": 650,
-                    "date": [
-                        "M",
-                        "W",
-                        "F"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "LAB": {
-                    "start": 690,
-                    "end": 860,
-                    "date": [
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            },
-            {
-                "id": "BIOC*2580*0106",
-                "LEC": {
-                    "start": 540,
-                    "end": 650,
-                    "date": [
-                        "M",
-                        "W",
-                        "F"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "LAB": {
-                    "start": 690,
-                    "end": 860,
-                    "date": [
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            },
-            {
-                "id": "BIOC*2580*01XX",
-                "LEC": {
-                    "start": 540,
-                    "end": 650,
-                    "date": [
-                        "M",
-                        "W",
-                        "F"
-                    ],
-                    "location": "Guelph, ,"
                 }
             }
         ]
@@ -1116,326 +914,6 @@
                         "M"
                     ],
                     "location": "Guelph, ,"
-                }
-            }
-        ]
-    },
-    "CDE*6290": {
-        "Title": "CDE*6290 ST:Capacity Building/Extens'n (0.5 Credits)",
-        "Description": "Selected study topics which may be pursued in accordance with the special needs of students in the program.\n\nDepartment(s):\nSchool of Environmental Design and Rural Development",
-        "Offering": "",
-        "Restriction": "",
-        "Department": "School of Environmental Design and Rural Development",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "CDE*6290*01",
-                "LEC": {
-                    "start": 870,
-                    "end": 1040,
-                    "date": [
-                        "T"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            }
-        ]
-    },
-    "CHEM*2070": {
-        "Title": "CHEM*2070 Structure and Spectroscopy (0.5 Credits)",
-        "Description": "This course provides an introduction to spectroscopy and its relationship to molecular structure and dynamics. Rotational, vibrational, electronic and magnetic resonance spectroscopies will be studied. Concepts introduced in CHEM*2060 will be applied to chemical and biochemical problems through spectroscopic techniques. Central to this course is the use of spectroscopy for the determination of molecular structures and the investigation of molecular motions.\n\nDepartment(s):\nDepartment of Chemistry",
-        "Offering": "",
-        "Restriction": "",
-        "Department": "Department of Chemistry",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "CHEM*2070*0101",
-                "LEC": {
-                    "start": 600,
-                    "end": 680,
-                    "date": [
-                        "T",
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "SEM": {
-                    "start": 780,
-                    "end": 860,
-                    "date": [
-                        "W"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            }
-        ]
-    },
-    "CHEM*2700": {
-        "Title": "CHEM*2700 Organic Chemistry I (0.5 Credits)",
-        "Description": "This course provides an introduction to organic chemistry through the discussion of stereochemistry and major reaction mechanisms such as nucleophilic substitution and elimination, electrophilic addition, free radical reactions, electrophilic aromatic substitution, nucleophilic addition and nucleophilic acyl substitution. This course is intended for students who plan to enroll in additional organic chemistry courses.\n\nRestriction(s):\nCHEM*2720. This is a Priority Access Course. Enrolment may be restricted to particular programs, specializations or semester levels during certain periods. Please see the departmental website for more information.\nDepartment(s):\nDepartment of Chemistry",
-        "Offering": "",
-        "Restriction": "CHEM*2720. This is a Priority Access Course. Enrolment may be restricted to particular programs, specializations or semester levels during certain periods. Please see the departmental website for more information.",
-        "Department": "Department of Chemistry",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "CHEM*2700*0101",
-                "LEC": {
-                    "start": 690,
-                    "end": 770,
-                    "date": [
-                        "T",
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "LAB": {
-                    "start": 870,
-                    "end": 1040,
-                    "date": [
-                        "T"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "EXAM": {
-                    "start": 690,
-                    "end": 810,
-                    "date": [
-                        "M"
-                    ],
-                    "location": "Guelph"
-                }
-            },
-            {
-                "id": "CHEM*2700*0102",
-                "LEC": {
-                    "start": 690,
-                    "end": 770,
-                    "date": [
-                        "T",
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "LAB": {
-                    "start": 870,
-                    "end": 1040,
-                    "date": [
-                        "T"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "EXAM": {
-                    "start": 690,
-                    "end": 810,
-                    "date": [
-                        "M"
-                    ],
-                    "location": "Guelph"
-                }
-            },
-            {
-                "id": "CHEM*2700*0105",
-                "LEC": {
-                    "start": 690,
-                    "end": 770,
-                    "date": [
-                        "T",
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "LAB": {
-                    "start": 870,
-                    "end": 1040,
-                    "date": [
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "EXAM": {
-                    "start": 690,
-                    "end": 810,
-                    "date": [
-                        "M"
-                    ],
-                    "location": "Guelph"
-                }
-            },
-            {
-                "id": "CHEM*2700*0106",
-                "LEC": {
-                    "start": 690,
-                    "end": 770,
-                    "date": [
-                        "T",
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "LAB": {
-                    "start": 870,
-                    "end": 1040,
-                    "date": [
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "EXAM": {
-                    "start": 690,
-                    "end": 810,
-                    "date": [
-                        "M"
-                    ],
-                    "location": "Guelph"
-                }
-            },
-            {
-                "id": "CHEM*2700*01XX",
-                "LEC": {
-                    "start": 690,
-                    "end": 770,
-                    "date": [
-                        "T",
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "EXAM": {
-                    "start": 690,
-                    "end": 810,
-                    "date": [
-                        "M"
-                    ],
-                    "location": "Guelph"
-                }
-            }
-        ]
-    },
-    "CHEM*2720": {
-        "Title": "CHEM*2720 Fundamental Organic Chemistry (0.5 Credits)",
-        "Description": "This course provides an introduction to organic chemistry through the discussion of stereochemistry and major reaction mechanisms such as nucleophilic substitution and elimination, electrophilic addition, free radical reactions, electrophilic aromatic substitution, nucleophilic addition and nucleophilic acyl substitution. This course is not acceptable for BSCH students in CHEM, BPCH, BIOC, MBG or BTOX majors, and their respective co-op programs. This course is intended for students who do not plan to enroll in any further organic chemistry courses.\n\nRestriction(s):\nCHEM*2700\nDepartment(s):\nDepartment of Chemistry",
-        "Offering": "",
-        "Restriction": "CHEM*2700",
-        "Department": "Department of Chemistry",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "CHEM*2720*01",
-                "LEC": {
-                    "start": 690,
-                    "end": 770,
-                    "date": [
-                        "T",
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "EXAM": {
-                    "start": 690,
-                    "end": 810,
-                    "date": [
-                        "M"
-                    ],
-                    "location": "Guelph"
-                }
-            }
-        ]
-    },
-    "CHEM*3360": {
-        "Title": "CHEM*3360 Environmental Chem. & Tox. (0.5 Credits)",
-        "Description": "This course examines the chemistry of the natural environment and the influence of pollutants upon the environment. Topics will include methods of introduction of pollutants to, and removal of pollutants from, the environment. (Also listed as TOX*3360.)\n\nOffering(s):\nAlso offered through Distance Education format.\nEquate(s):\nTOX*3360\nDepartment(s):\nDepartment of Chemistry",
-        "Offering": "Also offered through Distance Education format.",
-        "Restriction": "",
-        "Department": "Department of Chemistry",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "CHEM*3360*DE01",
-                "DISTANCE EDUCATION": {
-                    "start": 0,
-                    "end": 0,
-                    "date": [],
-                    "location": "Guelph"
-                }
-            }
-        ]
-    },
-    "CHEM*3430": {
-        "Title": "CHEM*3430 Analytical Chemistry II (0.5 Credits)",
-        "Description": "This course is designed to introduce students to modern methods of instrumental analysis in analytical chemistry. The focus of the course is on trace analysis, and therefore methods for the identification, separation and quantification of trace substances in solids, liquids and vapors will be described. The course is intended to build the foundations of good laboratory practice with good understanding of new concepts and principles of instrumental chemical analysis.\n\nRestriction(s):\nThis is a Priority Access Course. Enrolment may be restricted to particular programs or specializations. See department for more information.\nDepartment(s):\nDepartment of Chemistry",
-        "Offering": "",
-        "Restriction": "This is a Priority Access Course. Enrolment may be restricted to particular programs or specializations. See department for more information.",
-        "Department": "Department of Chemistry",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "CHEM*3430*0102",
-                "LEC": {
-                    "start": 780,
-                    "end": 860,
-                    "date": [
-                        "T",
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "LAB": {
-                    "start": 870,
-                    "end": 1040,
-                    "date": [
-                        "W"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "EXAM": {
-                    "start": 690,
-                    "end": 810,
-                    "date": [
-                        "Sa"
-                    ],
-                    "location": "Guelph"
-                }
-            },
-            {
-                "id": "CHEM*3430*0103",
-                "LEC": {
-                    "start": 780,
-                    "end": 860,
-                    "date": [
-                        "T",
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "LAB": {
-                    "start": 870,
-                    "end": 1040,
-                    "date": [
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                },
-                "EXAM": {
-                    "start": 690,
-                    "end": 810,
-                    "date": [
-                        "Sa"
-                    ],
-                    "location": "Guelph"
                 }
             }
         ]
@@ -2657,29 +2135,6 @@
                     "end": 630,
                     "date": [
                         "Th"
-                    ],
-                    "location": "Ridgetown Campus, ,"
-                }
-            }
-        ]
-    },
-    "DVT*4060": {
-        "Title": "DVT*4060 Vet Technology Externship (0 Credits)",
-        "Description": "The Externship is a six week, 240 hour training and evaluation period in which senior students in their last semester enter veterinary practices away from the Ridgetown Campus. The location should be one in which they have not worked or volunteered previously. Students are required to perform many of the duties that are commonly performed by graduate veterinary technicians, and are assessed by veterinarians or graduate veterinary technicians in the work setting. Students will be assessed by the practice supervisor with input from various members of the veterinary practice team. Students will also have the opportunity to assess their externship practice. If the externship is not completed satisfactorily, it will have to be successfully repeated before the student can graduate. A pass/fail grade will be assigned upon completion of the course.\n\nRestriction(s):\nRegistration in the Associate Diploma in Veterinary Technology Conventional or Alternative program in the final semester of the program.\nDepartment(s):\nRidgetown Academic",
-        "Offering": "",
-        "Restriction": "Registration in the Associate Diploma in Veterinary Technology Conventional or Alternative program in the final semester of the program.",
-        "Department": "Ridgetown Academic",
-        "Requisites": "Requisites:",
-        "Locations": "Ridgetown Campus",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "DVT*4060*01",
-                "LEC": {
-                    "start": 900,
-                    "end": 950,
-                    "date": [
-                        "M"
                     ],
                     "location": "Ridgetown Campus, ,"
                 }
@@ -4784,6 +4239,136 @@
             }
         ]
     },
+    "ACCT*2230": {
+        "Title": "ACCT*2230 Management Accounting (0.5 Credits)",
+        "Description": "This course emphasizes the use of accounting information to facilitate effective management decisions. Topics include cost determination, cost control and analysis, budgeting, profit-volume analysis and capital investment analysis.\n\nOffering(s):\nAlso offered through Distance Education format.\nRestriction(s):\nThis is a Priority Access Course. Enrolment may be restricted to particular programs or specializations. See department for more information.\nDepartment(s):\nDepartment of Management",
+        "Offering": "Also offered through Distance Education format.",
+        "Restriction": "This is a Priority Access Course. Enrolment may be restricted to particular programs or specializations. See department for more information.",
+        "Department": "Department of Management",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "ACCT*2230*DE01",
+                "DISTANCE EDUCATION": {
+                    "start": 0,
+                    "end": 0,
+                    "date": [],
+                    "location": "Guelph"
+                },
+                "EXAM": {
+                    "start": 510,
+                    "end": 630,
+                    "date": [
+                        "T"
+                    ],
+                    "location": "Guelph"
+                }
+            }
+        ]
+    },
+    "ACCT*3340": {
+        "Title": "ACCT*3340 Intermed Financial Account II (0.5 Credits)",
+        "Description": "This course focuses on how entities account for current and non-current liabilities and equity accounts, including, income taxes, leases, pensions and other post retirement benefits, share equity and retained earnings, stock options. Additional topics may include earnings per share, restatements and statement analysis.\n\nDepartment(s):\nDepartment of Management",
+        "Offering": "",
+        "Restriction": "",
+        "Department": "Department of Management",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "ACCT*3340*01",
+                "LEC": {
+                    "start": 780,
+                    "end": 860,
+                    "date": [
+                        "T",
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "EXAM": {
+                    "start": 870,
+                    "end": 990,
+                    "date": [
+                        "T"
+                    ],
+                    "location": "Guelph"
+                }
+            }
+        ]
+    },
+    "BADM*4340": {
+        "Title": "BADM*4340 Leadership in Business (0.5 Credits)",
+        "Description": "In this course, students will examine a number of theories pertaining to leadership as well as describe and evaluate specific leadership styles. Through guest lecturers and case studies, students will appreciate and analyze different perspectives on how leadership is evolving in a variety of large, small, private, not-for-profit and public organizations within Canada and internationally.\n\nDepartment(s):\nBusiness Administration",
+        "Offering": "",
+        "Restriction": "",
+        "Department": "Business Administration",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph-Humber Campus",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "BADM*4340*S1",
+                "LEC": {
+                    "start": 865,
+                    "end": 1025,
+                    "date": [
+                        "W"
+                    ],
+                    "location": "Guelph-Humber Campus, ,"
+                }
+            }
+        ]
+    },
+    "CDE*6290": {
+        "Title": "CDE*6290 ST:Capacity Building/Extens'n (0.5 Credits)",
+        "Description": "Selected study topics which may be pursued in accordance with the special needs of students in the program.\n\nDepartment(s):\nSchool of Environmental Design and Rural Development",
+        "Offering": "",
+        "Restriction": "",
+        "Department": "School of Environmental Design and Rural Development",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "CDE*6290*01",
+                "LEC": {
+                    "start": 870,
+                    "end": 1040,
+                    "date": [
+                        "T"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            }
+        ]
+    },
+    "DVT*4060": {
+        "Title": "DVT*4060 Vet Technology Externship (0 Credits)",
+        "Description": "The Externship is a six week, 240 hour training and evaluation period in which senior students in their last semester enter veterinary practices away from the Ridgetown Campus. The location should be one in which they have not worked or volunteered previously. Students are required to perform many of the duties that are commonly performed by graduate veterinary technicians, and are assessed by veterinarians or graduate veterinary technicians in the work setting. Students will be assessed by the practice supervisor with input from various members of the veterinary practice team. Students will also have the opportunity to assess their externship practice. If the externship is not completed satisfactorily, it will have to be successfully repeated before the student can graduate. A pass/fail grade will be assigned upon completion of the course.\n\nRestriction(s):\nRegistration in the Associate Diploma in Veterinary Technology Conventional or Alternative program in the final semester of the program.\nDepartment(s):\nRidgetown Academic",
+        "Offering": "",
+        "Restriction": "Registration in the Associate Diploma in Veterinary Technology Conventional or Alternative program in the final semester of the program.",
+        "Department": "Ridgetown Academic",
+        "Requisites": "Requisites:",
+        "Locations": "Ridgetown Campus",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "DVT*4060*01",
+                "LEC": {
+                    "start": 900,
+                    "end": 950,
+                    "date": [
+                        "M"
+                    ],
+                    "location": "Ridgetown Campus, ,"
+                }
+            }
+        ]
+    },
     "MCS*1000": {
         "Title": "MCS*1000 Introductory Marketing (0.5 Credits)",
         "Description": "This course covers the marketing of both products and services. Students will be introduced to the theoretical concepts through lectures and class discussions and have the opportunity to apply these concepts through case analysis and discussion.\n\nOffering(s):\nAlso offered through Distance Education format.\nRestriction(s):\nThis is a Priority Access Course. Some restrictions may apply during some time periods. Please contact the department for more information. This course may not be taken for credit subsequent to receiving credit in FARE*4370 or HTM*3080.\nDepartment(s):\nDepartment of Marketing and Consumer Studies",
@@ -5193,75 +4778,6 @@
             }
         ]
     },
-    "MGMT*6130": {
-        "Title": "MGMT*6130 Creative Process of Innovation (0.5 Credits)",
-        "Description": "This course is focused on the creative process of innovation required to effectively engage in problem solving and opportunity creation toward organizational and societal flourishing. Students will develop both a theoretical understanding and the practical skills to engage in creative experimentation for novel idea generation.\n\nDepartment(s):\nDepartment of Management",
-        "Offering": "",
-        "Restriction": "",
-        "Department": "Department of Management",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "MGMT*6130*01",
-                "LEC": {
-                    "start": 870,
-                    "end": 1040,
-                    "date": [
-                        "T"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            }
-        ]
-    },
-    "MGMT*6300": {
-        "Title": "MGMT*6300 Business Consulting (0.5 Credits)",
-        "Description": "This course provides students with an understanding of the concepts, principles, and practices for management consulting. Students will be exposed to the various components of the consulting process, consulting approaches and styles, client- consultant relationships, issue and problem diagnosis, reporting of results, and professional codes of conduct and ethics. The emphasis is on techniques most frequently used in the context of both internal and external organizational roles and as a career choice.\n\nRestriction(s):\nRestricted to MSc Management, Master of Project Management, and Graduate Diploma in Project Management students.\nDepartment(s):\nDepartment of Management",
-        "Offering": "",
-        "Restriction": "Restricted to MSc Management, Master of Project Management, and Graduate Diploma in Project Management students.",
-        "Department": "Department of Management",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "MGMT*6300*01",
-                "LEC": {
-                    "start": 1020,
-                    "end": 1190,
-                    "date": [
-                        "T"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            }
-        ]
-    },
-    "MGMT*6410": {
-        "Title": "MGMT*6410 Advanced Project Management (0.5 Credits)",
-        "Description": "In this course, students learn advanced project management techniques, including estimation, scheduling, costing, scope management, quality management and project closure.\n\nDepartment(s):\nDepartment of Management",
-        "Offering": "",
-        "Restriction": "",
-        "Department": "Department of Management",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "MGMT*6410*01",
-                "LEC": {
-                    "start": 1140,
-                    "end": 1310,
-                    "date": [
-                        "M"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            }
-        ]
-    },
     "MGMT*6500": {
         "Title": "MGMT*6500 Major Research Project (1 Credits)",
         "Description": "This course is available to individuals or groups of graduate students. Students will complete a set of readings and an associated paper as approved by designated faculty. Specific learning objectives consistent with the University's will be developed each time the course is offered.\n\nRestriction(s):\nRestricted to Management masters coursework/MRP students.\nDepartment(s):\nDepartment of Management",
@@ -5450,148 +4966,6 @@
             }
         ]
     },
-    "PABI*6041": {
-        "Title": "PABI*6041 Applied Clinical Pathology III (0.5 Credits)",
-        "Description": "A continuation of PABI*6040 with independent and comprehensive interpretation of diagnostic test results, and analysis of laboratory quality assurance quality control procedures. Intended for students training in clinical pathology and DVM graduates licensed by CVO.\n\nOffering(s):\nAnnually\nRestriction(s):\nInstructor consent required.\nDepartment(s):\nDepartment of Pathobiology",
-        "Offering": "Annually",
-        "Restriction": "Instructor consent required.",
-        "Department": "Department of Pathobiology",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "PABI*6041*01",
-                "LEC": {
-                    "start": 750,
-                    "end": 800,
-                    "date": [
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            }
-        ]
-    },
-    "PABI*6080": {
-        "Title": "PABI*6080 Diagnostic Pathology I (0.5 Credits)",
-        "Description": "An introductory course of diagnostic pathology, including all body systems but emphasizing diseases affecting the whole body and respiratory, urinary and digestive (including liver and pancreas) systems. Intended for students in training in anatomic pathology and Veterinarians licensed by CVO, engaged in applied anatomic pathology training.\n\nRestriction(s):\nInstructor consent required.\nDepartment(s):\nDepartment of Pathobiology",
-        "Offering": "",
-        "Restriction": "Instructor consent required.",
-        "Department": "Department of Pathobiology",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "PABI*6080*01",
-                "LEC": {
-                    "start": 570,
-                    "end": 680,
-                    "date": [
-                        "T",
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            }
-        ]
-    },
-    "PABI*6090": {
-        "Title": "PABI*6090 Diagnostic Pathology II (0.5 Credits)",
-        "Description": "An intermediate course that builds on the skills acquired in PABI*6080 and further enhances diagnostic veterinary pathology skills to include diseases of the nervous, endocrine and musculoskeletal systems. Intended for students training in anatomic pathology and Veterinarians licensed by CVO, engaged in applied anatomic pathology training.\n\nRestriction(s):\nInstructor consent required.\nDepartment(s):\nDepartment of Pathobiology",
-        "Offering": "",
-        "Restriction": "Instructor consent required.",
-        "Department": "Department of Pathobiology",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "PABI*6090*01",
-                "LEC": {
-                    "start": 570,
-                    "end": 680,
-                    "date": [
-                        "T",
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            }
-        ]
-    },
-    "PABI*6091": {
-        "Title": "PABI*6091 Diagnostic Pathology III (0.5 Credits)",
-        "Description": "An advanced course that builds on the skills acquired in PABI*6090 and further enhances diagnostic veterinary pathology skills to include diseases of all organ systems. Intended for students training in anatomic pathology and Veterinarians licensed by CVO, engaged in applied anatomic pathology training.\n\nRestriction(s):\nInstructor consent required.\nDepartment(s):\nDepartment of Pathobiology",
-        "Offering": "",
-        "Restriction": "Instructor consent required.",
-        "Department": "Department of Pathobiology",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "PABI*6091*01",
-                "LEC": {
-                    "start": 570,
-                    "end": 680,
-                    "date": [
-                        "T",
-                        "Th"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            }
-        ]
-    },
-    "PABI*6430": {
-        "Title": "PABI*6430 Acad & Profnl Skills in PABI (0 Credits)",
-        "Description": "Students will be introduced to fundamental elements of scientific research and communication and to various academic skills through lectures, seminars, and completion of in class activities. Throughout the course, relevant ethical, and regulatory issues will be discussed.\n\nDepartment(s):\nDepartment of Pathobiology",
-        "Offering": "",
-        "Restriction": "",
-        "Department": "Department of Pathobiology",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "PABI*6430*01",
-                "LEC": {
-                    "start": 570,
-                    "end": 680,
-                    "date": [
-                        "W",
-                        "F"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            }
-        ]
-    },
-    "PABI*6440": {
-        "Title": "PABI*6440 MSc Seminar in Pathobiology (0.5 Credits)",
-        "Description": "Students registered in the MSc program will develop a written critical review of the literature and plan for their thesis research. This material will also be presented in the form of a public seminar. Students are also required to provide oral and written critical reviews of thesis plan presentations.\n\nDepartment(s):\nDepartment of Pathobiology",
-        "Offering": "",
-        "Restriction": "",
-        "Department": "Department of Pathobiology",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "PABI*6440*01",
-                "LEC": {
-                    "start": 690,
-                    "end": 830,
-                    "date": [
-                        "F"
-                    ],
-                    "location": "Guelph, ,"
-                }
-            }
-        ]
-    },
     "POLS*2230": {
         "Title": "POLS*2230 Public Policy (0.5 Credits)",
         "Description": "The course introduces students to public policy, including the differences between applied and explanatory policy analyses, within the larger context of politics and government. Case studies of different policy areas are used to illustrate the challenges of developing, implementing, and explaining policy in various (and often interrelated) contexts from the local to the global.\n\nOffering(s):\nAlso offered through Distance Education format.\nDepartment(s):\nDepartment of Political Science",
@@ -5615,64 +4989,6 @@
                     "end": 630,
                     "date": [
                         "Sa"
-                    ],
-                    "location": "Guelph"
-                }
-            }
-        ]
-    },
-    "POLS*3210": {
-        "Title": "POLS*3210 The Constit & Can Federalism (0.5 Credits)",
-        "Description": "Canada's constitution and its federal system lie at the heart of the ongoing crisis facing the Canadian Confederation. This course examines the major features of our constitutional development, how the current system of intergovernmental relations has evolved, and the challenges posed by Canada's cultural diversity, pressures for decentralisation, and the maintenance of national sovereignty.\n\nOffering(s):\nAlso offered through Distance Education format.\nDepartment(s):\nDepartment of Political Science",
-        "Offering": "Also offered through Distance Education format.",
-        "Restriction": "",
-        "Department": "Department of Political Science",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "POLS*3210*DE01",
-                "DISTANCE EDUCATION": {
-                    "start": 0,
-                    "end": 0,
-                    "date": [],
-                    "location": "Guelph"
-                },
-                "EXAM": {
-                    "start": 510,
-                    "end": 630,
-                    "date": [
-                        "M"
-                    ],
-                    "location": "Guelph"
-                }
-            }
-        ]
-    },
-    "POLS*3370": {
-        "Title": "POLS*3370 Enviro Politics & Governance (0.5 Credits)",
-        "Description": "This course examines environmental politics and governance in Canada as well as in comparative and international contexts. This is accomplished by surveying how various political, legal, administrative, and private-public actors and processes influence the development and implementation of environmental policy.\n\nOffering(s):\nAlso offered through Distance Education format.\nDepartment(s):\nDepartment of Political Science",
-        "Offering": "Also offered through Distance Education format.",
-        "Restriction": "",
-        "Department": "Department of Political Science",
-        "Requisites": "Requisites:",
-        "Locations": "Guelph",
-        "Offered": "Offered:",
-        "Sections": [
-            {
-                "id": "POLS*3370*DE01",
-                "DISTANCE EDUCATION": {
-                    "start": 0,
-                    "end": 0,
-                    "date": [],
-                    "location": "Guelph"
-                },
-                "EXAM": {
-                    "start": 690,
-                    "end": 810,
-                    "date": [
-                        "W"
                     ],
                     "location": "Guelph"
                 }
@@ -6579,6 +5895,723 @@
                         "F"
                     ],
                     "location": "Guelph, ,"
+                }
+            }
+        ]
+    },
+    "BIOC*2580": {
+        "Title": "BIOC*2580 Introduction to Biochemistry (0.5 Credits)",
+        "Description": "This course introduces students to the evolution, chemical structure, and biological roles of the major molecular components of the cell: including proteins, nucleic acids, lipids, and carbohydrates. Topics and processes integrated through understanding biological macromolecules include enzymology and intermediary metabolism, with emphasis on catabolic processes. Students will gain basic investigative skills through hands-on experiences in a laboratory setting.\n\nDepartment(s):\nDepartment of Molecular and Cellular Biology",
+        "Offering": "",
+        "Restriction": "",
+        "Department": "Department of Molecular and Cellular Biology",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "BIOC*2580*0101",
+                "LEC": {
+                    "start": 540,
+                    "end": 650,
+                    "date": [
+                        "M",
+                        "W",
+                        "F"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "LAB": {
+                    "start": 870,
+                    "end": 1040,
+                    "date": [
+                        "T"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            },
+            {
+                "id": "BIOC*2580*0102",
+                "LEC": {
+                    "start": 540,
+                    "end": 650,
+                    "date": [
+                        "M",
+                        "W",
+                        "F"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "LAB": {
+                    "start": 870,
+                    "end": 1040,
+                    "date": [
+                        "T"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            },
+            {
+                "id": "BIOC*2580*0103",
+                "LEC": {
+                    "start": 540,
+                    "end": 650,
+                    "date": [
+                        "M",
+                        "W",
+                        "F"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "LAB": {
+                    "start": 870,
+                    "end": 1040,
+                    "date": [
+                        "W"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            },
+            {
+                "id": "BIOC*2580*0104",
+                "LEC": {
+                    "start": 540,
+                    "end": 650,
+                    "date": [
+                        "M",
+                        "W",
+                        "F"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "LAB": {
+                    "start": 870,
+                    "end": 1040,
+                    "date": [
+                        "W"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            },
+            {
+                "id": "BIOC*2580*0105",
+                "LEC": {
+                    "start": 540,
+                    "end": 650,
+                    "date": [
+                        "M",
+                        "W",
+                        "F"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "LAB": {
+                    "start": 690,
+                    "end": 860,
+                    "date": [
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            },
+            {
+                "id": "BIOC*2580*0106",
+                "LEC": {
+                    "start": 540,
+                    "end": 650,
+                    "date": [
+                        "M",
+                        "W",
+                        "F"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "LAB": {
+                    "start": 690,
+                    "end": 860,
+                    "date": [
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            },
+            {
+                "id": "BIOC*2580*01XX",
+                "LEC": {
+                    "start": 540,
+                    "end": 650,
+                    "date": [
+                        "M",
+                        "W",
+                        "F"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            }
+        ]
+    },
+    "CHEM*2070": {
+        "Title": "CHEM*2070 Structure and Spectroscopy (0.5 Credits)",
+        "Description": "This course provides an introduction to spectroscopy and its relationship to molecular structure and dynamics. Rotational, vibrational, electronic and magnetic resonance spectroscopies will be studied. Concepts introduced in CHEM*2060 will be applied to chemical and biochemical problems through spectroscopic techniques. Central to this course is the use of spectroscopy for the determination of molecular structures and the investigation of molecular motions.\n\nDepartment(s):\nDepartment of Chemistry",
+        "Offering": "",
+        "Restriction": "",
+        "Department": "Department of Chemistry",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "CHEM*2070*0101",
+                "LEC": {
+                    "start": 600,
+                    "end": 680,
+                    "date": [
+                        "T",
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "SEM": {
+                    "start": 780,
+                    "end": 860,
+                    "date": [
+                        "W"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            }
+        ]
+    },
+    "CHEM*2700": {
+        "Title": "CHEM*2700 Organic Chemistry I (0.5 Credits)",
+        "Description": "This course provides an introduction to organic chemistry through the discussion of stereochemistry and major reaction mechanisms such as nucleophilic substitution and elimination, electrophilic addition, free radical reactions, electrophilic aromatic substitution, nucleophilic addition and nucleophilic acyl substitution. This course is intended for students who plan to enroll in additional organic chemistry courses.\n\nRestriction(s):\nCHEM*2720. This is a Priority Access Course. Enrolment may be restricted to particular programs, specializations or semester levels during certain periods. Please see the departmental website for more information.\nDepartment(s):\nDepartment of Chemistry",
+        "Offering": "",
+        "Restriction": "CHEM*2720. This is a Priority Access Course. Enrolment may be restricted to particular programs, specializations or semester levels during certain periods. Please see the departmental website for more information.",
+        "Department": "Department of Chemistry",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "CHEM*2700*0101",
+                "LEC": {
+                    "start": 690,
+                    "end": 770,
+                    "date": [
+                        "T",
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "LAB": {
+                    "start": 870,
+                    "end": 1040,
+                    "date": [
+                        "T"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "EXAM": {
+                    "start": 690,
+                    "end": 810,
+                    "date": [
+                        "M"
+                    ],
+                    "location": "Guelph"
+                }
+            },
+            {
+                "id": "CHEM*2700*0102",
+                "LEC": {
+                    "start": 690,
+                    "end": 770,
+                    "date": [
+                        "T",
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "LAB": {
+                    "start": 870,
+                    "end": 1040,
+                    "date": [
+                        "T"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "EXAM": {
+                    "start": 690,
+                    "end": 810,
+                    "date": [
+                        "M"
+                    ],
+                    "location": "Guelph"
+                }
+            },
+            {
+                "id": "CHEM*2700*0105",
+                "LEC": {
+                    "start": 690,
+                    "end": 770,
+                    "date": [
+                        "T",
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "LAB": {
+                    "start": 870,
+                    "end": 1040,
+                    "date": [
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "EXAM": {
+                    "start": 690,
+                    "end": 810,
+                    "date": [
+                        "M"
+                    ],
+                    "location": "Guelph"
+                }
+            },
+            {
+                "id": "CHEM*2700*0106",
+                "LEC": {
+                    "start": 690,
+                    "end": 770,
+                    "date": [
+                        "T",
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "LAB": {
+                    "start": 870,
+                    "end": 1040,
+                    "date": [
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "EXAM": {
+                    "start": 690,
+                    "end": 810,
+                    "date": [
+                        "M"
+                    ],
+                    "location": "Guelph"
+                }
+            },
+            {
+                "id": "CHEM*2700*01XX",
+                "LEC": {
+                    "start": 690,
+                    "end": 770,
+                    "date": [
+                        "T",
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "EXAM": {
+                    "start": 690,
+                    "end": 810,
+                    "date": [
+                        "M"
+                    ],
+                    "location": "Guelph"
+                }
+            }
+        ]
+    },
+    "CHEM*2720": {
+        "Title": "CHEM*2720 Fundamental Organic Chemistry (0.5 Credits)",
+        "Description": "This course provides an introduction to organic chemistry through the discussion of stereochemistry and major reaction mechanisms such as nucleophilic substitution and elimination, electrophilic addition, free radical reactions, electrophilic aromatic substitution, nucleophilic addition and nucleophilic acyl substitution. This course is not acceptable for BSCH students in CHEM, BPCH, BIOC, MBG or BTOX majors, and their respective co-op programs. This course is intended for students who do not plan to enroll in any further organic chemistry courses.\n\nRestriction(s):\nCHEM*2700\nDepartment(s):\nDepartment of Chemistry",
+        "Offering": "",
+        "Restriction": "CHEM*2700",
+        "Department": "Department of Chemistry",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "CHEM*2720*01",
+                "LEC": {
+                    "start": 690,
+                    "end": 770,
+                    "date": [
+                        "T",
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "EXAM": {
+                    "start": 690,
+                    "end": 810,
+                    "date": [
+                        "M"
+                    ],
+                    "location": "Guelph"
+                }
+            }
+        ]
+    },
+    "CHEM*3360": {
+        "Title": "CHEM*3360 Environmental Chem. & Tox. (0.5 Credits)",
+        "Description": "This course examines the chemistry of the natural environment and the influence of pollutants upon the environment. Topics will include methods of introduction of pollutants to, and removal of pollutants from, the environment. (Also listed as TOX*3360.)\n\nOffering(s):\nAlso offered through Distance Education format.\nEquate(s):\nTOX*3360\nDepartment(s):\nDepartment of Chemistry",
+        "Offering": "Also offered through Distance Education format.",
+        "Restriction": "",
+        "Department": "Department of Chemistry",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "CHEM*3360*DE01",
+                "DISTANCE EDUCATION": {
+                    "start": 0,
+                    "end": 0,
+                    "date": [],
+                    "location": "Guelph"
+                }
+            }
+        ]
+    },
+    "CHEM*3430": {
+        "Title": "CHEM*3430 Analytical Chemistry II (0.5 Credits)",
+        "Description": "This course is designed to introduce students to modern methods of instrumental analysis in analytical chemistry. The focus of the course is on trace analysis, and therefore methods for the identification, separation and quantification of trace substances in solids, liquids and vapors will be described. The course is intended to build the foundations of good laboratory practice with good understanding of new concepts and principles of instrumental chemical analysis.\n\nRestriction(s):\nThis is a Priority Access Course. Enrolment may be restricted to particular programs or specializations. See department for more information.\nDepartment(s):\nDepartment of Chemistry",
+        "Offering": "",
+        "Restriction": "This is a Priority Access Course. Enrolment may be restricted to particular programs or specializations. See department for more information.",
+        "Department": "Department of Chemistry",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "CHEM*3430*0102",
+                "LEC": {
+                    "start": 780,
+                    "end": 860,
+                    "date": [
+                        "T",
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "LAB": {
+                    "start": 870,
+                    "end": 1040,
+                    "date": [
+                        "W"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "EXAM": {
+                    "start": 690,
+                    "end": 810,
+                    "date": [
+                        "Sa"
+                    ],
+                    "location": "Guelph"
+                }
+            },
+            {
+                "id": "CHEM*3430*0103",
+                "LEC": {
+                    "start": 780,
+                    "end": 860,
+                    "date": [
+                        "T",
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "LAB": {
+                    "start": 870,
+                    "end": 1040,
+                    "date": [
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                },
+                "EXAM": {
+                    "start": 690,
+                    "end": 810,
+                    "date": [
+                        "Sa"
+                    ],
+                    "location": "Guelph"
+                }
+            }
+        ]
+    },
+    "MGMT*6130": {
+        "Title": "MGMT*6130 Creative Process of Innovation (0.5 Credits)",
+        "Description": "This course is focused on the creative process of innovation required to effectively engage in problem solving and opportunity creation toward organizational and societal flourishing. Students will develop both a theoretical understanding and the practical skills to engage in creative experimentation for novel idea generation.\n\nDepartment(s):\nDepartment of Management",
+        "Offering": "",
+        "Restriction": "",
+        "Department": "Department of Management",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "MGMT*6130*01",
+                "LEC": {
+                    "start": 870,
+                    "end": 1040,
+                    "date": [
+                        "T"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            }
+        ]
+    },
+    "MGMT*6300": {
+        "Title": "MGMT*6300 Business Consulting (0.5 Credits)",
+        "Description": "This course provides students with an understanding of the concepts, principles, and practices for management consulting. Students will be exposed to the various components of the consulting process, consulting approaches and styles, client- consultant relationships, issue and problem diagnosis, reporting of results, and professional codes of conduct and ethics. The emphasis is on techniques most frequently used in the context of both internal and external organizational roles and as a career choice.\n\nRestriction(s):\nRestricted to MSc Management, Master of Project Management, and Graduate Diploma in Project Management students.\nDepartment(s):\nDepartment of Management",
+        "Offering": "",
+        "Restriction": "Restricted to MSc Management, Master of Project Management, and Graduate Diploma in Project Management students.",
+        "Department": "Department of Management",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "MGMT*6300*01",
+                "LEC": {
+                    "start": 1020,
+                    "end": 1190,
+                    "date": [
+                        "T"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            }
+        ]
+    },
+    "MGMT*6410": {
+        "Title": "MGMT*6410 Advanced Project Management (0.5 Credits)",
+        "Description": "In this course, students learn advanced project management techniques, including estimation, scheduling, costing, scope management, quality management and project closure.\n\nDepartment(s):\nDepartment of Management",
+        "Offering": "",
+        "Restriction": "",
+        "Department": "Department of Management",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "MGMT*6410*01",
+                "LEC": {
+                    "start": 1140,
+                    "end": 1310,
+                    "date": [
+                        "M"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            }
+        ]
+    },
+    "PABI*6041": {
+        "Title": "PABI*6041 Applied Clinical Pathology III (0.5 Credits)",
+        "Description": "A continuation of PABI*6040 with independent and comprehensive interpretation of diagnostic test results, and analysis of laboratory quality assurance quality control procedures. Intended for students training in clinical pathology and DVM graduates licensed by CVO.\n\nOffering(s):\nAnnually\nRestriction(s):\nInstructor consent required.\nDepartment(s):\nDepartment of Pathobiology",
+        "Offering": "Annually",
+        "Restriction": "Instructor consent required.",
+        "Department": "Department of Pathobiology",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "PABI*6041*01",
+                "LEC": {
+                    "start": 750,
+                    "end": 800,
+                    "date": [
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            }
+        ]
+    },
+    "PABI*6080": {
+        "Title": "PABI*6080 Diagnostic Pathology I (0.5 Credits)",
+        "Description": "An introductory course of diagnostic pathology, including all body systems but emphasizing diseases affecting the whole body and respiratory, urinary and digestive (including liver and pancreas) systems. Intended for students in training in anatomic pathology and Veterinarians licensed by CVO, engaged in applied anatomic pathology training.\n\nRestriction(s):\nInstructor consent required.\nDepartment(s):\nDepartment of Pathobiology",
+        "Offering": "",
+        "Restriction": "Instructor consent required.",
+        "Department": "Department of Pathobiology",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "PABI*6080*01",
+                "LEC": {
+                    "start": 570,
+                    "end": 680,
+                    "date": [
+                        "T",
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            }
+        ]
+    },
+    "PABI*6090": {
+        "Title": "PABI*6090 Diagnostic Pathology II (0.5 Credits)",
+        "Description": "An intermediate course that builds on the skills acquired in PABI*6080 and further enhances diagnostic veterinary pathology skills to include diseases of the nervous, endocrine and musculoskeletal systems. Intended for students training in anatomic pathology and Veterinarians licensed by CVO, engaged in applied anatomic pathology training.\n\nRestriction(s):\nInstructor consent required.\nDepartment(s):\nDepartment of Pathobiology",
+        "Offering": "",
+        "Restriction": "Instructor consent required.",
+        "Department": "Department of Pathobiology",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "PABI*6090*01",
+                "LEC": {
+                    "start": 570,
+                    "end": 680,
+                    "date": [
+                        "T",
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            }
+        ]
+    },
+    "PABI*6091": {
+        "Title": "PABI*6091 Diagnostic Pathology III (0.5 Credits)",
+        "Description": "An advanced course that builds on the skills acquired in PABI*6090 and further enhances diagnostic veterinary pathology skills to include diseases of all organ systems. Intended for students training in anatomic pathology and Veterinarians licensed by CVO, engaged in applied anatomic pathology training.\n\nRestriction(s):\nInstructor consent required.\nDepartment(s):\nDepartment of Pathobiology",
+        "Offering": "",
+        "Restriction": "Instructor consent required.",
+        "Department": "Department of Pathobiology",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "PABI*6091*01",
+                "LEC": {
+                    "start": 570,
+                    "end": 680,
+                    "date": [
+                        "T",
+                        "Th"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            }
+        ]
+    },
+    "PABI*6430": {
+        "Title": "PABI*6430 Acad & Profnl Skills in PABI (0 Credits)",
+        "Description": "Students will be introduced to fundamental elements of scientific research and communication and to various academic skills through lectures, seminars, and completion of in class activities. Throughout the course, relevant ethical, and regulatory issues will be discussed.\n\nDepartment(s):\nDepartment of Pathobiology",
+        "Offering": "",
+        "Restriction": "",
+        "Department": "Department of Pathobiology",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "PABI*6430*01",
+                "LEC": {
+                    "start": 570,
+                    "end": 680,
+                    "date": [
+                        "W",
+                        "F"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            }
+        ]
+    },
+    "PABI*6440": {
+        "Title": "PABI*6440 MSc Seminar in Pathobiology (0.5 Credits)",
+        "Description": "Students registered in the MSc program will develop a written critical review of the literature and plan for their thesis research. This material will also be presented in the form of a public seminar. Students are also required to provide oral and written critical reviews of thesis plan presentations.\n\nDepartment(s):\nDepartment of Pathobiology",
+        "Offering": "",
+        "Restriction": "",
+        "Department": "Department of Pathobiology",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "PABI*6440*01",
+                "LEC": {
+                    "start": 690,
+                    "end": 830,
+                    "date": [
+                        "F"
+                    ],
+                    "location": "Guelph, ,"
+                }
+            }
+        ]
+    },
+    "POLS*3210": {
+        "Title": "POLS*3210 The Constit & Can Federalism (0.5 Credits)",
+        "Description": "Canada's constitution and its federal system lie at the heart of the ongoing crisis facing the Canadian Confederation. This course examines the major features of our constitutional development, how the current system of intergovernmental relations has evolved, and the challenges posed by Canada's cultural diversity, pressures for decentralisation, and the maintenance of national sovereignty.\n\nOffering(s):\nAlso offered through Distance Education format.\nDepartment(s):\nDepartment of Political Science",
+        "Offering": "Also offered through Distance Education format.",
+        "Restriction": "",
+        "Department": "Department of Political Science",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "POLS*3210*DE01",
+                "DISTANCE EDUCATION": {
+                    "start": 0,
+                    "end": 0,
+                    "date": [],
+                    "location": "Guelph"
+                },
+                "EXAM": {
+                    "start": 510,
+                    "end": 630,
+                    "date": [
+                        "M"
+                    ],
+                    "location": "Guelph"
+                }
+            }
+        ]
+    },
+    "POLS*3370": {
+        "Title": "POLS*3370 Enviro Politics & Governance (0.5 Credits)",
+        "Description": "This course examines environmental politics and governance in Canada as well as in comparative and international contexts. This is accomplished by surveying how various political, legal, administrative, and private-public actors and processes influence the development and implementation of environmental policy.\n\nOffering(s):\nAlso offered through Distance Education format.\nDepartment(s):\nDepartment of Political Science",
+        "Offering": "Also offered through Distance Education format.",
+        "Restriction": "",
+        "Department": "Department of Political Science",
+        "Requisites": "Requisites:",
+        "Locations": "Guelph",
+        "Offered": "Offered:",
+        "Sections": [
+            {
+                "id": "POLS*3370*DE01",
+                "DISTANCE EDUCATION": {
+                    "start": 0,
+                    "end": 0,
+                    "date": [],
+                    "location": "Guelph"
+                },
+                "EXAM": {
+                    "start": 690,
+                    "end": 810,
+                    "date": [
+                        "W"
+                    ],
+                    "location": "Guelph"
                 }
             }
         ]
