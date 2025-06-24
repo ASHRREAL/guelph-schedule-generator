@@ -298,10 +298,7 @@ def schedule():
         if not validCombinations:
              return _handle_error("No_Combinations_Query_Too_Strict")
 
-        processing_cap = 7500 
-        if len(validCombinations) > processing_cap:
-            print(f"Limiting to first {processing_cap} combinations (out of {len(validCombinations)}) for scoring.")
-            validCombinations = validCombinations[:processing_cap]
+       
 
         _, sorted_gap_indices, gap_times_list = filterByTotalMinTimeBetweenClasses(validCombinations)
         print(f"Gap calculation done. {len(validCombinations)} combinations remain for sorting.")
