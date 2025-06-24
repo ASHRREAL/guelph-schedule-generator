@@ -5,16 +5,16 @@ import re
 from CourseUtil import ScheduleItem, CourseSection, CoursePlanner
 
 from sortingMethods import (
-    filterByEarliestAtSchool, filterByLatestAtSchool, 
+    filterByEarliestAtSchool, filterByLatestAtSchool,
     filterByTotalMinTimeBetweenClasses, filterByAvgStartTime,
-    filterBySpecificDayOff, filterByAmountOfDaysOff 
+    filterBySpecificDayOff, filterByAmountOfDaysOff
 )
 from functools import lru_cache
 import gc
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
-app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False 
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
 course_data_cache = {}
 
@@ -23,15 +23,17 @@ error_messages = {
     "Course_Not_Available": "One or more selected courses are not available for the chosen semester.",
     "Invalid_Times": "The 'Earliest Start Time' cannot be after the 'Latest End Time'.",
     "No_Combinations": "No schedules match your selected courses and constraints.",
-    "No_Combinations_For_Course": "A selected course has no sections that meet all time criteria. Cannot generate schedules.",
+    "No_Combinations_For_Course": "A selected course has no sections that meet all specified time criteria. Please adjust constraints for this course or global times.",
     "No_Combinations_Query_Too_Strict": "No schedules found. Your time or course-specific constraints might be too strict.",
     "Invalid_Semester": "The selected semester data is not available."
 }
 
-@lru_cache(maxsize=3) 
+MAX_SCHEDULES_TO_DISPLAY = 500
+
+@lru_cache(maxsize=3)
 def load_course_data(json_file):
     try:
-        with open(json_file, 'r', encoding='utf-8') as file: 
+        with open(json_file, 'r', encoding='utf-8') as file:
             return json.load(file)
     except FileNotFoundError:
         print(f"Error: Data file {json_file} not found.")
@@ -41,7 +43,6 @@ def load_course_data(json_file):
         return None
 
 def get_cached_course_data(semester):
-
     json_file_map = {
         "Summer 2025": 'S25.json',
         "Fall 2025": 'F25.json',
@@ -55,16 +56,15 @@ def get_cached_course_data(semester):
         if data:
             course_data_cache[json_file] = data
         else:
-            return None 
+            return None
     return course_data_cache.get(json_file)
 
 def correct_course_codes(course_codes):
     corrected_codes = []
     for code in course_codes:
-        code = code.strip().upper() 
+        code = code.strip().upper()
         if not code: continue
         if '*' not in code:
-
             corrected_code = re.sub(r'([A-Z]+)(\d+)', r'\1*\2', code)
             corrected_codes.append(corrected_code)
         else:
@@ -81,13 +81,13 @@ def convert_time_to_minutes(time_str):
 
 def calculate_cm_schedule_score(combination):
     dateToIndexMap = {"M": 0, "T": 1, "W": 2, "Th": 3, "F": 4, "Sa": 5}
-    week = [[] for _ in range(6)] 
+    week = [[] for _ in range(6)]
 
-    for course_section in combination: 
-        for schedule_item in course_section.get_schedule_items(): 
+    for course_section in combination:
+        for schedule_item in course_section.get_schedule_items():
             if schedule_item is not None:
                 for day in schedule_item.days:
-                    if day in dateToIndexMap: 
+                    if day in dateToIndexMap:
                         week[dateToIndexMap[day]].append((schedule_item.start, schedule_item.finish))
 
     for w_idx in range(len(week)):
@@ -95,7 +95,7 @@ def calculate_cm_schedule_score(combination):
 
     score = 0
     gap_penalties = 0
-    back_to_back_penalties = 0 
+    back_to_back_penalties = 0
     long_day_penalties = 0
     days_on_campus = 0
 
@@ -105,7 +105,7 @@ def calculate_cm_schedule_score(combination):
         day_start_time, day_end_time = day_schedule[0][0], day_schedule[-1][1]
         day_duration = day_end_time - day_start_time
 
-        if day_duration > 8 * 60: 
+        if day_duration > 8 * 60:
             long_day_penalties += (day_duration - 8 * 60) * 0.1
 
         for i in range(len(day_schedule) - 1):
@@ -113,38 +113,37 @@ def calculate_cm_schedule_score(combination):
             next_class_start = day_schedule[i+1][0]
             gap = next_class_start - current_class_end
 
-            if gap == 0: 
-                back_to_back_penalties += 20 
-            elif gap < 0: 
-                gap_penalties += 100 
-            elif gap < 15: 
-                gap_penalties += 30 
-            elif gap < 30: 
+            if gap == 0:
+                back_to_back_penalties += 20
+            elif gap < 0:
+                gap_penalties += 100
+            elif gap < 15:
+                gap_penalties += 30
+            elif gap < 30:
                 gap_penalties += 10
-            elif 30 <= gap <= 120: 
-
+            elif 30 <= gap <= 120:
                 score += 20 + (10 * (1 - abs(gap - 60) / 60))
-            elif gap <= 180: 
-                gap_penalties += 5 
-            else: 
-                gap_penalties += gap * 0.1 
+            elif gap <= 180:
+                gap_penalties += 5
+            else:
+                gap_penalties += gap * 0.1
 
     if days_on_campus <= 3: score += 50
     elif days_on_campus == 4: score += 25
 
     final_score = score - gap_penalties - back_to_back_penalties - long_day_penalties
     return final_score, {
-        'base_score': score, 
-        'gap_penalties': gap_penalties, 
-        'back_to_back_penalties': back_to_back_penalties, 
-        'long_day_penalties': long_day_penalties, 
+        'base_score': score,
+        'gap_penalties': gap_penalties,
+        'back_to_back_penalties': back_to_back_penalties,
+        'long_day_penalties': long_day_penalties,
         'days_on_campus': days_on_campus
     }
 
-def calculate_gap_score(total_gap_minutes): 
-    if total_gap_minutes < 60 : return 100 - total_gap_minutes 
-    elif total_gap_minutes < 240: return 80 - (total_gap_minutes - 60) * 0.1 
-    else: return max(0, 40 - (total_gap_minutes - 240) * 0.2) 
+def calculate_gap_score(total_gap_minutes):
+    if total_gap_minutes < 60 : return 100 - total_gap_minutes
+    elif total_gap_minutes < 240: return 80 - (total_gap_minutes - 60) * 0.1
+    else: return max(0, 40 - (total_gap_minutes - 240) * 0.2)
 
 def section_meets_time_constraints(section, course_code, course_time_constraints):
     if course_code not in course_time_constraints: return True
@@ -159,7 +158,9 @@ def section_meets_time_constraints(section, course_code, course_time_constraints
 def _handle_error(error_code_key, status_code=400, **kwargs):
     message = error_messages.get(error_code_key, "An unknown error occurred.")
     if "problematic_course" in kwargs:
-        message = f"Course {kwargs['problematic_course']}: No sections meet all specified time criteria. Please adjust constraints for this course or global times."
+        message = f"One or more courses cannot be scheduled: {kwargs['problematic_course']}. Please check constraints or course availability."
+        if error_code_key == "No_Combinations_For_Course":
+             message = f"For course(s) {kwargs['problematic_course']}: No sections meet all specified time criteria. Please adjust constraints for these courses or global times."
     elif "invalid_courses" in kwargs:
         message = f"Courses not found or not available in {kwargs.get('semester', 'selected semester')}: {', '.join(kwargs['invalid_courses'])}. Please check course codes and semester selection."
 
@@ -173,7 +174,7 @@ def schedule():
     if request.method == 'POST':
         request_start_time = time.time()
 
-        course_codes_str = request.form.getlist('courses[]')[0] 
+        course_codes_str = request.form.getlist('courses[]')[0]
         raw_course_codes = [code.strip() for code in course_codes_str.split(',') if code.strip()]
         course_codes = correct_course_codes(raw_course_codes)
 
@@ -191,7 +192,7 @@ def schedule():
             course_time_constraints = {}
 
         earliestAtSchool = convert_time_to_minutes(earliest_str) or 0
-        latestAtSchool = convert_time_to_minutes(latest_str) or 0 
+        latestAtSchool = convert_time_to_minutes(latest_str) or 0
 
         if earliestAtSchool > 0 and latestAtSchool > 0 and earliestAtSchool >= latestAtSchool :
              return _handle_error("Invalid_Times")
@@ -206,12 +207,12 @@ def schedule():
         print(f"Global Times: Earliest={earliestAtSchool}, Latest={latestAtSchool}")
         print(f"Course Specific Times: {course_time_constraints}")
 
-        allCourseData_for_planner = [] 
-        problematic_courses_no_sections = [] 
+        allCourseData_for_planner = []
+        problematic_course_details = []
 
         for course_code in course_codes:
             if course_code not in data:
-                problematic_courses_no_sections.append(f"{course_code} (Not found in data)")
+                problematic_course_details.append(f"{course_code} (Not found in {semester} data)")
                 continue
 
             course_info_json = data[course_code]
@@ -219,18 +220,18 @@ def schedule():
             current_course_valid_sections = []
 
             if not sections_json_list:
-                problematic_courses_no_sections.append(f"{course_code} (No sections listed in data)")
+                problematic_course_details.append(f"{course_code} (No sections listed in data)")
                 continue
 
             for sec_json in sections_json_list:
                 def process_meeting_data(meeting_data_json, item_type_str):
                     if not meeting_data_json: return None
                     items = []
-                    if isinstance(meeting_data_json, list): 
+                    if isinstance(meeting_data_json, list):
                         for item_json in meeting_data_json:
                             if "start" in item_json and "end" in item_json and "date" in item_json:
                                 items.append(ScheduleItem(item_type_str, item_json["start"], item_json["end"], item_json["date"]))
-                    elif isinstance(meeting_data_json, dict): 
+                    elif isinstance(meeting_data_json, dict):
                         if "start" in meeting_data_json and "end" in meeting_data_json and "date" in meeting_data_json:
                             items.append(ScheduleItem(item_type_str, meeting_data_json["start"], meeting_data_json["end"], meeting_data_json["date"]))
                     if not items: return None
@@ -245,20 +246,23 @@ def schedule():
                 if not section_meets_time_constraints(newSection, course_code, course_time_constraints):
                     continue
                 if not newSection.fits_time_constraints(earliestAtSchool, latestAtSchool):
-                    continue               
+                    continue
                 current_course_valid_sections.append(newSection)
 
             if not current_course_valid_sections:
-                problematic_courses_no_sections.append(course_code)
+                problematic_course_details.append(f"{course_code} (No sections meet time criteria)")
             else:
                 allCourseData_for_planner.append(current_course_valid_sections)
 
-        if problematic_courses_no_sections:
-            if not allCourseData_for_planner or any(not sublist for sublist in allCourseData_for_planner):
-                 return _handle_error("No_Combinations_For_Course", problematic_course=", ".join(problematic_courses_no_sections))
+        if problematic_course_details:
+            return _handle_error("No_Combinations_For_Course", problematic_course=", ".join(problematic_course_details))
 
-        if not allCourseData_for_planner:
-             return _handle_error("Course_Not_Available", invalid_courses=course_codes, semester=semester)
+        if not allCourseData_for_planner and course_codes:
+            print("WARNING: Reached 'if not allCourseData_for_planner and course_codes' unexpectedly. Problematic courses should have been caught.")
+            return _handle_error("No_Combinations_Query_Too_Strict")
+
+        if not allCourseData_for_planner and not course_codes:
+             return _handle_error("No_Course_Entered")
 
         planner = CoursePlanner(allCourseData_for_planner)
         est_combinations = 1
@@ -270,7 +274,7 @@ def schedule():
         validCombinations = planner.nonOverlapped()
         print(f"Planner nonOverlapped returned: {len(validCombinations)} combinations")
 
-        days_off_request = request.form.getlist('days_off[]') 
+        days_off_request = request.form.getlist('days_off[]')
         if days_off_request:
             validCombinations = filterBySpecificDayOff(validCombinations, days_off_request)
             print(f"After 'Specific Day Off' ({days_off_request}) filter: {len(validCombinations)}")
@@ -280,69 +284,66 @@ def schedule():
         if num_days_off_request_str:
             try:
                 num_days_off = int(num_days_off_request_str)
-                if num_days_off >= 0: 
+                if num_days_off >= 0:
                     validCombinations = filterByAmountOfDaysOff(validCombinations, num_days_off)
                     print(f"After 'Amount of Days Off' ({num_days_off}) filter: {len(validCombinations)}")
                     if not validCombinations: return _handle_error("No_Combinations_Query_Too_Strict")
             except ValueError:
                 print(f"Warning: Invalid value for num_days_off: {num_days_off_request_str}")
 
-        if earliestAtSchool > 0: 
+        if earliestAtSchool > 0:
             validCombinations = filterByEarliestAtSchool(validCombinations, earliestAtSchool)
             print(f"After global earliest time filter ({earliestAtSchool}): {len(validCombinations)}")
 
-        if latestAtSchool > 0: 
+        if latestAtSchool > 0:
             validCombinations = filterByLatestAtSchool(validCombinations, latestAtSchool)
             print(f"After global latest time filter ({latestAtSchool}): {len(validCombinations)}")
 
         if not validCombinations:
              return _handle_error("No_Combinations_Query_Too_Strict")
 
-       
-
         _, sorted_gap_indices, gap_times_list = filterByTotalMinTimeBetweenClasses(validCombinations)
         print(f"Gap calculation done. {len(validCombinations)} combinations remain for sorting.")
 
-        if not validCombinations : 
+        if not validCombinations :
              return _handle_error("No_Combinations_Query_Too_Strict")
 
         sort_preference = request.form.get('sort_preference', 'smart_gaps')
         print(f"Sorting preference: {sort_preference}")
 
-        scored_schedules = [] 
+        scored_schedules = []
 
         for i in range(len(validCombinations)):
             combo = validCombinations[i]
-
-            gap_time = gap_times_list[i] if i < len(gap_times_list) else 0 
+            gap_time = gap_times_list[i] if i < len(gap_times_list) else 0
 
             if sort_preference == 'smart_gaps':
                 comp_score, metrics = calculate_cm_schedule_score(combo)
                 scored_schedules.append((comp_score, i, gap_time, metrics))
-            elif sort_preference == 'minimal_gaps': 
-                scored_schedules.append((-gap_time, i, gap_time)) 
-            elif sort_preference == 'best_gaps': 
+            elif sort_preference == 'minimal_gaps':
+                scored_schedules.append((-gap_time, i, gap_time))
+            elif sort_preference == 'best_gaps':
                 score = calculate_gap_score(gap_time)
                 scored_schedules.append((score, i, gap_time))
             elif sort_preference == 'fewer_days':
                 days_used_count = 0
-                if combo: 
+                if combo:
                     days_present = set()
                     for course_sec in combo:
                         for sch_item in course_sec.get_schedule_items():
                             days_present.update(sch_item.days)
                     days_used_count = len(days_present)
-                smart_s, _ = calculate_cm_schedule_score(combo) 
+                smart_s, _ = calculate_cm_schedule_score(combo)
                 scored_schedules.append(((-days_used_count * 10000) + smart_s, i, gap_time, {'days_on_campus': days_used_count}))
-            elif sort_preference == 'early_start': 
+            elif sort_preference == 'early_start':
                 min_start_time = float('inf')
                 if combo:
                     for course_sec in combo:
                         for sch_item in course_sec.get_schedule_items():
                             min_start_time = min(min_start_time, sch_item.start)
                 scored_schedules.append((min_start_time if min_start_time != float('inf') else 9999, i, gap_time))
-            elif sort_preference == 'late_start': 
-                overall_latest_first_class_start = 0 
+            elif sort_preference == 'late_start':
+                overall_latest_first_class_start = 0
                 if combo:
                     daily_first_starts = []
                     temp_week = [[] for _ in range(6)]; dateToIndexMap = {"M":0,"T":1,"W":2,"Th":3,"F":4,"Sa":5}
@@ -352,9 +353,9 @@ def schedule():
                                 if day_char in dateToIndexMap: temp_week[dateToIndexMap[day_char]].append(si.start)
                     for day_starts in temp_week:
                         if day_starts: daily_first_starts.append(min(day_starts))
-                    if daily_first_starts: overall_latest_first_class_start = min(daily_first_starts) 
+                    if daily_first_starts: overall_latest_first_class_start = min(daily_first_starts)
                 scored_schedules.append((overall_latest_first_class_start, i, gap_time))
-            elif sort_preference == 'compact': 
+            elif sort_preference == 'compact':
                 total_daily_span = 0; days_active = 0
                 if combo:
                     temp_week_spans = [[] for _ in range(6)]; dateToIndexMap = {"M":0,"T":1,"W":2,"Th":3,"F":4,"Sa":5}
@@ -366,30 +367,37 @@ def schedule():
                         if day_meetings:
                             days_active+=1; min_s = min(m[0] for m in day_meetings); max_e = max(m[1] for m in day_meetings)
                             total_daily_span += (max_e - min_s)
-                score = total_daily_span + gap_time * 0.1 
+                score = total_daily_span + gap_time * 0.1
                 scored_schedules.append((score, i, gap_time))
-            else: 
+            else:
                 comp_score, metrics = calculate_cm_schedule_score(combo)
                 scored_schedules.append((comp_score, i, gap_time, metrics))
 
-        if sort_preference in ['early_start', 'compact', 'minimal_gaps']: 
+        if sort_preference in ['early_start', 'compact', 'minimal_gaps']:
             scored_schedules.sort(key=lambda x: x[0])
-        else: 
+        else:
             scored_schedules.sort(key=lambda x: x[0], reverse=True)
 
         if not scored_schedules:
             return _handle_error("No_Combinations_Query_Too_Strict")
 
+        total_found_before_cap = len(scored_schedules)
         combinations_for_response = []
-        for scored_item in scored_schedules: 
+
+        # Limit the number of schedules to process for the response
+        for i, scored_item in enumerate(scored_schedules):
+            if i >= MAX_SCHEDULES_TO_DISPLAY:
+                print(f"Limiting display to {MAX_SCHEDULES_TO_DISPLAY} schedules out of {total_found_before_cap} found.")
+                break
+            
             original_combo_idx = scored_item[1]
             original_combo = validCombinations[original_combo_idx]
-            time_metric = scored_item[2] 
+            time_metric = scored_item[2]
 
             rank = len(combinations_for_response) + 1
             response_item = {
                 "rank": rank, "total_gap_time": time_metric,
-                "courses": original_combo 
+                "courses": original_combo
             }
             if sort_preference == 'smart_gaps' and len(scored_item) > 3:
                 response_item['smart_score_details'] = scored_item[3]
@@ -406,9 +414,9 @@ def schedule():
         print(f"Total request processing time: {elapsed_time:.2f} seconds.")
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or \
-           request.headers.get('Accept') == 'application/json': 
+           request.headers.get('Accept') == 'application/json':
             response_data_list_for_json = []
-            for combo_obj_for_resp in combinations_for_response:
+            for combo_obj_for_resp in combinations_for_response: # This is now the limited list
                 combo_data_for_json = {
                     'rank': combo_obj_for_resp['rank'],
                     'total_gap_time': combo_obj_for_resp['total_gap_time'],
@@ -421,24 +429,24 @@ def schedule():
                 if 'days_on_campus' in combo_obj_for_resp:
                     combo_data_for_json['days_on_campus'] = combo_obj_for_resp['days_on_campus']
 
-                for course_section_obj in combo_obj_for_resp['courses']: 
+                for course_section_obj in combo_obj_for_resp['courses']:
                     course_item_data_for_json = {'section_id': course_section_obj.courseCode}
                     def add_serialized_meetings_to_dict(target_dict, meeting_attr_val, meeting_key_str, meeting_type_str_val):
                         if meeting_attr_val is None: return
-                        if isinstance(meeting_attr_val, list): 
+                        if isinstance(meeting_attr_val, list):
                             serialized_list = []
                             for sch_item in meeting_attr_val:
                                 serialized_list.append({
                                     'type': meeting_type_str_val, 'start': sch_item.start,
                                     'finish': sch_item.finish, 'days': sch_item.days,
-                                    'location': getattr(sch_item, 'location', 'N/A') 
+                                    'location': getattr(sch_item, 'location', 'N/A')
                                 })
                             if serialized_list: target_dict[meeting_key_str] = serialized_list
-                        else: 
+                        else:
                             target_dict[meeting_key_str] = {
                                 'type': meeting_type_str_val, 'start': meeting_attr_val.start,
                                 'finish': meeting_attr_val.finish, 'days': meeting_attr_val.days,
-                                'location': getattr(meeting_attr_val, 'location', 'N/A') 
+                                'location': getattr(meeting_attr_val, 'location', 'N/A')
                             }
 
                     add_serialized_meetings_to_dict(course_item_data_for_json, course_section_obj.lecture, "LEC", "Lecture")
@@ -451,8 +459,8 @@ def schedule():
             return jsonify({
                 'combinations': response_data_list_for_json,
                 'stats': {
-                    'total_found_before_cap': len(combinations_for_response), 
-                    'total_displayed': len(response_data_list_for_json),
+                    'total_found_before_cap': total_found_before_cap, # Total found
+                    'total_displayed': len(combinations_for_response), # Actual number sent
                     'processing_time': round(elapsed_time, 2),
                     'earliest_time_applied': earliestAtSchool if earliestAtSchool > 0 else "Any",
                     'latest_time_applied': latestAtSchool if latestAtSchool > 0 else "Any",
@@ -460,26 +468,30 @@ def schedule():
                 }
             })
 
-        return render_template('result.html', combinations=combinations_for_response, 
-                               earliestAtSchool=earliestAtSchool, latestAtSchool=latestAtSchool, 
-                               elapsed_time=round(elapsed_time,2), total_possible=len(combinations_for_response),
+        return render_template('result.html',
+                               combinations=combinations_for_response, # Limited list
+                               earliestAtSchool=earliestAtSchool,
+                               latestAtSchool=latestAtSchool,
+                               elapsed_time=round(elapsed_time,2),
+                               total_possible=total_found_before_cap, # Total found
+                               num_displayed=len(combinations_for_response), # Actual number sent
                                sort_preference=sort_preference)
 
-    gc.collect() 
+    gc.collect()
     return render_template('index.html')
 
 @app.route('/api/search-courses')
 def api_search_courses():
     query = request.args.get('q', '').strip()
-    semester = request.args.get('semester', 'Summer 2025') 
+    semester = request.args.get('semester', 'Summer 2025')
 
-    if len(query) < 2: return jsonify([]) 
+    if len(query) < 2: return jsonify([])
 
     course_data = get_cached_course_data(semester)
-    if not course_data: return jsonify([]) 
+    if not course_data: return jsonify([])
 
     results = []
-    seen_codes = set() 
+    seen_codes = set()
     query_upper = query.upper()
     query_lower = query.lower()
 
@@ -491,10 +503,10 @@ def api_search_courses():
         if course_code_key in seen_codes: continue
         code_match = False
         code_without_star = course_code_key.replace('*', '')
-        if (query_upper in course_code_key or 
-            formatted_query_for_code_match in course_code_key or 
-            query_upper in code_without_star or 
-            course_code_key.startswith(formatted_query_for_code_match) or 
+        if (query_upper in course_code_key or
+            formatted_query_for_code_match in course_code_key or
+            query_upper in code_without_star or
+            course_code_key.startswith(formatted_query_for_code_match) or
             course_code_key.startswith(query_upper)
             ):
             code_match = True
@@ -505,18 +517,18 @@ def api_search_courses():
         description_match = query_lower in description.lower() and len(query_lower) > 3
 
         credits_str = ""
-        if title and "(" in title and "Credit" in title: 
+        if title and "(" in title and "Credit" in title:
             credits_match_re = re.search(r'\(([\d\.]+\s*Credits?)\)', title, re.IGNORECASE)
             if credits_match_re: credits_str = credits_match_re.group(1)
 
         if code_match or title_match or description_match:
             seen_codes.add(course_code_key)
             result_item = {
-                'code': course_code_key, 'title': title, 
-                'description': description[:120] + ("..." if len(description) > 120 else ""), 
-                'credits': credits_str, 
-                'sections_count': len(course_info_val.get('Sections', [])), 
-                'match_score': 0 
+                'code': course_code_key, 'title': title,
+                'description': description[:120] + ("..." if len(description) > 120 else ""),
+                'credits': credits_str,
+                'sections_count': len(course_info_val.get('Sections', [])),
+                'match_score': 0
             }
             if course_code_key.upper() == formatted_query_for_code_match: result_item['match_score'] = 100
             elif course_code_key.startswith(formatted_query_for_code_match): result_item['match_score'] = 95
@@ -528,9 +540,9 @@ def api_search_courses():
             else: result_item['match_score'] = 30
             results.append(result_item)
 
-    results.sort(key=lambda x: (-x['match_score'], x['code'])) 
-    for r_item in results: del r_item['match_score'] 
-    return jsonify(results[:15]) 
+    results.sort(key=lambda x: (-x['match_score'], x['code']))
+    for r_item in results: del r_item['match_score']
+    return jsonify(results[:15])
 
 @app.route('/api/semester-info')
 def api_semester_info():
@@ -543,7 +555,7 @@ def api_semester_info():
     departments = set()
     for course_code_key in course_data:
         if '*' in course_code_key: departments.add(course_code_key.split('*')[0])
-        else: 
+        else:
             match = re.match(r'([A-Z]+)', course_code_key)
             if match: departments.add(match.group(1))
 
@@ -553,5 +565,4 @@ def api_semester_info():
     })
 
 if __name__ == '__main__':
-
     app.run(debug=True, host='0.0.0.0', port=5000)
