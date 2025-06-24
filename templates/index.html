@@ -17,7 +17,7 @@
             --bg-card: #1E293B;
             --text-primary: #F1F5F9; 
             --text-secondary: #CBD5E1; 
-            --text-muted: #64748B; 
+            --text-muted: #94A3B8;
             --border-color: #334155; 
             --accent-color: #F43F5E; 
             --accent-hover: #E11D48; 
@@ -165,14 +165,38 @@
         .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); border: 2px dashed var(--border-color); border-radius: 12px; }
         .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
         .empty-state h3 { color: var(--text-primary); font-size: 1.25rem; }
-        #no-courses-selected-msg { color: var(--text-muted); font-style: italic; font-size: 0.9rem; }
+        /* Style for placeholder messages like "No courses selected yet" */
+        .text-muted-placeholder { color: var(--text-muted); font-style: italic; font-size: 0.9rem; }
 
 
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 3000; color: var(--text-primary); }
-        .loading-spinner { width: 50px; height: 50px; border: 3px solid rgba(244, 63, 94, 0.3); border-top: 3px solid var(--accent-color); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1.5rem; }
+        .loading-spinner { width: 50px; height: 50px; border: 3px solid rgba(244, 63, 94, 0.3); border-top: 3px solid var(--accent-color); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem; } /* Adjusted margin */
         .loading-overlay h4 { font-size: 1.125rem; margin-bottom: 0.5rem; }
-        .loading-overlay p { font-size: 0.9rem; color: var(--text-secondary); }
+        .loading-overlay p { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;} /* Added margin */
+        
+        .loading-progress-bar-container {
+            width: 200px;
+            height: 8px;
+            background-color: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem; /* Spacing from text */
+        }
+        .loading-progress-bar {
+            width: 100%;
+            height: 100%;
+            background-color: var(--accent-color);
+            border-radius: 4px;
+            animation: indeterminate-progress 2s linear infinite;
+        }
+
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes indeterminate-progress {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(0%); } /* Optional: pause in middle */
+            100% { transform: translateX(100%); }
+        }
+
 
         #saved-schedules-panel { 
             display: none; 
@@ -191,27 +215,26 @@
         .saved-schedule-item-details { font-size: 0.75rem; color: var(--text-muted); display: block; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .saved-schedule-item-actions .btn-custom { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
 
-        /* Modal specific styles */
         .modal-content { background-color: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color); }
         .modal-header { border-bottom-color: var(--border-color); }
         .btn-close-white { filter: invert(1) grayscale(100%) brightness(200%); } 
         #modal-calendar-content .visual-schedule-display { height: 500px; } 
         #modal-calendar-content .time-label-col { font-size: 0.6rem; }
         #modal-calendar-content .course-block-visual { 
-            align-items: center; /* Center vertically, good for single line */
+            align-items: center;
             padding: 2px 3px; 
         }
         #modal-calendar-content .course-block-visual span { 
-            font-size: 0.55rem; /* Slightly larger for modal */
-            font-weight: 500; /* Bolder */
+            font-size: 0.55rem;
+            font-weight: 500;
             line-height: 1.2; 
-            white-space: nowrap; /* Keep on one line */
-            text-align: left; /* Align to left for horizontal text */
+            white-space: nowrap;
+            text-align: left;
             display: block;
             width: 100%;
-            text-overflow: ellipsis; /* In case it's still too long */
+            text-overflow: ellipsis;
             overflow: hidden;
-            text-shadow: 0 0 2px rgba(0,0,0,0.7); /* For better visibility */
+            text-shadow: 0 0 2px rgba(0,0,0,0.7);
         } 
         #modal-course-list-content ul { padding-left: 0; list-style: none; }
         #modal-course-list-content li { margin-bottom: 0.25rem; font-size: 0.9rem; }
@@ -277,7 +300,7 @@
                 <h2 class="card-header-title"><i class="fas fa-check-square"></i>Selected Courses (<span id="selected-courses-count">0</span>)</h2>
                 <p class="card-description">Courses added to your schedule builder</p>
                 <div id="selected-courses">
-                     <p class="text-muted" id="no-courses-selected-msg">No courses selected yet. Type to search and add.</p>
+                     <p class="text-muted-placeholder" id="no-courses-selected-msg">No courses selected yet. Type to search and add.</p>
                 </div>
             </div>
         </div>
@@ -287,7 +310,7 @@
                 <i class="fas fa-filter"></i> Show Filters
             </button>
             <button type="button" class="btn-custom btn-secondary-custom" id="toggle-saved-schedules-btn">
-                <i class="fas fa-star"></i> My Saved Schedules
+                <i class="fas fa-star"></i> Saved Schedules
             </button>
         </div>
 
@@ -326,9 +349,9 @@
         </div>
         
         <div id="saved-schedules-panel" class="card-common">
-            <h2 class="card-header-title"><i class="fas fa-star"></i>My Saved Schedules</h2>
+            <h2 class="card-header-title"><i class="fas fa-star"></i>Saved Schedules</h2>
             <div id="saved-schedules-list">
-                <p class="text-muted">No schedules saved yet.</p>
+                <p class="text-muted-placeholder">No schedules saved yet.</p>
             </div>
         </div>
 
@@ -342,7 +365,6 @@
                     <p>Select courses and click "Generate Schedules" to see results.</p>
                 </div>
                 <div class="schedules-grid" id="schedules-grid-container" style="display: none;">
-                    <!-- Visual schedule cards will be inserted here -->
                 </div>
                 <div class="load-more-controls mt-4 text-center" id="load-more-controls" style="display: none;">
                      <button class="btn-custom btn-accent" id="load-more-btn">Load More Schedules</button>
@@ -352,7 +374,6 @@
         </div>
     </div>
 
-    <!-- Schedule Detail Modal -->
     <div class="modal fade" id="scheduleDetailModal" tabindex="-1" aria-labelledby="scheduleDetailModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl"> 
             <div class="modal-content">
@@ -362,11 +383,9 @@
                 </div>
                 <div class="modal-body">
                     <div id="modal-calendar-content" class="mb-3">
-                        {/* Larger calendar will be injected here */}
                     </div>
                     <h6>Courses in this Schedule:</h6>
                     <div id="modal-course-list-content">
-                        {/* Course list for this schedule */}
                     </div>
                 </div>
             </div>
@@ -377,6 +396,9 @@
         <div class="loading-spinner"></div>
         <h4>Generating Schedules...</h4>
         <p>This might take a moment.</p>
+        <div class="loading-progress-bar-container">
+            <div class="loading-progress-bar"></div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -474,7 +496,7 @@
                 saveCurrentState(); 
             });
             document.getElementById('sort-preference').addEventListener('change', () => {
-                 if(currentResultsData) { 
+                 if(currentResultsData && currentResultsData.combinations && currentResultsData.combinations.length > 0) { 
                     handleFormSubmit(new Event('submit'), true); 
                  }
                  saveCurrentState();
@@ -529,6 +551,10 @@
             updateCourseTimeConstraintsHiddenInput(); 
             saveCurrentState(); 
 
+            document.getElementById('results-empty').innerHTML = `
+                <i class="fas fa-calendar-alt"></i>
+                <h3>No Schedules Generated Yet</h3>
+                <p>Select courses and click "Generate Schedules" to see results.</p>`;
             document.getElementById('results-empty').style.display = 'block';
             document.getElementById('schedules-grid-container').style.display = 'none';
             document.getElementById('schedules-count-header').textContent = 'Schedules: 0';
@@ -590,7 +616,7 @@
         function displaySuggestions(courses) {
             const container = document.getElementById('course-suggestions');
             if (!courses || courses.length === 0) { 
-                container.innerHTML = '<div class="suggestion-item text-muted">No courses found.</div>';
+                container.innerHTML = '<div class="suggestion-item text-muted-placeholder">No courses found.</div>';
             } else {
                 container.innerHTML = courses.map(course => `
                     <div class="suggestion-item" data-course-code="${course.code}" onclick="selectCourse('${course.code}')">
@@ -733,8 +759,17 @@
 
         async function handleFormSubmit(e, isReSort = false) {
             if (e) e.preventDefault();
+            const resultsEmptyEl = document.getElementById('results-empty');
+            
             if (selectedCourses.length === 0 && !isReSort) {
-                alert('Please select at least one course.');
+                resultsEmptyEl.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Input Required</h3>
+                    <p>Please select at least one course before generating schedules.</p>`;
+                resultsEmptyEl.style.display = 'block';
+                document.getElementById('schedules-grid-container').style.display = 'none';
+                document.getElementById('schedules-count-header').textContent = 'Schedules: 0';
+                document.getElementById('load-more-controls').style.display = 'none';
                 return;
             }
             showLoading();
@@ -746,7 +781,6 @@
             formData.append('earliest', document.getElementById('earliest').value || '');
             formData.append('latest', document.getElementById('latest').value || '');
             formData.append('sort_preference', document.getElementById('sort-preference').value);
-            formData.append('preferred_times', document.getElementById('preferred-times').value || '');
 
             try {
                 const response = await fetch('/', {
@@ -754,24 +788,45 @@
                     headers: {'X-Requested-With': 'XMLHttpRequest'},
                     body: formData
                 });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
                 const data = await response.json();
-                
-                if (data.error) {
-                    alert(`Error: ${data.error}`);
+
+                if (!response.ok) {
+                    resultsEmptyEl.innerHTML = `
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error ${response.status}</h3>
+                        <p>${data.message || 'An unexpected error occurred on the server.'}</p>`;
+                    currentResultsData = null;
+                } else if (data.error) {
+                    resultsEmptyEl.innerHTML = `
+                        <i class="fas fa-calendar-times"></i>
+                        <h3>Problem Generating Schedules</h3>
+                        <p>${data.message || 'Could not generate schedules based on your criteria.'}</p>`;
                     currentResultsData = null;
                 } else {
                     currentResultsData = data; 
                     currentPage = 1; 
+                    resultsEmptyEl.innerHTML = `
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>No Schedules Generated Yet</h3>
+                        <p>Select courses and click "Generate Schedules" to see results.</p>`;
+                }
+            } catch (error) {
+                resultsEmptyEl.innerHTML = `
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3>Request Failed</h3>
+                    <p>An error occurred while communicating with the server. Please check your connection and try again.</p>`;
+                currentResultsData = null;
+            } finally {
+                if (currentResultsData && currentResultsData.combinations && currentResultsData.combinations.length > 0) {
+                    resultsEmptyEl.style.display = 'none';
+                } else {
+                    resultsEmptyEl.style.display = 'block';
+                    document.getElementById('schedules-grid-container').style.display = 'none';
+                    document.getElementById('schedules-count-header').textContent = 'Schedules: 0';
+                    document.getElementById('load-more-controls').style.display = 'none';
                 }
                 displayPaginatedResults();
-
-            } catch (error) {
-                console.error('Error generating schedules:', error);
-                alert('An error occurred. Please try again.');
-                currentResultsData = null;
-                displayPaginatedResults(); 
-            } finally {
                 hideLoading();
             }
         }
@@ -827,9 +882,26 @@
                 const sectionNum = courseCodeParts[2];
                 coursesHtml += `<li><strong>${courseCode} (${sectionNum})</strong>: `;
                 let times = [];
-                if (course.lecture) times.push(`LEC ${formatTime(course.lecture.start)}-${formatTime(course.lecture.finish)} ${course.lecture.days.join('')}`);
-                if (course.seminar) times.push(`SEM ${formatTime(course.seminar.start)}-${formatTime(course.seminar.finish)} ${course.seminar.days.join('')}`);
-                if (course.lab) times.push(`LAB ${formatTime(course.lab.start)}-${formatTime(course.lab.finish)} ${course.lab.days.join('')}`);
+                // Check if course.lecture, course.seminar, course.lab exist and are arrays
+                // This function needs to be updated if the scraper changes format to lists of meetings
+                const processMeeting = (meeting, typeAbbr) => {
+                    if (meeting && meeting.start !== undefined && meeting.finish !== undefined && meeting.days) { // Basic check for a single meeting object
+                       return `${typeAbbr} ${formatTime(meeting.start)}-${formatTime(meeting.finish)} ${meeting.days.join('')}`;
+                    } else if (Array.isArray(meeting)) { // If it's an array of meetings
+                        return meeting.map(m => `${typeAbbr} ${formatTime(m.start)}-${formatTime(m.finish)} ${m.days.join('')}`).join('; ');
+                    }
+                    return '';
+                };
+        
+                let lecTime = processMeeting(course.lecture, 'LEC');
+                if (lecTime) times.push(lecTime);
+        
+                let semTime = processMeeting(course.seminar, 'SEM');
+                if (semTime) times.push(semTime);
+        
+                let labTime = processMeeting(course.lab, 'LAB');
+                if (labTime) times.push(labTime);
+
                 coursesHtml += times.join(', ') + '</li>';
             });
             coursesHtml += '</ul>';
@@ -862,33 +934,41 @@
                     const sectionNumOnly = course.section_id.split('*')[2];
                     
                     ['lecture', 'seminar', 'lab'].forEach(type => {
-                        const item = course[type];
-                        if (item && item.days.includes(dayAbbr)) {
-                            const startHour = item.start / 60;
-                            const endHour = item.finish / 60;
-                            const totalCalendarHours = calendarEndHour - calendarStartHour; 
+                        let itemsToProcess = course[type];
+                        if (itemsToProcess && !Array.isArray(itemsToProcess)) { // Ensure it's an array for consistent processing
+                            itemsToProcess = [itemsToProcess];
+                        }
 
-                            if (startHour < calendarEndHour && endHour > calendarStartHour) {
-                                const topPercent = Math.max(0, (startHour - calendarStartHour) / totalCalendarHours * 100);
-                                const clampedEndHour = Math.min(endHour, calendarEndHour);
-                                const heightPercent = Math.max(0, (clampedEndHour - Math.max(startHour, calendarStartHour)) / totalCalendarHours * 100);
-                                
-                                let blockTextContent = courseCodeBase; // Default for main grid
-                                if (isModal) {
-                                    const componentTypeAbbr = type.substring(0,3).toUpperCase();
-                                    const timeFormatted = `${formatTime(item.start)}-${formatTime(item.finish)}`;
-                                    blockTextContent = `${courseCodeBase}*${sectionNumOnly} (${componentTypeAbbr}) ${timeFormatted}`;
-                                }
+                        if (itemsToProcess && itemsToProcess.length > 0) {
+                            itemsToProcess.forEach(item => { // Iterate if it's an array of meetings
+                                if (item && item.days && item.days.includes(dayAbbr)) {
+                                    const startHour = item.start / 60;
+                                    const endHour = item.finish / 60;
+                                    const totalCalendarHours = calendarEndHour - calendarStartHour; 
 
-                                if (heightPercent > 0.1) { 
-                                     visualGridHtml += `
-                                        <div class="course-block-visual ${type.toLowerCase()}" 
-                                             style="top: ${topPercent}%; height: ${heightPercent}%;"
-                                             title="${course.section_id} ${type.toUpperCase()} ${formatTime(item.start)}-${formatTime(item.finish)}">
-                                             <span>${blockTextContent}</span>
-                                        </div>`;
+                                    if (startHour < calendarEndHour && endHour > calendarStartHour) {
+                                        const topPercent = Math.max(0, (startHour - calendarStartHour) / totalCalendarHours * 100);
+                                        const clampedEndHour = Math.min(endHour, calendarEndHour);
+                                        const heightPercent = Math.max(0, (clampedEndHour - Math.max(startHour, calendarStartHour)) / totalCalendarHours * 100);
+                                        
+                                        let blockTextContent = courseCodeBase;
+                                        if (isModal) {
+                                            const componentTypeAbbr = type.substring(0,3).toUpperCase();
+                                            const timeFormatted = `${formatTime(item.start)}-${formatTime(item.finish)}`;
+                                            blockTextContent = `${courseCodeBase}*${sectionNumOnly} (${componentTypeAbbr}) ${timeFormatted}`;
+                                        }
+
+                                        if (heightPercent > 0.1) { 
+                                             visualGridHtml += `
+                                                <div class="course-block-visual ${type.toLowerCase()}" 
+                                                     style="top: ${topPercent}%; height: ${heightPercent}%;"
+                                                     title="${course.section_id} ${type.toUpperCase()} ${formatTime(item.start)}-${formatTime(item.finish)}">
+                                                     <span>${blockTextContent}</span>
+                                                </div>`;
+                                        }
+                                    }
                                 }
-                            }
+                            });
                         }
                     });
                 });
@@ -991,7 +1071,7 @@
             const listContainer = document.getElementById('saved-schedules-list');
             if (!listContainer) return; 
             if (savedSchedules.length === 0) {
-                listContainer.innerHTML = '<p class="text-muted">No schedules saved yet. Generate and save some!</p>';
+                listContainer.innerHTML = '<p class="text-muted-placeholder">No schedules saved yet. Generate and save some!</p>';
                 return;
             }
             listContainer.innerHTML = savedSchedules.map(item => `
@@ -1016,13 +1096,11 @@
                 alert("Saved schedule not found.");
                 return;
             }
-            // Instead of re-rendering the main grid, directly show the modal
-            // We still need currentResultsData to have this one item for viewScheduleDetail to work
             currentResultsData = {
                 combinations: [scheduleItem.data],
                 stats: { total_found: 1, processing_time: "N/A" }
             };
-            viewScheduleDetail(0); // View the first (and only) schedule in this temporary set
+            viewScheduleDetail(0); 
 
             document.getElementById('saved-schedules-panel').style.display = 'none'; 
         }
