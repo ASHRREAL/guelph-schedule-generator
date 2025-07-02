@@ -17,7 +17,7 @@
             --bg-card: #1E293B;
             --text-primary: #F1F5F9; 
             --text-secondary: #CBD5E1; 
-            --text-muted: #94A3B8;
+            --text-muted: #CBD5E1;
             --border-color: #334155; 
             --accent-color: #F43F5E; 
             --accent-hover: #E11D48; 
@@ -75,6 +75,8 @@
         .suggestions-dropdown { background: var(--bg-secondary); border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 8px 8px; box-shadow: var(--shadow-lg); max-height: 250px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000; }
         .suggestion-item { padding: 0.75rem 1rem; cursor: pointer; transition: background-color 0.2s ease; color: var(--text-primary); font-size: 0.875rem; }
         .suggestion-item:hover { background-color: var(--bg-tertiary); }
+        .suggestion-item .small { color: var(--text-secondary); }
+        .suggestion-item .text-muted.small { color: var(--text-secondary) !important; }
         .suggestion-item:not(:last-child) { border-bottom: 1px solid var(--border-color); }
 
         .button-group { display: flex; gap: 0.75rem; margin-top: 1rem; }
@@ -218,6 +220,14 @@
         .modal-content { background-color: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color); }
         .modal-header { border-bottom-color: var(--border-color); }
         .btn-close-white { filter: invert(1) grayscale(100%) brightness(200%); } 
+        #sectionFilterModal .list-group-item {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+        #sectionFilterModal .list-group-item:hover {
+            background-color: var(--bg-tertiary);
+        } 
         #modal-calendar-content .visual-schedule-display { height: 500px; } 
         #modal-calendar-content .time-label-col { font-size: 0.6rem; }
         #modal-calendar-content .course-block-visual { 
@@ -392,6 +402,29 @@
         </div>
     </div>
 
+    <div class="modal fade" id="sectionFilterModal" tabindex="-1" aria-labelledby="sectionFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sectionFilterModalLabel">Filter Sections</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="section-search-input" class="form-control-custom mb-3" placeholder="Search sections...">
+                    <div id="section-list" class="list-group" style="max-height: 200px; overflow-y: auto;">
+                        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-custom btn-secondary-custom" id="select-all-sections">Select All</button>
+                    <button type="button" class="btn-custom btn-secondary-custom" id="deselect-all-sections">Deselect All</button>
+                    <button type="button" class="btn-custom btn-secondary-custom" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn-custom btn-accent" id="save-section-filter">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="loading-overlay" id="loading-overlay">
         <div class="loading-spinner"></div>
         <h4>Generating Schedules...</h4>
@@ -416,6 +449,7 @@
             selectedCourses: 'courseGen_selectedCourses_v3',
             selectedSemester: 'courseGen_selectedSemester_v3',
             courseTimeConstraints: 'courseGen_courseTimeConstraints_v3',
+            courseSectionFilter: 'courseGen_courseSectionFilter_v3',
             formFilters: 'courseGen_formFilters_v3'
         };
 
@@ -453,6 +487,9 @@
             const storedCourseConstraints = localStorage.getItem(STORAGE_KEYS.courseTimeConstraints);
             if (storedCourseConstraints) courseTimeConstraints = JSON.parse(storedCourseConstraints);
             updateCourseTimeConstraintsHiddenInput(); 
+
+            const storedCourseSectionFilter = localStorage.getItem(STORAGE_KEYS.courseSectionFilter);
+            if (storedCourseSectionFilter) courseSectionFilter = JSON.parse(storedCourseSectionFilter);
             
             const storedFilters = localStorage.getItem(STORAGE_KEYS.formFilters);
             if (storedFilters) {
@@ -468,6 +505,7 @@
             localStorage.setItem(STORAGE_KEYS.selectedCourses, JSON.stringify(selectedCourses));
             localStorage.setItem(STORAGE_KEYS.selectedSemester, document.getElementById('selected-semester').value);
             localStorage.setItem(STORAGE_KEYS.courseTimeConstraints, JSON.stringify(courseTimeConstraints));
+            localStorage.setItem(STORAGE_KEYS.courseSectionFilter, JSON.stringify(courseSectionFilter));
             const filters = {
                 earliest: document.getElementById('earliest').value,
                 latest: document.getElementById('latest').value,
@@ -510,9 +548,15 @@
                 });
             });
             document.addEventListener('click', function(e) {
-                if (!e.target.closest('#course-input') && !e.target.closest('#course-suggestions') && !e.target.closest('.course-time-dropdown')) {
+                if (!e.target.closest('#course-input') && !e.target.closest('#course-suggestions') && !e.target.closest('.course-time-dropdown') && !e.target.closest('#sectionFilterModal')) {
                     hideSuggestions();
-                    document.querySelectorAll('.course-time-dropdown').forEach(d => d.style.display = 'none');
+                    document.querySelectorAll('.course-time-dropdown').forEach(d => {
+                        if (d.style.display === 'block') {
+                            const courseCode = d.id.replace('dropdown-', '').replace('_star_', '*');
+                            applyCourseTimeConstraint(courseCode);
+                        }
+                        d.style.display = 'none';
+                    });
                 }
             });
             document.getElementById('load-more-btn').addEventListener('click', loadMoreSchedules);
@@ -577,9 +621,13 @@
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const courseInputEl = document.getElementById('course-input');
-                const typedCourseCode = courseInputEl.value.trim().toUpperCase();
+                let typedCourseCode = courseInputEl.value.trim().toUpperCase();
                 const firstSuggestionEl = document.querySelector('#course-suggestions .suggestion-item');
                 
+                if (typedCourseCode.match(/^[A-Z]{2,4}\d{4}$/)) {
+                    typedCourseCode = typedCourseCode.replace(/^([A-Z]{2,4})(\d{4})$/, '$1*$2');
+                }
+
                 let courseToAdd = null;
 
                 if (firstSuggestionEl && firstSuggestionEl.dataset.courseCode && firstSuggestionEl.dataset.courseCode.toUpperCase() === typedCourseCode) {
@@ -621,7 +669,7 @@
                 container.innerHTML = courses.map(course => `
                     <div class="suggestion-item" data-course-code="${course.code}" onclick="selectCourse('${course.code}')">
                         <strong>${course.code}</strong> - ${course.title}
-                        <div class="text-muted small">${course.sections} sections</div>
+                        <div class="text-muted small">${course.sections_count} sections</div>
                     </div>
                 `).join('');
             }
@@ -676,6 +724,11 @@
                                         onclick="toggleCourseTimeDropdown(event, '${course}')" 
                                         title="Set time preferences for ${course}">
                                     <i class="fas fa-clock"></i>
+                                </button>
+                                <button type="button" class="action-btn course-section-filter-btn" 
+                                        onclick="openSectionFilter(event, '${course}')" 
+                                        title="Filter sections for ${course}">
+                                    <i class="fas fa-filter"></i>
                                 </button>
                                 <button type="button" class="action-btn remove-btn" onclick="removeCourse('${course}')" title="Remove ${course}">
                                     <i class="fas fa-times"></i>
@@ -753,6 +806,53 @@
             if (suggestionsEl) suggestionsEl.style.display = 'none';
         }
 
+        let courseSectionFilter = {};
+
+        async function openSectionFilter(event, courseCode) {
+            event.stopPropagation();
+            const semester = document.getElementById('selected-semester').value;
+            const response = await fetch(`/api/course-sections?course_code=${courseCode}&semester=${semester}`);
+            const sections = await response.json();
+
+            const sectionList = document.getElementById('section-list');
+            sectionList.innerHTML = sections.map(section => {
+                const isChecked = courseSectionFilter[courseCode] ? courseSectionFilter[courseCode].includes(section.id) : true;
+                return `
+                    <label class="list-group-item">
+                        <input class="form-check-input me-1" type="checkbox" value="${section.id}" ${isChecked ? 'checked' : ''}>
+                        ${section.id}
+                    </label>
+                `;
+            }).join('');
+
+            const sectionFilterModal = new bootstrap.Modal(document.getElementById('sectionFilterModal'));
+            sectionFilterModal.show();
+
+            document.getElementById('save-section-filter').onclick = () => {
+                const selectedSections = Array.from(sectionList.querySelectorAll('input:checked')).map(input => input.value);
+                courseSectionFilter[courseCode] = selectedSections;
+                sectionFilterModal.hide();
+                updateSelectedCoursesDisplay();
+                saveCurrentState();
+            };
+
+            document.getElementById('section-search-input').oninput = (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                Array.from(sectionList.children).forEach(item => {
+                    const sectionId = item.textContent.trim().toLowerCase();
+                    item.style.display = sectionId.includes(searchTerm) ? '' : 'none';
+                });
+            };
+
+            document.getElementById('select-all-sections').onclick = () => {
+                Array.from(sectionList.querySelectorAll('input')).forEach(input => input.checked = true);
+            };
+
+            document.getElementById('deselect-all-sections').onclick = () => {
+                Array.from(sectionList.querySelectorAll('input')).forEach(input => input.checked = false);
+            };
+        }
+
         function submitForm() {
             handleFormSubmit(new Event('submit'));
         }
@@ -778,6 +878,7 @@
             formData.append('semester', document.getElementById('selected-semester').value);
             formData.append('courses[]', selectedCourses.join(',')); 
             formData.append('course_time_constraints', document.getElementById('course-time-constraints-input').value);
+            formData.append('course_section_filter', JSON.stringify(courseSectionFilter));
             formData.append('earliest', document.getElementById('earliest').value || '');
             formData.append('latest', document.getElementById('latest').value || '');
             formData.append('sort_preference', document.getElementById('sort-preference').value);

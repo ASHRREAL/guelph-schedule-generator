@@ -852,13 +852,9 @@
                                                  style="top: {{ top_position }}%; height: {{ height }}%;"
                                                  title="{{ course.courseCode }} - {{ schedule_item.item_type }}">
                                                 <div class="course-info">
-                                                    <div class="course-main">
-                                                        <span class="course-code">{{ course.courseCode }} ({{ schedule_item.item_type }})</span>
-                                                    </div>
-                                                    <div class="course-time">
-                                                        {{ start_hour if start_hour == 12 else start_hour % 12 }}:{{ '%02d' % start_minute }}{{ 'AM' if start_hour < 12 else 'PM' }}-{{ finish_hour if finish_hour == 12 else finish_hour % 12 }}:{{ '%02d' % finish_minute }}{{ 'AM' if finish_hour < 12 else 'PM' }}
-                                                    </div>
-                                                </div>
+                <h2>{{ course[0].courseCode }}</h2>
+                <p>Sections available: {{ course | length }}</p>
+            </div>
                                             </div>
                                         {% endif %}
                                     {% endfor %}
