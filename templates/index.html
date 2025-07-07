@@ -31,7 +31,7 @@
             --warning-text: #FCD34D; 
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 16px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -157,6 +157,7 @@
 
 
         .schedule-details-list { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem; max-height: 70px; overflow-y: auto; flex-grow: 1; }
+        #modal-course-list-content .schedule-details-list { max-height: 400px; }
         .schedule-details-list strong { color: var(--text-primary); }
         .schedule-card-actions { display: flex; gap: 0.5rem; margin-top: auto; }
         .schedule-card-actions .btn-custom { flex-grow: 1; font-size: 0.8rem; padding: 0.4rem 0.8rem; }
@@ -224,10 +225,16 @@
             background-color: var(--bg-secondary);
             color: var(--text-primary);
             border-color: var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         #sectionFilterModal .list-group-item:hover {
             background-color: var(--bg-tertiary);
-        } 
+        }
+        #sectionFilterModal .list-group-item .status-badge-container .badge {
+            font-size: 0.7rem;
+        }
         #modal-calendar-content .visual-schedule-display { height: 500px; } 
         #modal-calendar-content .time-label-col { font-size: 0.6rem; }
         #modal-calendar-content .course-block-visual { 
@@ -246,6 +253,7 @@
             overflow: hidden;
             text-shadow: 0 0 2px rgba(0,0,0,0.7);
         } 
+        #modal-course-list-content { max-height: 400px; overflow-y: auto; }
         #modal-course-list-content ul { padding-left: 0; list-style: none; }
         #modal-course-list-content li { margin-bottom: 0.25rem; font-size: 0.9rem; }
 
@@ -355,6 +363,22 @@
                         <option value="50">50</option>
                     </select>
                 </div>
+                <!-- START: New Live Filter Section -->
+                <div>
+                    <label class="form-label-custom">Live Section Availability <i class="fas fa-question-circle" data-bs-toggle="tooltip" title="Warning: This feature sends live requests to the university website. Excessive use may result in a temporary IP block. It only filters for sections with available seats and does not account for waitlists."></i></label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="live-filter-switch">
+                        <label class="form-check-label" for="live-filter-switch">Enable Live Filtering</label>
+                    </div>
+                    <div class="btn-group w-100 mt-2" role="group" id="live-filter-options" style="display:none;">
+                        <input type="radio" class="btn-check" name="live-filter-mode" id="live-filter-all-sections" autocomplete="off" checked>
+                        <label class="btn btn-outline-secondary" for="live-filter-all-sections">All Sections</label>
+
+                        <input type="radio" class="btn-check" name="live-filter-mode" id="live-filter-available-only" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="live-filter-available-only">Available Only</label>
+                    </div>
+                </div>
+                <!-- END: New Live Filter Section -->
             </div>
         </div>
         
@@ -410,6 +434,25 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Live Status Feature UI -->
+                    <div id="live-status-controls" class="mb-3 p-3 rounded" style="background-color: var(--bg-primary); border: 1px solid var(--border-color);">
+                        <div id="live-status-action">
+                            <button type="button" class="btn-custom btn-secondary-custom w-100" id="check-live-status-btn">
+                                <i class="fas fa-sync"></i> Check Live Section Status
+                            </button>
+                            <small class="d-block text-center mt-2 text-muted">
+                                (Not Recommended <i class="fas fa-question-circle" data-bs-toggle="tooltip" title="Making too many rapid requests to the university website may result in a temporary IP block. Use this feature sparingly."></i>)
+                            </small>
+                        </div>
+                        <div id="live-status-filter-toggles" class="btn-group w-100" role="group" style="display: none;">
+                            <input type="radio" class="btn-check" name="status-filter" id="status-filter-all" autocomplete="off" checked>
+                            <label class="btn btn-outline-secondary" for="status-filter-all">All</label>
+
+                            <input type="radio" class="btn-check" name="status-filter" id="status-filter-available" autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="status-filter-available">Available Only</label>
+                        </div>
+                    </div>
+
                     <input type="text" id="section-search-input" class="form-control-custom mb-3" placeholder="Search sections...">
                     <div id="section-list" class="list-group" style="max-height: 200px; overflow-y: auto;">
                         
@@ -424,6 +467,7 @@
             </div>
         </div>
     </div>
+
 
     <div class="loading-overlay" id="loading-overlay">
         <div class="loading-spinner"></div>
@@ -518,7 +562,7 @@
         function setupEventListeners() {
             document.getElementById('course-input').addEventListener('input', handleCourseInput);
             document.getElementById('course-input').addEventListener('keydown', handleCourseKeydown);
-            document.getElementById('generate-btn').addEventListener('click', submitForm);
+            document.getElementById('generate-btn').addEventListener('click', applyLiveFiltersAndSubmit); // MODIFIED
             document.getElementById('reset-form-btn').addEventListener('click', resetForm);
             
             document.getElementById('show-filters-btn').addEventListener('click', toggleFilterPanel);
@@ -528,6 +572,11 @@
                 document.getElementById(id).addEventListener('change', saveCurrentState);
             });
             
+            // NEW: Listener for the live filter switch
+            document.getElementById('live-filter-switch').addEventListener('change', function() {
+                document.getElementById('live-filter-options').style.display = this.checked ? 'flex' : 'none';
+            });
+
             document.getElementById('items-per-page').addEventListener('change', () => {
                 currentPage = 1; 
                 if(currentResultsData) displayPaginatedResults();
@@ -535,7 +584,7 @@
             });
             document.getElementById('sort-preference').addEventListener('change', () => {
                  if(currentResultsData && currentResultsData.combinations && currentResultsData.combinations.length > 0) { 
-                    handleFormSubmit(new Event('submit'), true); 
+                    applyLiveFiltersAndSubmit(); // MODIFIED
                  }
                  saveCurrentState();
             });
@@ -560,6 +609,12 @@
                 }
             });
             document.getElementById('load-more-btn').addEventListener('click', loadMoreSchedules);
+            
+            // Enable tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+              return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
         }
         
         function loadMoreSchedules() {
@@ -808,6 +863,16 @@
 
         let courseSectionFilter = {};
 
+        function createStatusBadge(status, details) {
+            let badgeClass = 'bg-secondary';
+            let text = status.charAt(0).toUpperCase() + status.slice(1);
+            if (status === 'available') badgeClass = 'bg-success';
+            if (status === 'full' || status === 'waitlisted') badgeClass = 'bg-danger';
+            if (status === 'unknown') badgeClass = 'bg-warning text-dark';
+            
+            return `<span class="badge ${badgeClass}" title="${details}">${text}</span>`;
+        }
+
         async function openSectionFilter(event, courseCode) {
             event.stopPropagation();
             const semester = document.getElementById('selected-semester').value;
@@ -818,46 +883,148 @@
             sectionList.innerHTML = sections.map(section => {
                 const isChecked = courseSectionFilter[courseCode] ? courseSectionFilter[courseCode].includes(section.id) : true;
                 return `
-                    <label class="list-group-item">
-                        <input class="form-check-input me-1" type="checkbox" value="${section.id}" ${isChecked ? 'checked' : ''}>
-                        ${section.id}
+                    <label class="list-group-item" data-section-id="${section.id}">
+                        <span>
+                            <input class="form-check-input me-2" type="checkbox" value="${section.id}" ${isChecked ? 'checked' : ''}>
+                            ${section.id}
+                        </span>
+                        <span class="status-badge-container"></span>
                     </label>
                 `;
             }).join('');
+            
+            document.getElementById('live-status-action').style.display = 'block';
+            document.getElementById('check-live-status-btn').disabled = false;
+            document.getElementById('check-live-status-btn').innerHTML = '<i class="fas fa-sync"></i> Check Live Section Status';
+            document.getElementById('live-status-filter-toggles').style.display = 'none';
+            document.getElementById('status-filter-all').checked = true;
 
-            const sectionFilterModal = new bootstrap.Modal(document.getElementById('sectionFilterModal'));
+            const sectionFilterModalEl = document.getElementById('sectionFilterModal');
+            const sectionFilterModal = new bootstrap.Modal(sectionFilterModalEl);
+            
+            const tooltipTriggerList = [].slice.call(sectionFilterModalEl.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                if (!bootstrap.Tooltip.getInstance(tooltipTriggerEl)) {
+                    new bootstrap.Tooltip(tooltipTriggerEl);
+                }
+            });
+            
             sectionFilterModal.show();
+            
+            const checkLiveBtn = document.getElementById('check-live-status-btn');
+            const saveBtn = document.getElementById('save-section-filter');
+            const selectAllBtn = document.getElementById('select-all-sections');
+            const deselectAllBtn = document.getElementById('deselect-all-sections');
+            const searchInput = document.getElementById('section-search-input');
+            const filterToggles = document.getElementById('live-status-filter-toggles');
 
-            document.getElementById('save-section-filter').onclick = () => {
-                const selectedSections = Array.from(sectionList.querySelectorAll('input:checked')).map(input => input.value);
-                courseSectionFilter[courseCode] = selectedSections;
-                sectionFilterModal.hide();
-                updateSelectedCoursesDisplay();
-                saveCurrentState();
-            };
+            checkLiveBtn.onclick = async () => {
+                checkLiveBtn.disabled = true;
+                checkLiveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Checking...';
+                
+                try {
+                    // --- START OF FIX ---
+                    // Add the currently selected semester to the API request URL.
+                    const selectedSemester = document.getElementById('selected-semester').value;
+                    const liveStatusResponse = await fetch(`/api/live-status?course_code=${courseCode}&semester=${encodeURIComponent(selectedSemester)}`);
+                    // --- END OF FIX ---
 
-            document.getElementById('section-search-input').oninput = (e) => {
-                const searchTerm = e.target.value.toLowerCase();
-                Array.from(sectionList.children).forEach(item => {
-                    const sectionId = item.textContent.trim().toLowerCase();
-                    item.style.display = sectionId.includes(searchTerm) ? '' : 'none';
-                });
-            };
+                    const liveStatusData = await liveStatusResponse.json();
 
-            document.getElementById('select-all-sections').onclick = () => {
-                Array.from(sectionList.querySelectorAll('input')).forEach(input => input.checked = true);
-            };
-
-            document.getElementById('deselect-all-sections').onclick = () => {
-                Array.from(sectionList.querySelectorAll('input')).forEach(input => input.checked = false);
+                    if (liveStatusResponse.ok) {
+                        document.querySelectorAll('#section-list .list-group-item').forEach(item => {
+                            const sectionId = item.dataset.sectionId;
+                            const statusInfo = liveStatusData[sectionId];
+                            const badgeContainer = item.querySelector('.status-badge-container');
+                            if (statusInfo) {
+                                item.dataset.status = statusInfo.status;
+                                badgeContainer.innerHTML = createStatusBadge(statusInfo.status, statusInfo.details);
+                            } else {
+                                item.dataset.status = 'unknown';
+                                badgeContainer.innerHTML = createStatusBadge('unknown', 'Status not found');
+                            }
+                        });
+                        document.getElementById('live-status-action').style.display = 'none';
+                        filterToggles.style.display = 'flex';
+                    } else {
+                        alert(`Error: ${liveStatusData.details || 'Failed to fetch live status.'}`);
+                        checkLiveBtn.disabled = false;
+                        checkLiveBtn.innerHTML = '<i class="fas fa-sync"></i> Check Live Section Status';
+                    }
+                } catch (e) {
+                    alert('A network error occurred while checking live status.');
+                    checkLiveBtn.disabled = false;
+                    checkLiveBtn.innerHTML = '<i class="fas fa-sync"></i> Check Live Section Status';
+                }
             };
         }
+        
+        async function applyLiveFiltersAndSubmit() {
+            const liveFilterEnabled = document.getElementById('live-filter-switch').checked;
+            const availableOnly = document.getElementById('live-filter-available-only').checked;
 
-        function submitForm() {
-            handleFormSubmit(new Event('submit'));
+            if (!liveFilterEnabled || !availableOnly) {
+                // If live filtering is disabled or not set to "Available Only", submit normally.
+                return handleFormSubmit(new Event('submit'));
+            }
+
+            // --- Live Filtering is ON ---
+            showLoading();
+            const loadingText = document.querySelector('#loading-overlay h4');
+            const originalLoadingText = loadingText.textContent;
+            loadingText.textContent = "Checking Live Section Status...";
+
+            let liveCourseSectionFilter = {};
+            let errorOccurred = false;
+
+            for (const courseCode of selectedCourses) {
+                try {
+                    const response = await fetch(`/api/live-status?course_code=${courseCode}`);
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        alert(`Error checking status for ${courseCode}: ${data.details || 'Unknown server error'}`);
+                        errorOccurred = true;
+                        break;
+                    }
+
+                    const availableSections = Object.keys(data).filter(sectionId => data[sectionId].status === 'available');
+                    liveCourseSectionFilter[courseCode] = availableSections;
+
+                } catch (e) {
+                    alert(`Network error while checking status for ${courseCode}.`);
+                    errorOccurred = true;
+                    break;
+                }
+            }
+
+            loadingText.textContent = originalLoadingText; // Reset loading text
+
+            if (errorOccurred) {
+                hideLoading();
+                return;
+            }
+
+            // Intersect the live filter with any existing user-defined filter.
+            let finalFilter = {};
+            for (const courseCode of selectedCourses) {
+                const userFiltered = courseSectionFilter[courseCode]; 
+                const liveAvailable = liveCourseSectionFilter[courseCode];
+
+                if (userFiltered) {
+                    // User has a filter, so find the intersection.
+                    finalFilter[courseCode] = userFiltered.filter(id => liveAvailable.includes(id));
+                } else {
+                    // User has no filter, so just use the live available ones.
+                    finalFilter[courseCode] = liveAvailable;
+                }
+            }
+            
+            // Submit the form with the final, intersected filter.
+            handleFormSubmit(new Event('submit'), false, finalFilter);
         }
 
-        async function handleFormSubmit(e, isReSort = false) {
+        async function handleFormSubmit(e, isReSort = false, overrideSectionFilter = null) {
             if (e) e.preventDefault();
             const resultsEmptyEl = document.getElementById('results-empty');
             
@@ -878,7 +1045,11 @@
             formData.append('semester', document.getElementById('selected-semester').value);
             formData.append('courses[]', selectedCourses.join(',')); 
             formData.append('course_time_constraints', document.getElementById('course-time-constraints-input').value);
-            formData.append('course_section_filter', JSON.stringify(courseSectionFilter));
+
+            // Use the override if provided, otherwise use the global filter
+            const filterToSend = overrideSectionFilter !== null ? overrideSectionFilter : courseSectionFilter;
+            formData.append('course_section_filter', JSON.stringify(filterToSend));
+            
             formData.append('earliest', document.getElementById('earliest').value || '');
             formData.append('latest', document.getElementById('latest').value || '');
             formData.append('sort_preference', document.getElementById('sort-preference').value);
@@ -978,7 +1149,13 @@
             const scheduleId = `schedule-card-${globalIndex}${isModal ? '-modal' : ''}`;
             let coursesHtml = `<ul class="list-unstyled schedule-details-list ${isModal ? 'fs-sm' : ''}">`;
             
-            combination.courses.forEach(course => { // course has .LEC, .SEM, .LAB properties
+            const sortedCourses = [...combination.courses].sort((a, b) => {
+                const codeA = a.section_id.split('*').slice(0, 2).join('*');
+                const codeB = b.section_id.split('*').slice(0, 2).join('*');
+                return codeA.localeCompare(codeB);
+            });
+
+            sortedCourses.forEach(course => { // course has .LEC, .SEM, .LAB properties
                 const courseCodeParts = course.section_id.split('*');
                 const courseCodeDisplay = courseCodeParts[0] + '*' + courseCodeParts[1];
                 const sectionNum = courseCodeParts[2];
@@ -1052,11 +1229,11 @@
                         let itemsToProcess = course[compType.key]; // Access using uppercase key, e.g., course.LEC
 
                         if (itemsToProcess && !Array.isArray(itemsToProcess)) {
-                            itemsToProcess = [itemsToProcess]; // Ensure it's an array
+                            itemsToProcess = [itemsToProcess];
                         }
 
                         if (itemsToProcess && itemsToProcess.length > 0) {
-                            itemsToProcess.forEach(item => { // item is a single meeting object
+                            itemsToProcess.forEach(item => { 
                                 if (item && item.days && item.days.includes(dayAbbr)) {
                                     const startHour = item.start / 60;
                                     const endHour = item.finish / 60;

@@ -4,6 +4,10 @@ import time
 import re
 from CourseUtil import ScheduleItem, CourseSection, CoursePlanner
 
+from LiveStatusChecker import get_live_section_status, shutdown_driver
+import atexit
+import traceback
+
 from sortingMethods import (
     filterByEarliestAtSchool, filterByLatestAtSchool,
     filterByTotalMinTimeBetweenClasses, filterByAvgStartTime,
@@ -12,28 +16,13 @@ from sortingMethods import (
 from functools import lru_cache
 import gc
 
-def levenshtein_distance(s1, s2):
-    if len(s1) < len(s2):
-        return levenshtein_distance(s2, s1)
-
-    if len(s2) == 0:
-        return len(s1)
-
-    previous_row = range(len(s2) + 1)
-    for i, c1 in enumerate(s1):
-        current_row = [i + 1]
-        for j, c2 in enumerate(s2):
-            insertions = previous_row[j + 1] + 1
-            deletions = current_row[j] + 1
-            substitutions = previous_row[j] + (c1 != c2)
-            current_row.append(min(insertions, deletions, substitutions))
-        previous_row = current_row
-
-    return previous_row[-1]
-
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
+
+# This ensures that when the Flask app is closed (e.g., with Ctrl+C),
+# the WebDriver process is properly terminated to prevent memory leaks.
+atexit.register(shutdown_driver)
 
 course_data_cache = {}
 
@@ -601,6 +590,29 @@ def api_course_sections():
 
     sections = course_data[course_code].get('Sections', [])
     return jsonify(sections)
+
+@app.route('/api/live-status')
+def api_live_status():
+    course_code = request.args.get('course_code')
+    if not course_code:
+        return jsonify({'error': 'course_code is required'}), 400
+    
+    try:
+        status_data, error = get_live_section_status(course_code)
+        
+        if error:
+            return jsonify({'error': 'Failed to fetch live status', 'details': error}), 500
+        
+        return jsonify(status_data)
+
+    except Exception as e:
+        # This catches any unhandled exception (a CRASH) from the scraper
+        print(f"!!! CRITICAL ERROR in /api/live-status for course '{course_code}': {e}")
+        traceback.print_exc()
+        return jsonify({
+            'error': 'A critical server error occurred during the live check.',
+            'details': 'The server was unable to complete the request. Please check the server logs for more information.'
+        }), 500
 
 @app.route('/api/semester-info')
 def api_semester_info():
