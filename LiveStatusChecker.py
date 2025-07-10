@@ -25,7 +25,7 @@ def setup_driver(headless=True):
         print(f"[LiveStatusChecker] Initializing Selenium WebDriver (headless={headless})...")
         options = Options()
         if headless:
-            options.add_argument('--headless')
+            options.add_argument('--head')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--disable-gpu')
@@ -98,7 +98,7 @@ def get_live_section_status(course_code, headless=True):
             local_driver.execute_script("arguments[0].click();", view_sections_button)
 
             # After the click, we must wait for the section content to load and become visible.
-            WebDriverWait(local_driver, 10).until(
+            WebDriverWait(local_driver, 20).until(
                 EC.visibility_of_element_located((By.CSS_SELECTOR, content_selector))
             )
 

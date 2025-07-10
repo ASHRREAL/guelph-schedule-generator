@@ -11,7 +11,7 @@ import traceback
 from sortingMethods import (
     filterByEarliestAtSchool, filterByLatestAtSchool,
     filterByTotalMinTimeBetweenClasses, filterByAvgStartTime,
-    filterBySpecificDayOff, filterByAmountOfDaysOff
+    filterBySpecificDayOff, filterByAmountOfDaysOff, levenshtein_distance
 )
 from functools import lru_cache
 import gc
