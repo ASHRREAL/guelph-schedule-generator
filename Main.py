@@ -19,9 +19,6 @@ import gc
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
-
-# This ensures that when the Flask app is closed (e.g., with Ctrl+C),
-# the WebDriver process is properly terminated to prevent memory leaks.
 atexit.register(shutdown_driver)
 
 course_data_cache = {}
@@ -594,24 +591,36 @@ def api_course_sections():
 @app.route('/api/live-status')
 def api_live_status():
     course_code = request.args.get('course_code')
+    semester = request.args.get('semester')
+
     if not course_code:
         return jsonify({'error': 'course_code is required'}), 400
+    if not semester:
+        return jsonify({'error': 'semester is required'}), 400
     
     try:
-        status_data, error = get_live_section_status(course_code)
+        # Pass both the course code and the selected semester to the checking function
+        status_data, error_msg = get_live_section_status(course_code, semester)
         
-        if error:
-            return jsonify({'error': 'Failed to fetch live status', 'details': error}), 500
+        # This handles critical scraper failures like a timeout
+        if status_data is None:
+            return jsonify({'error': 'Failed to fetch live status', 'details': error_msg}), 500
         
+        # This handles cases where the course exists but has no sections in the selected semester.
+        # It's not an error, so we return a success status with a message.
+        if not status_data:
+            return jsonify({'message': error_msg, 'data': {}}), 200
+
+        # Success: return the found statuses
         return jsonify(status_data)
 
     except Exception as e:
         # This catches any unhandled exception (a CRASH) from the scraper
-        print(f"!!! CRITICAL ERROR in /api/live-status for course '{course_code}': {e}")
+        print(f"!!! CRITICAL ERROR in /api/live-status for course '{course_code}' in {semester}: {e}")
         traceback.print_exc()
         return jsonify({
             'error': 'A critical server error occurred during the live check.',
-            'details': 'The server was unable to complete the request. Please check the server logs for more information.'
+            'details': 'The server was unable to complete the request. Please check server logs.'
         }), 500
 
 @app.route('/api/semester-info')

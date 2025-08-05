@@ -324,6 +324,10 @@
         </div>
         
         <div class="global-controls-header">
+            <!-- MODIFIED: Changed button ID and text -->
+            <button type="button" class="btn-custom btn-secondary-custom" id="export-text-btn" style="display: none;">
+                <i class="fas fa-file-alt"></i> Export Summary to Text
+            </button>
             <button type="button" class="btn-custom btn-secondary-custom" id="show-filters-btn">
                 <i class="fas fa-filter"></i> Show Filters
             </button>
@@ -562,17 +566,19 @@
         function setupEventListeners() {
             document.getElementById('course-input').addEventListener('input', handleCourseInput);
             document.getElementById('course-input').addEventListener('keydown', handleCourseKeydown);
-            document.getElementById('generate-btn').addEventListener('click', applyLiveFiltersAndSubmit); // MODIFIED
+            document.getElementById('generate-btn').addEventListener('click', applyLiveFiltersAndSubmit);
             document.getElementById('reset-form-btn').addEventListener('click', resetForm);
             
             document.getElementById('show-filters-btn').addEventListener('click', toggleFilterPanel);
             document.getElementById('toggle-saved-schedules-btn').addEventListener('click', toggleSavedSchedulesPanel);
+            
+            // MODIFIED: Event listener for the new text export button
+            document.getElementById('export-text-btn').addEventListener('click', exportSchedulesToText);
 
             ['earliest', 'latest', 'sort-preference', 'items-per-page'].forEach(id => {
                 document.getElementById(id).addEventListener('change', saveCurrentState);
             });
             
-            // NEW: Listener for the live filter switch
             document.getElementById('live-filter-switch').addEventListener('change', function() {
                 document.getElementById('live-filter-options').style.display = this.checked ? 'flex' : 'none';
             });
@@ -584,7 +590,7 @@
             });
             document.getElementById('sort-preference').addEventListener('change', () => {
                  if(currentResultsData && currentResultsData.combinations && currentResultsData.combinations.length > 0) { 
-                    applyLiveFiltersAndSubmit(); // MODIFIED
+                    applyLiveFiltersAndSubmit();
                  }
                  saveCurrentState();
             });
@@ -610,7 +616,6 @@
             });
             document.getElementById('load-more-btn').addEventListener('click', loadMoreSchedules);
             
-            // Enable tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
               return new bootstrap.Tooltip(tooltipTriggerEl)
@@ -658,6 +663,9 @@
             document.getElementById('schedules-grid-container').style.display = 'none';
             document.getElementById('schedules-count-header').textContent = 'Schedules: 0';
             document.getElementById('load-more-controls').style.display = 'none';
+            
+            document.getElementById('export-text-btn').style.display = 'none';
+            
             currentPage = 1;
             currentResultsData = null;
         }
@@ -881,9 +889,9 @@
 
             const sectionList = document.getElementById('section-list');
             sectionList.innerHTML = sections.map(section => {
-                const isChecked = courseSectionFilter[courseCode] ? courseSectionFilter[courseCode].includes(section.id) : true;
+                const isChecked = !courseSectionFilter[courseCode] || courseSectionFilter[courseCode].includes(section.id);
                 return `
-                    <label class="list-group-item" data-section-id="${section.id}">
+                    <label class="list-group-item" data-section-id="${section.id}" style="display: flex;">
                         <span>
                             <input class="form-check-input me-2" type="checkbox" value="${section.id}" ${isChecked ? 'checked' : ''}>
                             ${section.id}
@@ -892,15 +900,16 @@
                     </label>
                 `;
             }).join('');
-            
+
             document.getElementById('live-status-action').style.display = 'block';
             document.getElementById('check-live-status-btn').disabled = false;
             document.getElementById('check-live-status-btn').innerHTML = '<i class="fas fa-sync"></i> Check Live Section Status';
             document.getElementById('live-status-filter-toggles').style.display = 'none';
             document.getElementById('status-filter-all').checked = true;
+            document.getElementById('section-search-input').value = '';
 
             const sectionFilterModalEl = document.getElementById('sectionFilterModal');
-            const sectionFilterModal = new bootstrap.Modal(sectionFilterModalEl);
+            const sectionFilterModal = bootstrap.Modal.getInstance(sectionFilterModalEl) || new bootstrap.Modal(sectionFilterModalEl);
             
             const tooltipTriggerList = [].slice.call(sectionFilterModalEl.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.forEach(function (tooltipTriggerEl) {
@@ -918,23 +927,76 @@
             const searchInput = document.getElementById('section-search-input');
             const filterToggles = document.getElementById('live-status-filter-toggles');
 
+            const applySectionFilters = () => {
+                const showAvailableOnly = document.getElementById('status-filter-available').checked;
+                const searchTerm = searchInput.value.toLowerCase();
+
+                sectionList.querySelectorAll('.list-group-item').forEach(item => {
+                    const sectionIdText = item.textContent || item.innerText;
+                    const status = item.dataset.status;
+
+                    const matchesSearch = sectionIdText.toLowerCase().includes(searchTerm);
+                    const matchesStatus = !showAvailableOnly || (status === 'available');
+                    
+                    item.style.display = (matchesSearch && matchesStatus) ? 'flex' : 'none';
+                });
+            };
+
+            searchInput.oninput = applySectionFilters;
+            document.querySelectorAll('input[name="status-filter"]').forEach(radio => {
+                radio.onchange = applySectionFilters;
+            });
+
+            saveBtn.onclick = () => {
+                const allSectionCheckboxes = sectionList.querySelectorAll('.form-check-input');
+                const selectedSections = Array.from(allSectionCheckboxes)
+                                            .filter(cb => cb.checked)
+                                            .map(cb => cb.value);
+
+                if (selectedSections.length < allSectionCheckboxes.length) {
+                    courseSectionFilter[courseCode] = selectedSections;
+                } else {
+                    delete courseSectionFilter[courseCode];
+                }
+                
+                saveCurrentState();
+                sectionFilterModal.hide();
+            };
+
+            selectAllBtn.onclick = () => {
+                sectionList.querySelectorAll('.form-check-input').forEach(cb => {
+                    if (cb.closest('.list-group-item').style.display !== 'none') {
+                        cb.checked = true;
+                    }
+                });
+            };
+            deselectAllBtn.onclick = () => {
+                sectionList.querySelectorAll('.form-check-input').forEach(cb => {
+                    if (cb.closest('.list-group-item').style.display !== 'none') {
+                        cb.checked = false;
+                    }
+                });
+            };
+
             checkLiveBtn.onclick = async () => {
                 checkLiveBtn.disabled = true;
                 checkLiveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Checking...';
                 
                 try {
-                    // --- START OF FIX ---
-                    // Add the currently selected semester to the API request URL.
                     const selectedSemester = document.getElementById('selected-semester').value;
                     const liveStatusResponse = await fetch(`/api/live-status?course_code=${courseCode}&semester=${encodeURIComponent(selectedSemester)}`);
-                    // --- END OF FIX ---
-
                     const liveStatusData = await liveStatusResponse.json();
 
                     if (liveStatusResponse.ok) {
-                        document.querySelectorAll('#section-list .list-group-item').forEach(item => {
+                        if(liveStatusData.message && Object.keys(liveStatusData.data || {}).length === 0) {
+                             alert(liveStatusData.message); 
+                        }
+
+                        const statuses = liveStatusData.data || liveStatusData;
+
+                        sectionList.querySelectorAll('.list-group-item').forEach(item => {
                             const sectionId = item.dataset.sectionId;
-                            const statusInfo = liveStatusData[sectionId];
+                            const statusInfo = statuses[sectionId];
                             const badgeContainer = item.querySelector('.status-badge-container');
                             if (statusInfo) {
                                 item.dataset.status = statusInfo.status;
@@ -946,13 +1008,14 @@
                         });
                         document.getElementById('live-status-action').style.display = 'none';
                         filterToggles.style.display = 'flex';
+                        applySectionFilters(); 
                     } else {
                         alert(`Error: ${liveStatusData.details || 'Failed to fetch live status.'}`);
-                        checkLiveBtn.disabled = false;
-                        checkLiveBtn.innerHTML = '<i class="fas fa-sync"></i> Check Live Section Status';
                     }
                 } catch (e) {
+                    console.error("Live status check failed:", e);
                     alert('A network error occurred while checking live status.');
+                } finally {
                     checkLiveBtn.disabled = false;
                     checkLiveBtn.innerHTML = '<i class="fas fa-sync"></i> Check Live Section Status';
                 }
@@ -964,11 +1027,9 @@
             const availableOnly = document.getElementById('live-filter-available-only').checked;
 
             if (!liveFilterEnabled || !availableOnly) {
-                // If live filtering is disabled or not set to "Available Only", submit normally.
                 return handleFormSubmit(new Event('submit'));
             }
 
-            // --- Live Filtering is ON ---
             showLoading();
             const loadingText = document.querySelector('#loading-overlay h4');
             const originalLoadingText = loadingText.textContent;
@@ -977,9 +1038,11 @@
             let liveCourseSectionFilter = {};
             let errorOccurred = false;
 
+            const selectedSemester = document.getElementById('selected-semester').value;
+
             for (const courseCode of selectedCourses) {
                 try {
-                    const response = await fetch(`/api/live-status?course_code=${courseCode}`);
+                    const response = await fetch(`/api/live-status?course_code=${courseCode}&semester=${encodeURIComponent(selectedSemester)}`);
                     const data = await response.json();
 
                     if (!response.ok) {
@@ -987,8 +1050,9 @@
                         errorOccurred = true;
                         break;
                     }
-
-                    const availableSections = Object.keys(data).filter(sectionId => data[sectionId].status === 'available');
+                    
+                    const statuses = data.data || data;
+                    const availableSections = Object.keys(statuses).filter(sectionId => statuses[sectionId].status === 'available');
                     liveCourseSectionFilter[courseCode] = availableSections;
 
                 } catch (e) {
@@ -998,29 +1062,25 @@
                 }
             }
 
-            loadingText.textContent = originalLoadingText; // Reset loading text
+            loadingText.textContent = originalLoadingText;
 
             if (errorOccurred) {
                 hideLoading();
                 return;
             }
 
-            // Intersect the live filter with any existing user-defined filter.
             let finalFilter = {};
             for (const courseCode of selectedCourses) {
                 const userFiltered = courseSectionFilter[courseCode]; 
                 const liveAvailable = liveCourseSectionFilter[courseCode];
 
                 if (userFiltered) {
-                    // User has a filter, so find the intersection.
                     finalFilter[courseCode] = userFiltered.filter(id => liveAvailable.includes(id));
                 } else {
-                    // User has no filter, so just use the live available ones.
                     finalFilter[courseCode] = liveAvailable;
                 }
             }
             
-            // Submit the form with the final, intersected filter.
             handleFormSubmit(new Event('submit'), false, finalFilter);
         }
 
@@ -1046,7 +1106,6 @@
             formData.append('courses[]', selectedCourses.join(',')); 
             formData.append('course_time_constraints', document.getElementById('course-time-constraints-input').value);
 
-            // Use the override if provided, otherwise use the global filter
             const filterToSend = overrideSectionFilter !== null ? overrideSectionFilter : courseSectionFilter;
             formData.append('course_section_filter', JSON.stringify(filterToSend));
             
@@ -1110,6 +1169,7 @@
             const loadMoreControls = document.getElementById('load-more-controls');
             const loadMoreBtn = document.getElementById('load-more-btn');
             const showingInfo = document.getElementById('showing-results-info');
+            const exportBtn = document.getElementById('export-text-btn');
 
             if (!currentResultsData || !currentResultsData.combinations || currentResultsData.combinations.length === 0) {
                 schedulesGrid.innerHTML = '';
@@ -1117,11 +1177,13 @@
                 emptyState.style.display = 'block';
                 countHeader.textContent = 'Schedules: 0';
                 loadMoreControls.style.display = 'none';
+                exportBtn.style.display = 'none';
                 return;
             }
             
             emptyState.style.display = 'none';
             schedulesGrid.style.display = 'grid';
+            exportBtn.style.display = 'inline-flex';
             
             const totalSchedules = currentResultsData.combinations.length;
             countHeader.textContent = `Schedules: ${totalSchedules}`;
@@ -1163,19 +1225,17 @@
                 
                 let times = [];
                 const processMeeting = (meetingData, typeAbbr) => {
-                    if (!meetingData) return ''; // If the component (e.g., LEC) doesn't exist for the course
+                    if (!meetingData) return ''; 
                     
-                    let meetings = meetingData;
-                    if (!Array.isArray(meetings)) {
-                        meetings = [meetings]; // Ensure we always iterate over an array
-                    }
+                    let meetings = Array.isArray(meetingData) ? meetingData : [meetingData];
                     
                     return meetings.map(m => {
                         if (m && m.start !== undefined && m.finish !== undefined && m.days) {
+                           if (m.start === 0 && m.finish === 0) return `${typeAbbr} Online`;
                            return `${typeAbbr} ${formatTime(m.start)}-${formatTime(m.finish)} ${m.days.join('')}`;
                         }
                         return '';
-                    }).filter(s => s).join('; '); // Filter out empty strings and join
+                    }).filter(s => s).join('; ');
                 };
         
                 let lecTime = processMeeting(course.LEC, 'LEC');
@@ -1215,7 +1275,7 @@
             daysOfWeek.forEach((dayAbbr, dayIndex) => {
                 visualGridHtml += `<div class="day-col-visual" data-day="${dayAbbr}" style="grid-column: ${dayIndex + 2};">`;
                 
-                combination.courses.forEach(course => { // course has .LEC, .SEM, .LAB
+                combination.courses.forEach(course => { 
                     const courseCodeBase = course.section_id.split('*').slice(0, 2).join('*'); 
                     const sectionNumOnly = course.section_id.split('*')[2];
                     
@@ -1226,7 +1286,7 @@
                     ];
 
                     componentTypes.forEach(compType => {
-                        let itemsToProcess = course[compType.key]; // Access using uppercase key, e.g., course.LEC
+                        let itemsToProcess = course[compType.key];
 
                         if (itemsToProcess && !Array.isArray(itemsToProcess)) {
                             itemsToProcess = [itemsToProcess];
@@ -1264,9 +1324,9 @@
                         }
                     });
                 });
-                visualGridHtml += `</div>`; // Close day-col-visual
+                visualGridHtml += `</div>`;
             });
-            visualGridHtml += '</div>'; // Close visual-schedule-display
+            visualGridHtml += '</div>';
 
             if (isModal) { 
                 return visualGridHtml + coursesHtml; 
@@ -1403,8 +1463,75 @@
             persistSavedSchedules();
             renderSavedSchedulesList();
         }
+        
+        // NEW: Replaced JSON export with Text export
+        function exportSchedulesToText() {
+            if (!currentResultsData || !currentResultsData.combinations || currentResultsData.combinations.length === 0) {
+                alert("No schedules to export. Please generate schedules first.");
+                return;
+            }
+
+            let fullTextOutput = `Generated Schedules Summary\n`;
+            fullTextOutput += `Semester: ${document.getElementById('selected-semester').value}\n`;
+            fullTextOutput += `Generated At: ${new Date().toLocaleString()}\n`;
+            fullTextOutput += `Total Schedules Found: ${currentResultsData.combinations.length}\n`;
+            fullTextOutput += `--------------------------------------------------\n\n`;
+
+            currentResultsData.combinations.forEach((schedule, index) => {
+                fullTextOutput += `--- SCHEDULE (Rank ${schedule.rank}) ---\n`;
+                
+                const sortedCourses = [...schedule.courses].sort((a, b) => a.section_id.localeCompare(b.section_id));
+                
+                sortedCourses.forEach(course => {
+                    const parts = course.section_id.split('*');
+                    const courseCode = `${parts[0]}*${parts[1]}`;
+                    const sectionId = parts[2];
+                    
+                    let courseLine = `${courseCode} (${sectionId}): `;
+                    const meetingParts = [];
+                    
+                    ['LEC', 'SEM', 'LAB'].forEach(compKey => {
+                        if (course[compKey]) {
+                            const meetings = Array.isArray(course[compKey]) ? course[compKey] : [course[compKey]];
+                            const meetingStrings = new Set(); // Use a Set to prevent duplicate meeting times
+
+                            meetings.forEach(meeting => {
+                                if(meeting.start === 0 && meeting.finish === 0) {
+                                    meetingStrings.add(`${compKey} Online`);
+                                } else {
+                                    meetingStrings.add(`${compKey} ${formatTime(meeting.start)}-${formatTime(meeting.finish)} ${meeting.days.join('')}`);
+                                }
+                            });
+                            
+                            if(meetingStrings.size > 0) {
+                                meetingParts.push(Array.from(meetingStrings).join('; '));
+                            }
+                        }
+                    });
+                    
+                    courseLine += meetingParts.join(', ');
+                    fullTextOutput += courseLine + '\n';
+                });
+                
+                fullTextOutput += '\n';
+            });
+
+            const blob = new Blob([fullTextOutput], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement('a');
+            const semesterText = document.getElementById('selected-semester').value.replace(/\s+/g, '_');
+            
+            anchor.href = url;
+            anchor.download = `schedules_summary_${semesterText}.txt`;
+            
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+            URL.revokeObjectURL(url);
+        }
 
         function formatTime(minutes) {
+            if (minutes === null || minutes === undefined) return '';
             const h = Math.floor(minutes / 60);
             const m = minutes % 60;
             return `${h < 10 ? '0' : ''}${h}:${m < 10 ? '0' : ''}${m}`;

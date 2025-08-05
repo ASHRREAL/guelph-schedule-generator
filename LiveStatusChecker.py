@@ -1,5 +1,3 @@
-# LiveStatusChecker.py
-
 from bs4 import BeautifulSoup
 import re
 import sys
@@ -25,7 +23,7 @@ def setup_driver(headless=True):
         print(f"[LiveStatusChecker] Initializing Selenium WebDriver (headless={headless})...")
         options = Options()
         if headless:
-            options.add_argument('--head')
+            options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--disable-gpu')
@@ -52,9 +50,9 @@ def shutdown_driver():
         driver.quit()
         driver = None
 
-def get_live_section_status(course_code, headless=True):
+def get_live_section_status(course_code, semester, headless=True):
     """
-    Scrapes the UoGuelph course search page for live section availability.
+    Scrapes the UoGuelph course search page for live section availability for a specific semester.
     It uses Selenium to handle the JavaScript-driven page and mimics user interaction.
     """
     local_driver = setup_driver(headless=headless)
@@ -63,6 +61,8 @@ def get_live_section_status(course_code, headless=True):
 
     if not course_code:
         return None, "Course code cannot be empty."
+    if not semester:
+        return None, "Semester must be provided to check live status."
 
     search_url = f"https://colleague-ss.uoguelph.ca/Student/Courses/Search?keyword={course_code}"
     section_statuses = {}
@@ -75,9 +75,9 @@ def get_live_section_status(course_code, headless=True):
             EC.presence_of_element_located((By.ID, "course-resultul"))
         )
         
-        # Handle cases where the course code is invalid or not offered.
+        # Handle cases where the course code is invalid or not offered at all.
         if "No results found for your search" in local_driver.page_source:
-             return None, f"The course '{course_code}' was not found. It may not be offered or the code is incorrect."
+             return {}, f"The course '{course_code}' was not found. It may not be offered or the code is incorrect."
 
         # First, check if the section content is already visible to avoid unnecessary clicks.
         try:
@@ -110,95 +110,98 @@ def get_live_section_status(course_code, headless=True):
     # Now that the page is fully rendered, parse the HTML.
     soup = BeautifulSoup(local_driver.page_source, 'html.parser')
     
-    # Iterate through each term (e.g., "Fall 2025", "Winter 2026") on the page.
-    term_headers = soup.select("h4")
-    for term_header in term_headers:
-        term_name = term_header.get_text(strip=True)
-        # Skip any headers that aren't valid term names.
-        if term_name not in ["Fall 2025", "Winter 2026", "Summer 2025"]:
-            continue
-        
-        # Find the list of sections associated with the current term.
-        section_list_ul = term_header.find_next_sibling('ul')
-        if not section_list_ul:
-            continue
-            
-        section_lis = section_list_ul.select('li.search-nestedaccordionitem')
-        if not section_lis:
-            continue
-        
-        # Extract the status from each section within the term.
-        for section_li in section_lis:
-            section_id_tag = section_li.find('a', class_='search-sectiondetailslink')
-            if not section_id_tag or not section_id_tag.text.strip():
-                continue
-            section_id = section_id_tag.text.strip()
-            
-            table = section_li.find('table', class_='search-sectiontable')
-            if not table: continue
-            
-            headers = [th.get_text(strip=True) for th in table.select('thead > tr > th')]
-            data_cells = table.select('tbody > tr:first-child > td')
-            if not headers or not data_cells: continue
-            
-            status_idx, status_type = -1, None
-            if 'Seats' in headers:
-                status_idx, status_type = headers.index('Seats'), 'Seats'
-            elif 'Waitlisted' in headers:
-                status_idx, status_type = headers.index('Waitlisted'), 'Waitlisted'
+    # Find the specific term header (e.g., "Fall 2025")
+    term_header = soup.find('h4', string=re.compile(r'\s*' + re.escape(semester) + r'\s*'))
 
-            if status_idx != -1 and status_idx < len(data_cells):
-                status_cell = data_cells[status_idx]
-                
-                # The status cell contains multiple spans; find the one that is currently visible.
-                spans = status_cell.find_all('span', class_='search-seatsavailabletext')
-                status_value = "N/A"
-                for span in spans:
-                    # A visible span does not have 'display: none' in its style attribute.
-                    if 'style' not in span.attrs or 'display: none' not in span['style']:
-                        status_value = span.get_text(strip=True)
-                        break
-                
-                # Categorize the section status based on the parsed value.
-                if status_type == 'Seats':
-                    parts = [p.strip() for p in status_value.split('/')]
-                    try:
-                        available_seats = int(parts[0])
-                        status = "available" if available_seats > 0 else "full"
-                        section_statuses[section_id] = {"status": status, "details": status_value, "term": term_name}
-                    except (ValueError, IndexError):
-                        section_statuses[section_id] = {"status": "unknown", "details": status_value, "term": term_name}
-                elif status_type == 'Waitlisted':
-                    section_statuses[section_id] = {"status": "waitlisted", "details": status_value, "term": term_name}
+    if not term_header:
+        return {}, f"Course '{course_code}' may not be offered in {semester}, or the term is not listed on the page."
+
+    # Find the list of sections associated with the matched term.
+    section_list_ul = term_header.find_next_sibling('ul')
+    if not section_list_ul:
+        return {}, f"No section list found under the '{semester}' header for {course_code}."
+        
+    section_lis = section_list_ul.select('li.search-nestedaccordionitem')
+    if not section_lis:
+        return section_statuses, f"No sections found for {course_code} in {semester}."
+    
+    # Extract the status from each section within the term.
+    for section_li in section_lis:
+        section_id_tag = section_li.find('a', class_='search-sectiondetailslink')
+        if not section_id_tag or not section_id_tag.text.strip():
+            continue
+        section_id = section_id_tag.text.strip()
+        
+        table = section_li.find('table', class_='search-sectiontable')
+        if not table: continue
+        
+        headers = [th.get_text(strip=True) for th in table.select('thead > tr > th')]
+        data_cells = table.select('tbody > tr:first-child > td')
+        if not headers or not data_cells: continue
+        
+        status_idx, status_type = -1, None
+        if 'Seats' in headers:
+            status_idx, status_type = headers.index('Seats'), 'Seats'
+        elif 'Waitlisted' in headers:
+            status_idx, status_type = headers.index('Waitlisted'), 'Waitlisted'
+
+        if status_idx != -1 and status_idx < len(data_cells):
+            status_cell = data_cells[status_idx]
+            
+            # The status cell contains multiple spans; find the one that is currently visible.
+            spans = status_cell.find_all('span', class_='search-seatsavailabletext')
+            status_value = "N/A"
+            for span in spans:
+                # A visible span does not have 'display: none' in its style attribute.
+                if 'style' not in span.attrs or 'display: none' not in span['style']:
+                    status_value = span.get_text(strip=True)
+                    break
+            
+            # Categorize the section status based on the parsed value.
+            if status_type == 'Seats':
+                parts = [p.strip() for p in status_value.split('/')]
+                try:
+                    available_seats = int(parts[0])
+                    status = "available" if available_seats > 0 else "full"
+                    section_statuses[section_id] = {"status": status, "details": status_value, "term": semester}
+                except (ValueError, IndexError):
+                    section_statuses[section_id] = {"status": "unknown", "details": status_value, "term": semester}
+            elif status_type == 'Waitlisted':
+                section_statuses[section_id] = {"status": "waitlisted", "details": status_value, "term": semester}
     
     if not section_statuses:
-        return None, f"Could not parse status for any section of {course_code}. The page structure may have changed."
+        return {}, f"Could not parse status for any section of {course_code} in {semester}. The page structure may have changed."
 
     return section_statuses, None
 
 # This block allows the script to be run directly from the command line for testing purposes.
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("Usage: python LiveStatusChecker.py <COURSE_CODE> [--no-headless]")
-        print("Example (headless): python LiveStatusChecker.py \"CIS*2750\"")
-        print("Example (visible browser):  python LiveStatusChecker.py \"CIS*2750\" --no-headless")
+    if len(sys.argv) < 3:
+        print("Usage: python LiveStatusChecker.py <COURSE_CODE> <SEMESTER> [--no-headless]")
+        print("Example (headless): python LiveStatusChecker.py \"CIS*2750\" \"Fall 2025\"")
+        print("Example (visible browser):  python LiveStatusChecker.py \"CIS*2750\" \"Fall 2025\" --no-headless")
         sys.exit(1)
 
     course_to_check = sys.argv[1]
+    semester_to_check = sys.argv[2]
     # Check for the optional flag to run with a visible browser for debugging.
     run_headless = "--no-headless" not in sys.argv
     
-    print(f"Checking live status for: {course_to_check}...")
+    print(f"Checking live status for: {course_to_check} in {semester_to_check}...")
     try:
-        statuses, error_msg = get_live_section_status(course_to_check, headless=run_headless)
+        statuses, error_msg = get_live_section_status(course_to_check, semester_to_check, headless=run_headless)
 
         if error_msg:
-            print(f"\n--- ERROR ---")
+            print(f"\n--- MESSAGE ---")
             print(error_msg)
-        else:
+        
+        if statuses:
             print(f"\n--- SUCCESS ---")
             print(f"Found status for {len(statuses)} sections:")
             pprint.pprint(statuses)
+        elif not error_msg:
+             print(f"\n--- No sections or status found ---")
+
     finally:
         # Ensure the browser instance is closed after the script finishes.
         shutdown_driver()
