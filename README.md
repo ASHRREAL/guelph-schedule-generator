@@ -6,15 +6,14 @@ A small Python utility to scrape University of Guelph course section availabilit
 ---
 ## Overview
 
-- `Main.py` - main entrypoint for the application.--------
+- `Main.py` - main entrypoint for the application.
 
-- `LiveStatusChecker.py` - uses Selenium to perform a live availability check of course sections on the U of Guelph site.- `Main.py` - main entrypoint for the application.
+- `LiveStatusChecker.py` - uses Selenium to perform a live availability check of course sections on the U of Guelph site.
 
-- `scraperv2.py`, `CourseUtil.py`, `sortingMethods.py` - supporting scripts used by the project.- `LiveStatusChecker.py` - uses Selenium to perform a live availability check of course sections on the U of Guelph site.
+- `scraperv2.py`, `CourseUtil.py`, `sortingMethods.py` - supporting scripts used by the project.
 
-- `*.json` - sample semester/course data files.- `scraperv2.py`, `CourseUtil.py`, `sortingMethods.py` - supporting scripts used by the project.
+- `*.json` - course data.
 
-- `*.json` - sample semester/course data files.
 ---
 ## Requirements
 
