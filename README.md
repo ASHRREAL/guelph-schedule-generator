@@ -1,7 +1,6 @@
-# Guelph Schedule Generatorguelph-schedule-generator
+# Guelph Schedule Generator
 
-=========================
-
+---
 A small Python utility to scrape University of Guelph course section availability and generate schedules.
 
 A small Python utility to scrape University of Guelph course section availability and generate schedules.
