@@ -18,86 +18,69 @@ def levenshtein_distance(s1, s2):
     return previous_row[-1]
 
 def filterByEarliestAtSchool(schedule, startTime):
-
     if startTime == 0:
         return schedule
 
-    dateToIndexMap = {"M": 0, "T": 1, "W": 2, "Th": 3, "F": 4, "Sa": 5}
     validCombinations = []
+    dateToIndexMap = {"M": 0, "T": 1, "W": 2, "Th": 3, "F": 4, "Sa": 5}
 
-    for possibleCombination in schedule: 
-        week = [[], [], [], [], [], []]  
-        isValidCombination = True 
-
-        for course_section in possibleCombination: 
-
-            for schedule_item in course_section.get_schedule_items(): 
+    for possibleCombination in schedule:
+        daily_starts = {} 
+        
+        for course_section in possibleCombination:
+            for schedule_item in course_section.get_schedule_items():
                 if schedule_item is not None:
-
-                    if schedule_item.start < startTime:
-                        isValidCombination = False
-                        break 
-
                     for day in schedule_item.days:
                         if day in dateToIndexMap:
-                             week[dateToIndexMap[day]].append((schedule_item.start, schedule_item.finish))
-            if not isValidCombination:
-                break 
-
-        if not isValidCombination: 
-            continue
-
-        isTrulyValid = True
-        for w_idx in range(len(week)):
-            if week[w_idx]:
-                week[w_idx] = sorted(week[w_idx], key=lambda x: x[0]) 
-                if week[w_idx][0][0] < startTime:
-                    isTrulyValid = False
+                            # Store the start time for each day, creating a list of starts if multiple classes on one day
+                            if day not in daily_starts:
+                                daily_starts[day] = []
+                            daily_starts[day].append(schedule_item.start)
+        
+        is_valid = True
+        if daily_starts:
+            for day, starts in daily_starts.items():
+                # The actual earliest time the student is at school on this day
+                day_earliest_start = min(starts)
+                if day_earliest_start < startTime:
+                    is_valid = False
                     break
-
-        if isTrulyValid:
+        
+        if is_valid:
             validCombinations.append(possibleCombination)
-
+            
     return validCombinations
 
 def filterByLatestAtSchool(schedule, endTime):
-
     if endTime == 0:
         return schedule
 
+    validCombinations = []
     dateToIndexMap = {"M": 0, "T": 1, "W": 2, "Th": 3, "F": 4, "Sa": 5}
-    validCombinations = [] 
 
     for possibleCombination in schedule:
-        week = [[], [], [], [], [], []]
-        max_end_time_for_combination = 0
-        has_classes = False
+        daily_ends = {}
 
         for course_section in possibleCombination:
             for schedule_item in course_section.get_schedule_items():
                 if schedule_item is not None:
-                    has_classes = True
-                    max_end_time_for_combination = max(max_end_time_for_combination, schedule_item.finish)
-
                     for day in schedule_item.days:
                         if day in dateToIndexMap:
-                            week[dateToIndexMap[day]].append((schedule_item.start, schedule_item.finish))
-
-        if not has_classes: 
-            validCombinations.append(possibleCombination)
-            continue
-
-        isTrulyValid = True
-        for w_idx in range(len(week)):
-            if week[w_idx]:
-                week[w_idx] = sorted(week[w_idx], key=lambda x: x[1], reverse=True) 
-                if week[w_idx][0][1] > endTime: 
-                    isTrulyValid = False
+                            if day not in daily_ends:
+                                daily_ends[day] = []
+                            daily_ends[day].append(schedule_item.finish)
+        
+        is_valid = True
+        if daily_ends:
+            for day, ends in daily_ends.items():
+                day_latest_end = max(ends)
+                if day_latest_end > endTime:
+                    is_valid = False
                     break
-
-        if isTrulyValid:
+        
+        if is_valid:
             validCombinations.append(possibleCombination)
-
+            
     return validCombinations
 
 def filterBySpecificDayOff(schedule, daysOff): 

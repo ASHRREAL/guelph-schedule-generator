@@ -145,11 +145,6 @@ def calculate_cm_schedule_score(combination):
         'days_on_campus': days_on_campus
     }
 
-def calculate_gap_score(total_gap_minutes):
-    if total_gap_minutes < 60 : return 100 - total_gap_minutes
-    elif total_gap_minutes < 240: return 80 - (total_gap_minutes - 60) * 0.1
-    else: return max(0, 40 - (total_gap_minutes - 240) * 0.2)
-
 def section_meets_time_constraints(section, course_code, course_time_constraints):
     if course_code not in course_time_constraints: return True
 
@@ -304,13 +299,7 @@ def schedule():
             except ValueError:
                 print(f"Warning: Invalid value for num_days_off: {num_days_off_request_str}")
 
-        if earliestAtSchool > 0:
-            validCombinations = filterByEarliestAtSchool(validCombinations, earliestAtSchool)
-            print(f"After global earliest time filter ({earliestAtSchool}): {len(validCombinations)}")
 
-        if latestAtSchool > 0:
-            validCombinations = filterByLatestAtSchool(validCombinations, latestAtSchool)
-            print(f"After global latest time filter ({latestAtSchool}): {len(validCombinations)}")
 
         if not validCombinations:
              return _handle_error("No_Combinations_Query_Too_Strict")
@@ -321,7 +310,7 @@ def schedule():
         if not validCombinations :
              return _handle_error("No_Combinations_Query_Too_Strict")
 
-        sort_preference = request.form.get('sort_preference', 'smart_gaps')
+        sort_preference = request.form.get('sort_preference', 'balanced')
         print(f"Sorting preference: {sort_preference}")
 
         scored_schedules = []
@@ -330,32 +319,17 @@ def schedule():
             combo = validCombinations[i]
             gap_time = gap_times_list[i] if i < len(gap_times_list) else 0
 
-            if sort_preference == 'smart_gaps':
+            if sort_preference == 'balanced':
                 comp_score, metrics = calculate_cm_schedule_score(combo)
                 scored_schedules.append((comp_score, i, gap_time, metrics))
-            elif sort_preference == 'minimal_gaps':
-                scored_schedules.append((-gap_time, i, gap_time))
-            elif sort_preference == 'best_gaps':
-                score = calculate_gap_score(gap_time)
-                scored_schedules.append((score, i, gap_time))
-            elif sort_preference == 'fewer_days':
-                days_used_count = 0
-                if combo:
-                    days_present = set()
-                    for course_sec in combo:
-                        for sch_item in course_sec.get_schedule_items():
-                            days_present.update(sch_item.days)
-                    days_used_count = len(days_present)
-                smart_s, _ = calculate_cm_schedule_score(combo)
-                scored_schedules.append(((-days_used_count * 10000) + smart_s, i, gap_time, {'days_on_campus': days_used_count}))
-            elif sort_preference == 'early_start':
+            elif sort_preference == 'morning_schedule':
                 min_start_time = float('inf')
                 if combo:
                     for course_sec in combo:
                         for sch_item in course_sec.get_schedule_items():
                             min_start_time = min(min_start_time, sch_item.start)
                 scored_schedules.append((min_start_time if min_start_time != float('inf') else 9999, i, gap_time))
-            elif sort_preference == 'late_start':
+            elif sort_preference == 'afternoon_schedule':
                 overall_latest_first_class_start = 0
                 if combo:
                     daily_first_starts = []
@@ -368,6 +342,16 @@ def schedule():
                         if day_starts: daily_first_starts.append(min(day_starts))
                     if daily_first_starts: overall_latest_first_class_start = min(daily_first_starts)
                 scored_schedules.append((overall_latest_first_class_start, i, gap_time))
+            elif sort_preference == 'most_days_off':
+                days_used_count = 0
+                if combo:
+                    days_present = set()
+                    for course_sec in combo:
+                        for sch_item in course_sec.get_schedule_items():
+                            days_present.update(sch_item.days)
+                    days_used_count = len(days_present)
+                smart_s, _ = calculate_cm_schedule_score(combo)
+                scored_schedules.append(((-days_used_count * 10000) + smart_s, i, gap_time, {'days_on_campus': days_used_count}))
             elif sort_preference == 'compact':
                 total_daily_span = 0; days_active = 0
                 if combo:
@@ -382,11 +366,11 @@ def schedule():
                             total_daily_span += (max_e - min_s)
                 score = total_daily_span + gap_time * 0.1
                 scored_schedules.append((score, i, gap_time))
-            else:
+            else: # Default to balanced
                 comp_score, metrics = calculate_cm_schedule_score(combo)
                 scored_schedules.append((comp_score, i, gap_time, metrics))
 
-        if sort_preference in ['early_start', 'compact', 'minimal_gaps']:
+        if sort_preference in ['morning_schedule', 'compact']:
             scored_schedules.sort(key=lambda x: x[0])
         else:
             scored_schedules.sort(key=lambda x: x[0], reverse=True)
