@@ -106,24 +106,50 @@ class CourseSection:
 
 class CoursePlanner:
     def __init__(self, courses):
-        self.courses = courses 
-        self.combinations = None
-        self._conflict_cache = {} 
+        self.courses = courses
+        self._conflict_matrix = None
+        self._section_map = None
 
-    def generate_combinations(self):
-        """Generate combinations lazily to save memory"""
-        if self.combinations is None:
+    def _build_conflict_matrix(self):
+        """Pre-compute conflict matrix for all sections across all courses."""
+        if self._conflict_matrix is not None:
+            return
 
-            self.combinations = list(itertools.product(*self.courses))
-        return self.combinations
+        sections = []
+        section_course_map = []
+        for ci, course_sections in enumerate(self.courses):
+            for section in course_sections:
+                sections.append(section)
+                section_course_map.append(ci)
+
+        n = len(sections)
+        self._conflict_matrix = [set() for _ in range(n)]
+        self._section_map = (sections, section_course_map)
+
+        for i in range(n):
+            for j in range(i + 1, n):
+                if section_course_map[i] == section_course_map[j]:
+                    continue
+                if sections[i].conflicts_with(sections[j]):
+                    self._conflict_matrix[i].add(j)
+                    self._conflict_matrix[j].add(i)
 
     def nonOverlapped(self):
-        """Optimized conflict detection using early termination and caching"""
-        validCombinations = []
+        """Use pre-computed conflict matrix for fast combination checking."""
+        self._build_conflict_matrix()
+        sections, section_course_map = self._section_map
+        conflict_matrix = self._conflict_matrix
+
+        course_section_indices = []
+        idx = 0
+        for course_sections in self.courses:
+            indices = list(range(idx, idx + len(course_sections)))
+            course_section_indices.append(indices)
+            idx += len(course_sections)
 
         total_combinations = 1
-        for course_sections_list in self.courses:
-            total_combinations *= len(course_sections_list)
+        for ci in range(len(self.courses)):
+            total_combinations *= len(course_section_indices[ci])
 
         if total_combinations == 0:
             print("No combinations possible as at least one course has no available sections.")
@@ -131,32 +157,34 @@ class CoursePlanner:
 
         print(f"Checking {total_combinations:,} total combinations in CoursePlanner...")
 
+        validCombinations = []
         combination_count = 0
 
-        for combination in itertools.product(*self.courses):
+        for combo_indices in itertools.product(*course_section_indices):
             combination_count += 1
 
-            if combination_count % 50000 == 0 and combination_count > 0:
+            if combination_count % 100000 == 0 and combination_count > 0:
                 print(f"Processed {combination_count:,}/{total_combinations:,} combinations in planner...")
 
-            if self._is_valid_combination_optimized(combination):
-                validCombinations.append(combination)
+            valid = True
+            for i in range(len(combo_indices)):
+                for j in range(i + 1, len(combo_indices)):
+                    if combo_indices[j] in conflict_matrix[combo_indices[i]]:
+                        valid = False
+                        break
+                if not valid:
+                    break
 
-            if len(validCombinations) >= 1500000: 
+            if valid:
+                combo_sections = tuple(sections[idx] for idx in combo_indices)
+                validCombinations.append(combo_sections)
+
+            if len(validCombinations) >= 1500000:
                 print(f"Reached combination limit ({len(validCombinations):,}). Stopping early.")
                 break
 
         print(f"Planner found {len(validCombinations):,} valid (non-overlapping) combinations out of {combination_count:,} checked.")
         return validCombinations
-
-    def _is_valid_combination_optimized(self, combination):
-        """Optimized conflict checking with early termination for a given combination (tuple of CourseSections)."""
-        for i in range(len(combination)):
-            for j in range(i + 1, len(combination)):
-
-                if combination[i].conflicts_with(combination[j]):
-                    return False
-        return True
 
     def print_all_schedules(self):
 

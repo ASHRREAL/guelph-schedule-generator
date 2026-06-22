@@ -143,10 +143,9 @@
             border-radius: 4px;
             position: relative; 
             background-image: repeating-linear-gradient(
-                var(--bg-secondary) 0, var(--bg-secondary) calc(100% / 14 - 1px), 
-                var(--border-color) calc(100% / 14 - 1px), var(--border-color) calc(100% / 14)
+                var(--bg-secondary) 0, var(--bg-secondary) calc(100% / 28 - 1px), 
+                var(--border-color) calc(100% / 28 - 1px), var(--border-color) calc(100% / 28)
             );
-            background-size: 100% calc(100% / 14); 
         }
 
         .course-block-visual { position: absolute; left: 1px; right: 1px; width: calc(100% - 2px); border-radius: 2px; overflow: hidden; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; padding: 1px; }
@@ -292,11 +291,11 @@
                     <div class="mb-3"> 
                         <label for="semester" class="form-label-custom">Select Semester:</label>
                         <div class="semester-pills" id="semester-pills-container">
-                            <button type="button" class="semester-pill" data-semester="Summer 2025"><i class="fas fa-sun"></i>S25</button>
-                            <button type="button" class="semester-pill" data-semester="Fall 2025"><i class="fas fa-leaf"></i>F25</button>
-                            <button type="button" class="semester-pill" data-semester="Winter 2026"><i class="fas fa-snowflake"></i>W26</button>
+                            <button type="button" class="semester-pill" data-semester="Summer 2026"><i class="fas fa-sun"></i>S26</button>
+                            <button type="button" class="semester-pill" data-semester="Fall 2026"><i class="fas fa-leaf"></i>F26</button>
+                            <button type="button" class="semester-pill" data-semester="Winter 2027"><i class="fas fa-snowflake"></i>W27</button>
                         </div>
-                        <input type="hidden" name="semester" id="selected-semester" value="Summer 2025">
+                        <input type="hidden" name="semester" id="selected-semester" value="Summer 2026">
                     </div>
 
                     <input type="hidden" name="course_time_constraints" id="course-time-constraints-input" value="{}">
@@ -514,7 +513,7 @@
 
             const storedSemester = localStorage.getItem(STORAGE_KEYS.selectedSemester);
             const semesterPills = document.querySelectorAll('.semester-pill');
-            let activeSemester = "Summer 2025"; 
+            let activeSemester = "Summer 2026"; 
             
             semesterPills.forEach(p => p.classList.remove('active'));
             if (storedSemester) {
@@ -523,10 +522,10 @@
                     pillToActivate.classList.add('active');
                     activeSemester = storedSemester;
                 } else { 
-                    document.querySelector('.semester-pill[data-semester="Summer 2025"]').classList.add('active');
+                    document.querySelector('.semester-pill[data-semester="Summer 2026"]').classList.add('active');
                 }
             } else {
-                 document.querySelector('.semester-pill[data-semester="Summer 2025"]').classList.add('active');
+                 document.querySelector('.semester-pill[data-semester="Summer 2026"]').classList.add('active');
             }
             document.getElementById('selected-semester').value = activeSemester;
 
@@ -646,9 +645,9 @@
             document.getElementById('items-per-page').value = '10';
 
             document.querySelectorAll('.semester-pill').forEach(p => p.classList.remove('active'));
-            const defaultSemesterPill = document.querySelector('.semester-pill[data-semester="Summer 2025"]');
+            const defaultSemesterPill = document.querySelector('.semester-pill[data-semester="Summer 2026"]');
             if (defaultSemesterPill) defaultSemesterPill.classList.add('active');
-            document.getElementById('selected-semester').value = "Summer 2025";
+            document.getElementById('selected-semester').value = "Summer 2026";
             
             updateSelectedCoursesDisplay(); 
             updateCourseTimeConstraintsHiddenInput(); 

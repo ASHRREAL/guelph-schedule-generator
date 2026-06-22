@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, jsonify
 import json
 import time
 import re
+import gzip
+import io
 from CourseUtil import ScheduleItem, CourseSection, CoursePlanner
 
 from LiveStatusChecker import get_live_section_status, shutdown_driver
@@ -19,9 +21,25 @@ import gc
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 31536000
 atexit.register(shutdown_driver)
 
+@app.after_request
+def add_gzip_header(response):
+    accept_encoding = request.headers.get('Accept-Encoding', '')
+    if 'gzip' in accept_encoding and response.content_length is not None and response.content_length > 500:
+        if 'Content-Encoding' not in response.headers and response.mimetype in ('application/json', 'text/html', 'text/css', 'application/javascript'):
+            gzip_buffer = io.BytesIO()
+            with gzip.GzipFile(mode='wb', fileobj=gzip_buffer, compresslevel=5) as gzip_file:
+                gzip_file.write(response.get_data())
+            response.set_data(gzip_buffer.getvalue())
+            response.headers['Content-Encoding'] = 'gzip'
+            response.headers['Content-Length'] = len(response.get_data())
+            response.headers.add('Vary', 'Accept-Encoding')
+    return response
+
 course_data_cache = {}
+_search_index = None
 
 error_messages = {
     "No_Course_Entered": "Please select at least one course.",
@@ -35,7 +53,7 @@ error_messages = {
 
 MAX_SCHEDULES_TO_DISPLAY = 500
 
-@lru_cache(maxsize=3)
+@lru_cache(maxsize=6)
 def load_course_data(json_file):
     try:
         with open(json_file, 'r', encoding='utf-8') as file:
@@ -51,7 +69,10 @@ def get_cached_course_data(semester):
     json_file_map = {
         "Summer 2025": 'S25.json',
         "Fall 2025": 'F25.json',
-        "Winter 2026": 'W26.json'
+        "Winter 2026": 'W26.json',
+        "Summer 2026": 'outputSummer2026_final.json',
+        "Fall 2026": 'outputFall2026_final.json',
+        "Winter 2027": 'outputWinter2027_final.json'
     }
     if semester not in json_file_map:
         return None
@@ -477,90 +498,176 @@ def schedule():
     gc.collect()
     return render_template('index.html')
 
+def _build_search_index(semester):
+    """Pre-build search index for a semester's course data: prefix tree + title words."""
+    data = get_cached_course_data(semester)
+    if not data:
+        return None
+
+    # Build prefix index: normalized_key -> course_code
+    prefix_index = {}  # prefix -> set of course_codes
+    title_index = {}   # lowercase_word -> set of course_codes
+
+    for course_code in data:
+        # Prefix index: all prefixes of normalized course code
+        norm = re.sub(r'[\s\*]', '', course_code.upper())
+        for i in range(2, len(norm) + 1):
+            prefix = norm[:i]
+            if prefix not in prefix_index:
+                prefix_index[prefix] = set()
+            prefix_index[prefix].add(course_code)
+
+        # Title index: individual words in title
+        title = data[course_code].get('Title', '')
+        for word in re.findall(r'\b[a-zA-Z]{2,}\b', title.lower()):
+            if word not in title_index:
+                title_index[word] = set()
+            title_index[word].add(course_code)
+
+    return {'prefix': prefix_index, 'title': title_index, 'data': data}
+
+def _get_search_index(semester):
+    global _search_index
+    if _search_index is None:
+        _search_index = {}
+    if semester not in _search_index:
+        idx = _build_search_index(semester)
+        if idx:
+            _search_index[semester] = idx
+    return _search_index.get(semester)
+
 @app.route('/api/search-courses')
 def api_search_courses():
     query = request.args.get('q', '').strip()
-    semester = request.args.get('semester', 'Summer 2025')
+    semester = request.args.get('semester', 'Summer 2026')
 
-    if len(query) < 2: return jsonify([])
+    if len(query) < 2:
+        return jsonify([])
 
-    course_data = get_cached_course_data(semester)
-    if not course_data: return jsonify([])
+    index = _get_search_index(semester)
+    if not index:
+        return jsonify([])
+
+    data = index['data']
+    prefix_index = index['prefix']
+    title_index = index['title']
 
     query_upper = query.upper()
     query_lower = query.lower()
-    
-    # Normalize query for matching, e.g., CIS1500 -> CIS*1500
-    normalized_query = query_upper
-    if '*' not in normalized_query and re.match(r'^[A-Z]+\d+', normalized_query):
-        normalized_query = re.sub(r'([A-Z]+)(\d+)', r'\1*\2', normalized_query)
-    
-    # Create a version of the query with no spaces or stars for Levenshtein distance calculation
-    query_for_levenshtein = re.sub(r'[\s\*]', '', query_upper)
+    normalized_query = re.sub(r'[\s\*]', '', query_upper)
 
-    final_results = {}
-    for course_code, course_info in course_data.items():
-        title = course_info.get('Title', "Unknown Course Title")
-        
-        # Normalize course_code for Levenshtein matching
-        course_code_for_levenshtein = re.sub(r'[\s\*]', '', course_code)
-        
-        # Calculate match score
+    # Fast path: exact match
+    if query_upper in data:
+        course = data[query_upper]
+        title = course.get('Title', '')
+        credits_match = re.search(r'\(([\d\.]+\s*Credits?)\)', title, re.IGNORECASE)
+        return jsonify([{
+            'code': query_upper, 'title': title,
+            'description': course.get('Description', '')[:120] + '...',
+            'credits': credits_match.group(1) if credits_match else '',
+            'sections_count': len(course.get('Sections', []))
+        }])
+
+    # Fast path: prefix match via index
+    candidates = set()
+    if normalized_query in prefix_index:
+        candidates |= prefix_index[normalized_query]
+
+    # Fast path: title word match via index (only if query doesn't look like a course code)
+    if not re.search(r'\d', query):  # no digits → user is searching by title, not course code
+        query_words = re.findall(r'\b[a-zA-Z]{2,}\b', query_lower)
+        for word in query_words:
+            if word in title_index:
+                if candidates:
+                    candidates &= title_index[word]
+                else:
+                    candidates = title_index[word].copy()
+            else:
+                candidates.clear()
+                break
+
+    # Fallback: try shorter prefixes
+    if not candidates:
+        prefix_len = max(2, len(normalized_query) - 1)
+        while prefix_len >= 2 and not candidates:
+            shorter_prefix = normalized_query[:prefix_len]
+            if shorter_prefix in prefix_index:
+                candidates = prefix_index[shorter_prefix].copy()
+            prefix_len -= 1
+
+    # Smart fallback: split query into subject prefix + digits (e.g. "ENG3450" → subject="ENG", digits="3450")
+    if not candidates:
+        match = re.match(r'^([A-Z]{2,5})(\d+)$', normalized_query)
+        if match:
+            subj_prefix = match.group(1)
+            digits = match.group(2)
+            for course_code in data:
+                if '*' in course_code:
+                    subj, num = course_code.split('*', 1)
+                    if subj.startswith(subj_prefix) and num.startswith(digits):
+                        candidates.add(course_code)
+
+    final_results = []
+    query_subj, query_num = None, None
+    subj_match = re.match(r'^([A-Z]{2,5})(\d+)$', normalized_query)
+    if subj_match:
+        query_subj, query_num = subj_match.group(1), subj_match.group(2)
+
+    for course_code in candidates:
+        course_info = data[course_code]
+        title = course_info.get('Title', 'Unknown Course Title')
+        course_code_norm = re.sub(r'[\s\*]', '', course_code)
+
         match_score = 0
-        
-        # 1. Levenshtein Distance (for typos in course code)
-        distance = levenshtein_distance(query_for_levenshtein, course_code_for_levenshtein)
-        
-        if distance <= 2: # Only consider courses with a small number of typos
-            # Higher score for lower distance
-            match_score = max(match_score, 85 - (distance * 15))
 
-        # 2. Exact/Prefix Match (override Levenshtein score if better)
-        if course_code == normalized_query:
+        if course_code == query_upper or course_code == normalized_query:
             match_score = 100
-        elif course_code.startswith(normalized_query):
-            match_score = max(match_score, 95)
+        elif course_code_norm == normalized_query:
+            match_score = 98
         elif course_code.startswith(query_upper):
-             match_score = max(match_score, 90)
+            match_score = 95
+        elif course_code_norm.startswith(normalized_query):
+            match_score = 92
+        elif query_subj and '*' in course_code:
+            subj, num = course_code.split('*', 1)
+            if subj.startswith(query_subj) and num == query_num:
+                match_score = 88
+            elif subj.startswith(query_subj) and num.startswith(query_num):
+                match_score = 85
+        elif course_code.startswith(normalized_query):
+            match_score = 82
 
-        # 3. Title Match
         if query_lower in title.lower():
             if title.lower().startswith(query_lower):
                 match_score = max(match_score, 65)
             else:
                 match_score = max(match_score, 50)
 
-        # Add course to results if it has a reasonable score
         if match_score > 40:
-            # If course already in results, only update if the new score is higher
-            if course_code not in final_results or match_score > final_results[course_code]['match_score']:
-                credits_str = ""
-                if title and "(" in title and "Credit" in title:
-                    credits_match_re = re.search(r'\(([\d\.]+\s*Credits?)\)', title, re.IGNORECASE)
-                    if credits_match_re: credits_str = credits_match_re.group(1)
+            credits_str = ''
+            if title and '(' in title and 'Credit' in title:
+                credits_match_re = re.search(r'\(([\d\.]+\s*Credits?)\)', title, re.IGNORECASE)
+                if credits_match_re:
+                    credits_str = credits_match_re.group(1)
 
-                final_results[course_code] = {
-                    'code': course_code,
-                    'title': title,
-                    'description': course_info.get('Description', "")[:120] + "...",
-                    'credits': credits_str,
-                    'sections_count': len(course_info.get('Sections', [])),
-                    'match_score': match_score
-                }
+            final_results.append({
+                'code': course_code, 'title': title,
+                'description': course_info.get('Description', '')[:120] + '...',
+                'credits': credits_str,
+                'sections_count': len(course_info.get('Sections', [])),
+                'match_score': match_score
+            })
 
-    # Sort results by score (descending)
-    sorted_results = sorted(final_results.values(), key=lambda x: x['match_score'], reverse=True)
-    
-    # Clean up before sending
-    for r_item in sorted_results:
+    final_results.sort(key=lambda x: x['match_score'], reverse=True)
+    for r_item in final_results:
         del r_item['match_score']
 
-    return jsonify(sorted_results[:15])
+    return jsonify(final_results[:15])
 
 @app.route('/api/course-sections')
 def api_course_sections():
     course_code = request.args.get('course_code', '').strip().upper()
-    semester = request.args.get('semester', 'Summer 2025')
+    semester = request.args.get('semester', 'Summer 2026')
 
     if not course_code:
         return jsonify({'error': 'Course code is required.'}), 400
@@ -609,7 +716,7 @@ def api_live_status():
 
 @app.route('/api/semester-info')
 def api_semester_info():
-    semester = request.args.get('semester', 'Summer 2025')
+    semester = request.args.get('semester', 'Summer 2026')
     course_data = get_cached_course_data(semester)
     if not course_data: return jsonify({'error': 'Semester data not found'}), 404
 

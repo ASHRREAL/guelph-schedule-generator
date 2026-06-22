@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 import re
 import sys
 import pprint
-import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -23,16 +22,20 @@ def setup_driver(headless=True):
         print(f"[LiveStatusChecker] Initializing Selenium WebDriver (headless={headless})...")
         options = Options()
         if headless:
-            options.add_argument('--headless')
+            options.add_argument('--headless=new')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--disable-gpu')
+        options.add_argument('--disable-extensions')
         options.add_argument('--window-size=1920,1080')
+        options.add_argument('--blink-settings=imagesEnabled=false')
+        options.add_argument('--log-level=3')
+        options.add_argument('--silent')
         options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
         
         try:
-            # Hide verbose logs from webdriver-manager in the console
             options.add_experimental_option('excludeSwitches', ['enable-logging'])
+            options.binary_location = '/usr/bin/chromium'
             service = Service(ChromeDriverManager().install())
             driver = webdriver.Chrome(service=service, options=options)
         except Exception as e:
@@ -49,12 +52,17 @@ def shutdown_driver():
     if driver:
         driver.quit()
         driver = None
+_status_cache = {}
 
 def get_live_section_status(course_code, semester, headless=True):
     """
     Scrapes the UoGuelph course search page for live section availability for a specific semester.
-    It uses Selenium to handle the JavaScript-driven page and mimics user interaction.
+    Uses request-level caching to avoid redundant fetches.
     """
+    cache_key = f"{course_code}|{semester}"
+    if cache_key in _status_cache:
+        return _status_cache[cache_key]
+
     local_driver = setup_driver(headless=headless)
     if not local_driver:
         return None, "Selenium WebDriver is not available. Cannot perform live check."
@@ -70,14 +78,14 @@ def get_live_section_status(course_code, semester, headless=True):
     try:
         local_driver.get(search_url)
 
-        # Wait for the main course results container to appear, confirming the page has loaded.
-        WebDriverWait(local_driver, 15).until(
+        WebDriverWait(local_driver, 8).until(
             EC.presence_of_element_located((By.ID, "course-resultul"))
         )
         
         # Handle cases where the course code is invalid or not offered at all.
         if "No results found for your search" in local_driver.page_source:
-             return {}, f"The course '{course_code}' was not found. It may not be offered or the code is incorrect."
+             _status_cache[cache_key] = ({}, f"The course '{course_code}' was not found.")
+             return _status_cache[cache_key]
 
         # First, check if the section content is already visible to avoid unnecessary clicks.
         try:
@@ -94,18 +102,21 @@ def get_live_section_status(course_code, semester, headless=True):
             )
             # Scroll to the button to ensure it's in the viewport and clickable.
             local_driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", view_sections_button)
-            time.sleep(0.3)
             local_driver.execute_script("arguments[0].click();", view_sections_button)
 
             # After the click, we must wait for the section content to load and become visible.
-            WebDriverWait(local_driver, 20).until(
+            WebDriverWait(local_driver, 10).until(
                 EC.visibility_of_element_located((By.CSS_SELECTOR, content_selector))
             )
 
     except TimeoutException:
-        return None, f"A timeout occurred while trying to load section details for '{course_code}'. The website may be slow or its structure has changed."
+        result = (None, f"A timeout occurred while trying to load section details for '{course_code}'.")
+        _status_cache[cache_key] = result
+        return result
     except Exception as e:
-        return None, f"An unexpected error occurred during page navigation: {e}"
+        result = (None, f"An unexpected error occurred during page navigation: {e}")
+        _status_cache[cache_key] = result
+        return result
 
     # Now that the page is fully rendered, parse the HTML.
     soup = BeautifulSoup(local_driver.page_source, 'html.parser')
@@ -114,16 +125,22 @@ def get_live_section_status(course_code, semester, headless=True):
     term_header = soup.find('h4', string=re.compile(r'\s*' + re.escape(semester) + r'\s*'))
 
     if not term_header:
-        return {}, f"Course '{course_code}' may not be offered in {semester}, or the term is not listed on the page."
+        result = ({}, f"Course '{course_code}' may not be offered in {semester}.")
+        _status_cache[cache_key] = result
+        return result
 
     # Find the list of sections associated with the matched term.
     section_list_ul = term_header.find_next_sibling('ul')
     if not section_list_ul:
-        return {}, f"No section list found under the '{semester}' header for {course_code}."
+        result = ({}, f"No section list found under the '{semester}' header for {course_code}.")
+        _status_cache[cache_key] = result
+        return result
         
     section_lis = section_list_ul.select('li.search-nestedaccordionitem')
     if not section_lis:
-        return section_statuses, f"No sections found for {course_code} in {semester}."
+        result = (section_statuses, f"No sections found for {course_code} in {semester}.")
+        _status_cache[cache_key] = result
+        return result
     
     # Extract the status from each section within the term.
     for section_li in section_lis:
@@ -170,8 +187,11 @@ def get_live_section_status(course_code, semester, headless=True):
                 section_statuses[section_id] = {"status": "waitlisted", "details": status_value, "term": semester}
     
     if not section_statuses:
-        return {}, f"Could not parse status for any section of {course_code} in {semester}. The page structure may have changed."
+        result = ({}, f"Could not parse status for any section of {course_code} in {semester}.")
+        _status_cache[cache_key] = result
+        return result
 
+    _status_cache[cache_key] = (section_statuses, None)
     return section_statuses, None
 
 # This block allows the script to be run directly from the command line for testing purposes.
